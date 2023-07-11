@@ -102,6 +102,7 @@ function createNavbar(location) {
         login_button = document.createElement('td'),
         sign_up_button = document.createElement('td');
         logout_button = document.createElement('td');
+        profile_button = document.createElement('td');
 
     login_button.textContent = 'Login';
     login_button.className = 'pointer';
@@ -122,10 +123,17 @@ function createNavbar(location) {
         window.location.href = "/logout";
     };
 
+    profile_button.textContent = 'Profile';
+    profile_button.className = 'pointer';
+    profile_button.onclick = function() {
+        window.location.href = "/profile";
+    };
+
     
     tr.appendChild(login_button);
     tr.appendChild(sign_up_button);
     tr.appendChild(logout_button);
+    tr.appendChild(profile_button);
     tbody.appendChild(tr);
     table.appendChild(tbody);
     login.appendChild(table);

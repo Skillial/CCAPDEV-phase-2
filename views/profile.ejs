@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script src="/javascript/react.js"></script>
+        <title>
+            Display Name
+        </title>
+        <link rel="icon" href="../images/icon.png" sizes="32x32" type="image/png">
+        <script src="./javascript/profile.js"></script>
+        <link rel="stylesheet" type="text/css" href="/css/styles.css">
+	</head>
+	<body>
+		<script src="/javascript/navbar.js" type="text/javascript"></script>
+		<script>
+			createNavbar('');
+		</script>
+		<div class="border">
+			<div class="profile">
+				<aside>
+					<div>
+						<img src="./images/dark/file_not_found.png">
+					</div>
+					<main>
+						<%= user.username %> <!-- Display the user's display name -->
+					</main>
+					
+				</aside>
+				<div id="profile-details">
+					<main>
+					  About Me
+					</main>
+					<article align="justify">
+					  <%= user.aboutme %>
+					</article>
+					<script>
+					  <% if (user.posts.length > 0) { %>
+						<% user.posts.forEach((post) => { %>
+						  let title = '<%= post.title %>';
+						  let content = '<%= post.content %>';
+						  let postElement = createPost(title, content);
+						  $("#profile-details").append(postElement.spacer);
+						  $("#profile-details").append(postElement.title);
+						  $("#profile-details").append(postElement.content);
+						<% }) %>
+					  <% } else { %>
+						let title = 'No Posts';
+						let content = 'This user currently has no posts.';
+						let postElement = createPost(title, content);
+						$("#profile-details").append(postElement.spacer);
+						$("#profile-details").append(postElement.title);
+						$("#profile-details").append(postElement.content);
+					  <% } %>
+				  
+					//   <% if (user.comments.length > 0) { %>
+					// 	<% user.comments.forEach((comment) => { %>
+					// 	//   let commentContent = '<%= comment.content %>';
+					// 	//   let commentElement = createComment(commentContent);
+					// 	//   $("#profile-details").append(commentElement);
+					
+					// 	  //let title = '';
+					// 	  let content = '<%= comment.content %>';
+					// 	  let postElement = createPost(title, content);
+					// 	  $("#profile-details").append(postElement.spacer);
+					// 	  //$("#profile-details").append(postElement.title);
+					// 	  $("#profile-details").append(postElement.content);
+					// 	<% }) %>
+					//   <% } else { %>
+					// 	let title = 'No Comments';
+					// 	let content = 'This user currently has no posts.';
+					// 	let commentElement = createPost(title, content);
+					// 	$("#profile-details").append(postElement.spacer);
+					// 	$("#profile-details").append(postElement.title);
+					// 	$("#profile-details").append(postElement.content);
+					//   <% } %>
+					</script>
+				  </div>
+				  
+			</div>
+		</div>
+	</body>
+</html>
+	

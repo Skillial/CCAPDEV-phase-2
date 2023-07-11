@@ -18,11 +18,11 @@ const store = new MongoStore({
 });
 
 app.use(session({
-  name: 'example.sid',
-  secret: '123455',
+  name: process.env.SesNAME,
+  secret: process.env.SesSECRET,
   httpOnly: true,
   secure: true,
-  maxAge: 1000 * 60 * 60 * 11, //max age in milliseconds, currently set to 1 hr
+  maxAge: null,
   resave: false,
   saveUninitialized: true,
   store: store
@@ -57,6 +57,7 @@ app.get("/index", (req, res) => {
     console.log("LLLLLL");
     console.log(req.session.isLoggedIn);
     res.render("index");
+    req.session.userId = User.userId;
     //req.session.destroy();
   } else{res.redirect('/login')}
 });
@@ -92,12 +93,19 @@ app.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Invalid username or password." });
     }
     req.session.isLoggedIn = true;
+
+    if (!user._id) {
+      return res.status(500).json({ error: "An error occurred while retrieving user ID." });
+    }
+
+    req.session.userId = user._id;
+
     if (remember) {
       // Set a longer expiration time for the session cookie
       req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 21; // 21 days
     }
     
-    res.redirect("/index");
+    res.redirect("/profile");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred while logging in." });
@@ -129,16 +137,22 @@ app.post("/api/user", async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ error: "Username already exists." });
     }
+    
+    const user = new User({ username, password });
+    const savedUser = await user.save();
+    
+    // Assign the user's ID to the userId field
+    
+    savedUser.userId = savedUser._id;
+    await savedUser.save();
 
-    const newUser = new User({ username, password });
-    const savedUser = await newUser.save();
-    //req.session.isLoggedIn = true;
-    res.redirect("/login"); //maybe have a landing page that says "successfully created, you may now log in"
+    res.redirect("/login");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred while saving the user." });
   }
 });
+
 
 
 app.patch("/api/user/:id", async(req, res)=>{
@@ -150,6 +164,29 @@ app.get("/success", (req, res) => {
   // Render the success page
   res.render("success");
 });
+
+
+app.get("/profile", async (req, res) => {
+  try {
+    if (req.session.isLoggedIn) {
+      // Fetch user information from MongoDB based on the logged-in user's ID
+      const userId = req.session.userId;
+      const user = await User.findById(userId).populate('posts').populate('comments');
+      console.log(userId);
+      console.log(user);
+      // Render the profile page with the user's information
+      res.render("profile", { user });
+    } else {
+      // Redirect to the login page if not logged in
+      res.redirect("/login");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred while fetching user information." });
+  }
+});
+
+
 //To DO
 //patch user profile
 //post, patch, delete post
