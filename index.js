@@ -22,7 +22,7 @@ app.use(session({
   secret: '123455',
   httpOnly: true,
   secure: true,
-  maxAge: 1000 * 60 * 60 * 7, //max age in milliseconds, currently set to 7 hrs
+  maxAge: 1000 * 60 * 60 * 11, //max age in milliseconds, currently set to 1 hr
   resave: false,
   saveUninitialized: true,
   store: store
@@ -65,13 +65,6 @@ app.get("/index", (req, res) => {
 
 
 
-
-
-
-
-
-
-
 app.get("/index", (req, res)=>{
     res.render("index")
 })
@@ -87,21 +80,28 @@ app.get("/login", (req, res)=>{
 //logging in
 app.post("/login", async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, remember } = req.body;
     const user = await User.findOne({ username });
 
     // Check if the user exists and the password matches
     if (!user || user.password !== password) {
       return res.status(400).json({ error: "Invalid username or password." });
     }
+    
 
     req.session.isLoggedIn = true;
+    if (remember) {
+      // Set a longer expiration time for the session cookie
+      req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 21; // 21 days
+    }
+    
     res.redirect("/index");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred while logging in." });
   }
 });
+
 
 //registering
 app.post("/api/user", async (req, res) => {
@@ -118,8 +118,8 @@ app.post("/api/user", async (req, res) => {
 
     const newUser = new User({ username, password });
     const savedUser = await newUser.save();
-    req.session.isLoggedIn = true;
-    res.redirect("/index");
+    //req.session.isLoggedIn = true;
+    res.redirect("/login"); //maybe have a landing page that says "successfully created, you may now log in"
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred while saving the user." });
