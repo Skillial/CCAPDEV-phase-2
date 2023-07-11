@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="../styles.css">
+		<link rel="icon" href="../resources/icon.png" sizes="32x32" type="image/png">
+		<title>
+			Kinkey's Homepage
+		</title>
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script src="profile.js"></script>
+		<script src="../postView.js"></script>
+	</head>
+	<body>
+		<script src="../userView.js"></script>
+		<script src="../navbar.js" type="text/javascript"></script>
+		<script>
+			createNavbar('../');
+		</script>
+		<div class="border">
+			<div class="profile">
+				<aside>
+					<div>
+						<img src="../data/sample users/Kinkey.jpg">
+					</div>
+					<main>
+						Kinkey
+					</main>
+					<article>
+						@Kinkey
+					</article>
+				</aside>
+				<div id="profile-details">
+					<main>
+						About Me
+					</main>
+					<article align="justify" contenteditable="false" id="prof_info">
+						Welcome to my cozy corner of the foodie world! I'm a home cooking enthusiast who finds joy in creating delicious meals from scratch. From traditional family recipes to experimental kitchen creations, I'm always on the lookout for new flavors and techniques. Join me as we delve into the world of comforting home-cooked meals and exchange tips and tricks to elevate our culinary skills.
+					  </article>
+					  <div class="prof_button">
+							<div id="edit_Button">Edit</div>
+							<div id="save_Button" >Save</div>
+						</div>
+					  <script>
+						profButton();
+					  </script>
+					<br/>
+					<main>
+						Recent Posts
+					</main>
+					<script>
+						pauthor = 'Kinkey',    
+						ppfp = '../data/sample users/Kinkey.jpg',
+						pdesc = 'Hi! So I\'m a 17 year old who has been cooking for 2-3 years already but do not have much experience in prep work as my parents '+
+                                'usually do it for me. Late last year, I started taking charge of prepping when I cook and learned to chop more and more but I ' +
+                                'accidentally cut a chunk of my nail out which stopped me from chopping for a while. Recently, I have tried chopping again but ' +
+                                'my finger doesn\'t seem to trust me anymore. My brain tells me that I\'ll be fine and I just have to take it slow but my finger '+ 
+                                'tells me that it will slip again and chop myself. Any advice on how to get over this? I really wanna go back to chopping again as it\'s quite fun. ',
+		
+						pcount = '999';
+						let pid='1';
+						phtml='../data/sample posts/Advice_needed.html';
+						$('#profile-details').append(profpost(pauthor,ppfp,pdesc,pcount,pid,phtml) );
+					</script>
+					</script>
+					 <script>
+						pauthor = 'Kinkey',    
+						ppfp = '../data/sample users/Kinkey.jpg',
+						pdesc = 'El Poco Cantina in Estrada St. is one of my comfort places!!!!',
+						pcount = '1.5k';
+						pid='1';
+						phtml='../data/sample posts/Food_places_around_DLSU.html';
+						$('#profile-details').append(profpost(pauthor,ppfp,pdesc,pcount,pid,phtml) );
+					</script>
+					</script>
+					<script>
+						pauthor = 'Kinkey',    
+						ppfp = '../data/sample users/Kinkey.jpg',
+						pdesc = 'Adobo takes max 1hr and doesnt require you to do too much',
+						pcount = '1.5k';
+						 pid='1.1';
+						 phtml='../data/sample posts/Popular_Filipino_Dishes.html';
+						$('#profile-details').append(profpost(pauthor,ppfp,pdesc,pcount,pid,phtml) );
+					</script>
+					</script>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
+	

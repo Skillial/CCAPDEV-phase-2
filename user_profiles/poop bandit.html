@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="../styles.css">
+		<link rel="icon" href="../resources/icon.png" sizes="32x32" type="image/png">
+		<title>
+			poop bandit's Homepage
+		</title>
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script src="profile.js"></script>
+		<script src="../postView.js"></script>
+	</head>
+	<body>
+		<script src="../userView.js"></script>
+		<script src="../navbar.js" type="text/javascript"></script>
+		<script>
+			createNavbar('../');
+		</script>
+		<div class="border">
+			<div class="profile">
+				<aside>
+					<div>
+						<img src="../data/sample users/poop bandit.jpg">
+					</div>
+					<main>
+						poop bandit
+					</main>
+					<article>
+						@poop_bandit
+					</article>
+				</aside>
+				<div id="profile-details">
+					<main>
+						About Me
+					</main>
+					<article align="justify" contenteditable="false" id="prof_info">
+						Welcome to my virtual kitchen! I'm passionate about promoting a balanced and nourishing approach to food. As a health-conscious individual, I believe that what we eat plays a significant role in our overall well-being. Join me as we explore nutritious recipes, discuss mindful eating habits, and share tips on how to maintain a healthy lifestyle without compromising on flavor and enjoyment. Together, we can discover the art of fueling our bodies with wholesome goodness!
+					</article>
+					<div class="prof_button">
+						<div id="edit_Button">Edit</div>
+						<div id="save_Button" >Save</div>
+					</div>
+				  <script>
+					profButton();
+				  </script>
+					<br/>
+					<main>
+						Recent Posts
+					</main>
+					
+					<script>
+						pauthor = 'poop bandit',    
+						ppfp = '../data/sample users/poop bandit.jpg',
+						pdesc = 'Good Munch OG Agno stall',
+						pcount = '1.5k';
+						pid='2';
+						phtml='../data/sample posts/Food_places_around_DLSU.html';
+						$('#profile-details').append(profpost(pauthor,ppfp,pdesc,pcount,pid,phtml) );
+					</script>
+					<script>
+						pauthor = 'poop bandit',    
+						ppfp = '../data/sample users/poop bandit.jpg',
+						pdesc = 'Looks great',
+						pcount = '1.5k';
+						pid='2';
+						phtml='../data/sample posts/Showcasing_my_dish.html';
+						$('#profile-details').append(profpost(pauthor,ppfp,pdesc,pcount,pid,phtml) );
+					</script>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
+	

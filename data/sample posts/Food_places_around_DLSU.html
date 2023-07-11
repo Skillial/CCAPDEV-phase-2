@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script src="../../react.js"></script>
+        <script src="../../postView.js"></script>
+		<title>
+			Snacc
+		</title>
+		<link rel="icon" href="../../resources/icon.png" sizes="32x32" type="image/png">
+		<link rel="stylesheet" type="text/css" href="../../styles.css">
+	</head>
+	<body>
+		<script src="../../navbar.js"></script>
+		<script src="../../userView.js"></script>
+		<script>
+			createNavbar('../../');
+		</script>
+		<div class="border">
+			<div class="content_list">
+				
+			</div>
+            <script>
+				let pauthor = 'Matrix',
+                    ptitle = 'Food places around DLSU',
+					ppfp = '../sample users/Matrix.jpg',
+					pdesc = 'I\'m an incoming ID 123, any good places to eat around DLSU?',
+					pposted = 'yesterday',
+					pedited = 'today',
+                    ptags = 'Recommendation',
+					pcount = '999',
+                    pmedia= '';
+				$('.content_list').append(posthtml(pauthor,ptitle,ppfp,pdesc,pposted,pedited,ptags,pcount,pmedia) );
+			</script>
+
+            <script>
+                pauthor = 'Kinkey',    
+                ppfp = '../sample users/Kinkey.jpg',
+                pdesc = 'El Poco Cantina in Estrada St. is one of my comfort places!!!!',
+                pcount = '1.5k';
+                let pid='1';
+                $('.border').append(postreply(pauthor,ppfp,pdesc,pcount,pid) );
+            </script>
+            <script>
+                pauthor = 'Ecola',    
+                ppfp = '../sample users/Ecola.jpg',
+                pdesc = 'AGREEEEEE their quesabirrias are just too good :3',
+                pcount = '1.5k';
+                pid='1.1';
+                $('#1').append(postreply(pauthor,ppfp,pdesc,pcount,pid) );
+            </script>
+            <script>
+                pauthor = 'poop bandit',    
+                ppfp = '../sample users/poop bandit.jpg',
+                pdesc = 'Good Munch OG Agno stall',
+                pcount = '1.5k';
+                pid='2';
+                $('.border').append(postreply(pauthor,ppfp,pdesc,pcount,pid) );
+            </script>
+            <script>
+                pauthor = 'denial',    
+                ppfp = '../sample users/denial.jpg',
+                pdesc = 'Rosemary chicken>dirty porkchop>>>>>>>>>>everything else',
+                pcount = '1.5k';
+                pid='2.1';
+                $('#2').append(postreply(pauthor,ppfp,pdesc,pcount,pid) );
+            </script>
+            <script>
+                pauthor = 'Ecola',    
+                ppfp = '../sample users/Ecola.jpg',
+                pdesc = 'Check out Animo Eats to see more places!',
+                pcount = '1.5k';
+                pid='3';
+                $('.border').append(postreply(pauthor,ppfp,pdesc,pcount,pid) );
+            </script>
+
+		</div>
+	</body>
+</html>
+
+        

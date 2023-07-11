@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="styles.css">
+		<link rel="icon" href="resources/icon.png" sizes="32x32" type="image/png">
+		<title>
+			Display Name
+		</title>
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script src="profile.js"></script>
+	</head>
+	<body>
+		<script src="navbar.js" type="text/javascript"></script>
+		<script>
+			createNavbar('');
+		</script>
+		<div class="border">
+			<div class="profile">
+				<aside>
+					<div>
+						<img src="resources/dark/file_not_found.png">
+					</div>
+					<main>
+						Display Name
+					</main>
+					<article>
+						@username
+					</article>
+				</aside>
+				<div id="profile-details">
+					<main>
+						About Me
+					</main>
+					<article align="justify">
+						This is a sample profile template for new users. All users not manually hardcoded in will direct here (Will be updated in MCO2).
+					</article>
+					<script>
+						let title = 'No Posts';
+						let content = 'This user is hardcoded and currently has no posts.';
+						for (let i = 1; i <= 1; i++) {
+						title = 'No Posts';
+						let post  = createPost(title, content);
+						$("#profile-details").append(post.spacer);
+						$("#profile-details").append(post.title);
+						$("#profile-details").append(post.content);
+					}
+					</script>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
+	

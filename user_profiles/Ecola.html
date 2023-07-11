@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="../styles.css">
+		<link rel="icon" href="../resources/icon.png" sizes="32x32" type="image/png">
+		<title>
+			Ecola's Homepage
+		</title>
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script src="profile.js"></script>
+		<script src="../postView.js"></script>
+	</head>
+	<body>
+		<script src="../userView.js"></script>
+		<script src="../navbar.js" type="text/javascript"></script>
+		<script>
+			createNavbar('../');
+		</script>
+		<div class="border">
+			<div class="profile">
+				<aside>
+					<div>
+						<img src="../data/sample users/Ecola.jpg">
+					</div>
+					<main>
+						Ecola
+					</main>
+					<article>
+						@Ecola
+					</article>
+				</aside>
+				<div id="profile-details">
+					<main>
+						About Me
+					</main>
+					<article align="justify" contenteditable="false" id="prof_info">
+						Hi there! I'm a passionate foodie and a self-proclaimed gourmet explorer. I love embarking on culinary adventures, seeking out hidden gems, and trying diverse cuisines from around the world. Join me as I share my gastronomic escapades, restaurant reviews, and mouthwatering recipes that will surely tantalize your taste buds.
+					</article>
+					<div class="prof_button">
+						<div id="edit_Button">Edit</div>
+						<div id="save_Button" >Save</div>
+					</div>
+				  <script>
+					profButton();
+				  </script>
+					<br/>
+					<main>
+						Recent Posts
+					</main>
+					<script>
+						pauthor = 'Ecola',    
+						ppfp = '../data/sample users/Ecola.jpg',
+						pdesc = 'Look up some videos on YouTube on technique for how to hold the knife, where to rest it on your knuckle etc... and stick to it no matter '+
+								'how slow you are. With proper technique the risk of injury is extremely low. Let speed come naturally - don’t try to force it. Also make '+
+								'sure your knives are sharp',
+		
+						pcount = '1.5k';
+						let pid='1';
+						phtml='../data/sample posts/Advice_needed.html';
+						$('#profile-details').append(profpost(pauthor,ppfp,pdesc,pcount,pid,phtml) );
+					</script>
+					<script>
+						pauthor = 'Ecola',    
+						ppfp = '../data/sample users/Ecola.jpg',
+						pdesc = 'Kosher\'s grain size is generally larger and "less salty" than other salts. It\'s generrally used more during cooking. '+
+						'Iodized, otherwise known as table salt, is the refined version with some additives. (https://www.bonappetit.com/story/what-is-kosher-salt)',
+						pcount = '1.5k';
+						pid='1';
+						phtml='../data/sample posts/Differerent_salts.html';
+						$('#profile-details').append(profpost(pauthor,ppfp,pdesc,pcount,pid,phtml) );
+					</script>
+					<script>
+						pauthor = 'Ecola',    
+						ppfp = '../data/sample users/Ecola.jpg',
+						pdesc = 'AGREEEEEE their quesabirrias are just too good :3',
+						pcount = '1.5k';
+						pid='1.1';
+						phtml='../data/sample posts/Food_places_around_DLSU.html';
+						$('#profile-details').append(profpost(pauthor,ppfp,pdesc,pcount,pid,phtml) );
+					</script>
+					<script>
+						pauthor = 'Ecola',    
+						ppfp = '../data/sample users/Ecola.jpg',
+						pdesc = 'Check out Animo Eats to see more places!',
+						pcount = '1.5k';
+						pid='3';
+						phtml='../data/sample posts/Food_places_around_DLSU.html';
+						$('#profile-details').append(profpost(pauthor,ppfp,pdesc,pcount,pid,phtml) );
+					</script>
+					<script>
+						pauthor = 'Ecola',    
+						ppfp = '../data/sample users/Ecola.jpg',
+						pdesc = 'I tried my hand at cooking chicken. What do you all think?',
+						pcount = '5.3k';
+						pid='3';
+						phtml='../data/sample posts/Showcasing_my_dish.html';
+						$('#profile-details').append(profpost(pauthor,ppfp,pdesc,pcount,pid,phtml) );
+					</script>
+					
+				</div>
+			</div>
+		</div>
+		
+	</body>
+</html>
+	
