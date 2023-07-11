@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script src="/javascript/react.js"></script>
+        <title>
+            SnaccOverflow
+        </title>
+        <link rel="icon" href="../images/icon.png" sizes="32x32" type="image/png">
+        <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    </head>
+    <body>
+        <script src="/javascript/userView.js"></script>
+		<script src="/javascript/navbar.js" type="text/javascript"></script>
+		<script>
+			createNavbar('');
+		</script>
+
+        
+        <form method="POST" action="/login">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" required>
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" required>
+            <input type="submit" value="Login">
+          </form>
+          
+    </body>
+</html>

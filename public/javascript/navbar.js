@@ -41,8 +41,6 @@ var objPeople = [
 
 
 function createNavbar(location) {
-    //should only be false once - when the user view is of a visitor
-    //so i first need to make the visitor view?
 
     let navbar = document.createElement('div'),
         title = document.createElement('div'),
@@ -60,7 +58,7 @@ function createNavbar(location) {
 	search_button.className = 'search_button';
 	search_input.className = 'search_input'
     let home = document.createElement('a');
-    home.href = location + 'index.html';
+    home.href = "/index";;
     home.appendChild(logo);
     logo.setAttribute('height', '50px');
     logo.setAttribute('margin', 'auto');
@@ -89,8 +87,7 @@ function createNavbar(location) {
     search_button.appendChild(search_button_img);
 
     //maybe remove
-    if(isLoggedIn===false){
-        console.log(isLoggedIn); 
+    
 
     var table = document.createElement('table'),
         tbody = document.createElement('tbody'),
@@ -102,12 +99,12 @@ function createNavbar(location) {
     login_button.className = 'pointer';
     sign_up_button.className = 'pointer';
     login_button.onclick = function() {
-        showLogPopup();
+        window.location.href = "/login";
     };
 
     sign_up_button.textContent = 'Sign Up';
     sign_up_button.onclick = function() {
-        showSignPopup();
+      window.location.href = "/register";
     };
     tr.appendChild(login_button);
     tr.appendChild(sign_up_button);
@@ -426,7 +423,7 @@ function createNavbar(location) {
         return;
       }   
   }
-}
+
 
 function yes() {
 	console.log('yes')
