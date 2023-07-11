@@ -4,8 +4,7 @@ const UserSchema = new mongoose.Schema({
     photo: {type: String, default: 'link-to-noimage.png'}, //url to the pic or smth like that
     password: String,
     aboutme: {type: String, default: 'No information provided'},
-    remembered: {type: Boolean, default: false},
-    rememberedDaysRem: {type: Number, default: 0}
+    remembered: {type: Boolean, default: false}
 }, 
     {versionKey: false}
 )

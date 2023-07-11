@@ -53,13 +53,12 @@ app.use(express.static('public'));
 
 app.get("/index", (req, res) => {
   if (req.session?.isLoggedIn) {
+    console.log(req.sessionID);
     console.log("LLLLLL");
     console.log(req.session.isLoggedIn);
     res.render("index");
-  } else {
-    console.log("not logged in");
-    res.redirect("/login");
-  }
+    //req.session.destroy();
+  } else{res.redirect('/login')}
 });
 
 
@@ -76,6 +75,11 @@ app.get("/register", (req, res)=>{
 app.get("/login", (req, res)=>{
   res.render("login")
 })
+app.get("/logout", (req, res)=>{
+  req.session.destroy();
+  console.log("not logged in");
+  res.render("logout")
+})
 
 //logging in
 app.post("/login", async (req, res) => {
@@ -87,8 +91,6 @@ app.post("/login", async (req, res) => {
     if (!user || user.password !== password) {
       return res.status(400).json({ error: "Invalid username or password." });
     }
-    
-
     req.session.isLoggedIn = true;
     if (remember) {
       // Set a longer expiration time for the session cookie
@@ -102,6 +104,18 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.post("/logout", async (req, res) => {
+  try {
+      req.session.destroy();
+      req.session.isLoggedIn=false;
+      res.redirect("/logout");
+  } catch (err) {
+      console.error('Error logging out:', err);
+      return next(new Error('Error logging out'));
+  }
+  
+  res.status(200).send();
+})
 
 //registering
 app.post("/api/user", async (req, res) => {
@@ -143,3 +157,5 @@ app.get("/success", (req, res) => {
 //add reaction
 //patch/remove reaction
 
+//DONE
+//login, signup, logout (still need to fix some things)

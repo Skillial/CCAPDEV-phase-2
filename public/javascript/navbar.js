@@ -1,11 +1,11 @@
 // const express = require('express');
 // const session = require('express-session');
 // const app = express();
-const { isLoggedInMiddleware } = import('../lib/middleware');
+//const { isLoggedInMiddleware } = import('../lib/middleware');
 //app.use(isLoggedInMiddleware);
-if(remember){
-  console.log("i remember");
-}
+//if(remember)
+  //console.log("i remember");
+
 function showSignPopup() {
     hideLogPopup();
     document.getElementById("sign_pop").style.display = "block";
@@ -101,10 +101,12 @@ function createNavbar(location) {
         tr = document.createElement('tr'),
         login_button = document.createElement('td'),
         sign_up_button = document.createElement('td');
+        logout_button = document.createElement('td');
 
     login_button.textContent = 'Login';
     login_button.className = 'pointer';
     sign_up_button.className = 'pointer';
+
     login_button.onclick = function() {
         window.location.href = "/login";
     };
@@ -113,8 +115,17 @@ function createNavbar(location) {
     sign_up_button.onclick = function() {
       window.location.href = "/register";
     };
+
+    logout_button.textContent = 'Log Out';
+    logout_button.className = 'pointer';
+    logout_button.onclick = function() {
+        window.location.href = "/logout";
+    };
+
+    
     tr.appendChild(login_button);
     tr.appendChild(sign_up_button);
+    tr.appendChild(logout_button);
     tbody.appendChild(tr);
     table.appendChild(tbody);
     login.appendChild(table);
@@ -125,11 +136,11 @@ function createNavbar(location) {
     navbar.appendChild(search_bar);
     navbar.appendChild(login);
 
+    
+
     document.body.appendChild(navbar);
 
-
-      
-      
+    
   }
 
 
