@@ -1,12 +1,12 @@
 //To DO
-//patch user profile --> doesnt work
-//post, patch, delete post
+//patch profile --> doesnt work
+//patch, delete post
 //post, patch, delete comment
-//add reaction
-//patch/remove reaction
+//add reaction patch/remove reaction
 
-//DONE
-//login, signup, logout (still need to fix some things)
+//SEMI-Done
+//login, signup, logout (mostly just need to fix landing pages, especially if kapag may error)
+//post post -> needs links and implementation in homepage
 
 require('dotenv').config();
 const link = process.env.DB_URL;
@@ -198,11 +198,6 @@ app.post("/api/user", async (req, res) => {
 });
 
 
-
-// app.patch("/api/user/:id", async(req, res)=>{
-//   const data = await User.findByIdAndUpdate(req.params.id, req.body, {new:true,})
-//   res.json(data)
-// })
 
 app.get("/success", (req, res) => {
   // Render the success page
