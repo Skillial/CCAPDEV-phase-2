@@ -4,7 +4,7 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script src="/javascript/react.js"></script>
         <title>
-            Display Name
+            My Profile - SnaccOverflow
         </title>
         <link rel="icon" href="../images/icon.png" sizes="32x32" type="image/png">
         <script src="./javascript/profile.js"></script>
@@ -24,7 +24,7 @@
 					<main>
 						<%= user.username %> <!-- Display the user's display name -->
 					</main>
-					
+					<button onclick="window.location.href = '/profile/edit';">Edit Profile</button>
 				</aside>
 				<div id="profile-details">
 					<main>
@@ -33,49 +33,51 @@
 					<article align="justify">
 					  <%= user.aboutme %>
 					</article>
+					
 					<script>
 					  <% if (user.posts.length > 0) { %>
 						<% user.posts.forEach((post) => { %>
 						  let title = '<%= post.title %>';
 						  let content = '<%= post.content %>';
+						  let createDate = '<%= post.dateCreated %>'
 						  let postElement = createPost(title, content);
 						  $("#profile-details").append(postElement.spacer);
 						  $("#profile-details").append(postElement.title);
 						  $("#profile-details").append(postElement.content);
+						  $("#profile-details").append(postElement.createDate);
 						<% }) %>
 					  <% } else { %>
-						let title = 'No Posts';
-						let content = 'This user currently has no posts.';
-						let postElement = createPost(title, content);
+						let titlePost = 'No Posts';
+						let contentPost = 'This user currently has no posts.';
+						let postElement = createPost(titlePost, contentPost);
+						$("#profile-details").append(postElement.spacer);
+						$("#profile-details").append(postElement.titlePost);
+						$("#profile-details").append(postElement.contentPost);
+					  <% } %>
+				  
+					  <% if (user.comments.length > 0) { %>
+						<% user.comments.forEach((comment) => { %>
+							let commentContent = '<%= comment.content %>';
+							let createDate = '<%= comment.dateCreated %>'
+							let commentElement = createComment(commentContent);
+
+							$("#profile-details").append(commentElement.spacer);
+							$("#profile-details").append(commentElement.content);
+							$("#profile-details").append(commentElement.createDate);
+						<% }) %>
+					  <% } else { %>
+						let titleComment = 'No Comments';
+						let contentComment = 'This user currently has no commented posts.';
+						let commentElement = createPost(titleComment, contentComment);
 						$("#profile-details").append(postElement.spacer);
 						$("#profile-details").append(postElement.title);
 						$("#profile-details").append(postElement.content);
 					  <% } %>
-				  
-					//   <% if (user.comments.length > 0) { %>
-					// 	<% user.comments.forEach((comment) => { %>
-					// 	//   let commentContent = '<%= comment.content %>';
-					// 	//   let commentElement = createComment(commentContent);
-					// 	//   $("#profile-details").append(commentElement);
-					
-					// 	  //let title = '';
-					// 	  let content = '<%= comment.content %>';
-					// 	  let postElement = createPost(title, content);
-					// 	  $("#profile-details").append(postElement.spacer);
-					// 	  //$("#profile-details").append(postElement.title);
-					// 	  $("#profile-details").append(postElement.content);
-					// 	<% }) %>
-					//   <% } else { %>
-					// 	let title = 'No Comments';
-					// 	let content = 'This user currently has no posts.';
-					// 	let commentElement = createPost(title, content);
-					// 	$("#profile-details").append(postElement.spacer);
-					// 	$("#profile-details").append(postElement.title);
-					// 	$("#profile-details").append(postElement.content);
-					//   <% } %>
 					</script>
+
+					
 				  </div>
-				  
+				 
 			</div>
 		</div>
 	</body>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script src="/javascript/react.js"></script>
+        <title>
+            Edit My Profile - SnaccOverflow
+        </title>
+        <link rel="icon" href="../images/icon.png" sizes="32x32" type="image/png">
+        <script src="../javascript/profile.js"></script>
+        <link rel="stylesheet" type="text/css" href="/css/styles.css">
+	</head>
+	<body>
+		<script src="/javascript/navbar.js" type="text/javascript"></script>
+		<script>
+			createNavbar('');
+		</script>
+    <div class="border">
+        <!-- <form id="profile-form" action="/profile/edit" method="PATCH">
+            <input type="text" name="username" value="<%= user.username %>" placeholder = "Enter new username">
+            <input type="text" name="aboutme" value="<%= user.aboutme %>">
+            <input type="text" name="photo" value="<%= user.photo %>">
+             <input type="password" name="password" placeholder="Enter new password">
+            <input type="password" name="repassword" placeholder="Re Enter new password"> 
+            <button type="submit">Save Changes</button>
+          </form> -->
+
+          <form id="profile-form" action="/profile/edit/<%= user._id %>" method="PATCH">
+            <input type="hidden" name="_method" value="PATCH">
+            <input type="text" name="username" value="<%= user.username %>" placeholder="Enter new username">
+            <!-- <input type="text" name="aboutme" value="<%= user.aboutme %>" placeholder="Enter new aboutme">
+            <input type="text" name="photo" value="<%= user.photo %>" placeholder="Enter new photo">
+            <input type="password" name="password" placeholder="Enter new password">
+            <input type="password" name="repassword" placeholder="Re-enter new password"> -->
+            <button type="submit">Save Changes</button>
+          </form>
+          
+          
+          
+    </div>
+
+
+
+
+
+
+
+    </body>
+</html>
+        

@@ -1,3 +1,13 @@
+//To DO
+//patch user profile --> doesnt work
+//post, patch, delete post
+//post, patch, delete comment
+//add reaction
+//patch/remove reaction
+
+//DONE
+//login, signup, logout (still need to fix some things)
+
 require('dotenv').config();
 const link = process.env.DB_URL;
 
@@ -7,16 +17,21 @@ const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongodb-session')(session);
 const app = express();
+const store = new MongoStore({
+  uri: link,
+  collection: 'sessions'
+});
+
 
 const bodyParser = require('body-parser')
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}));
 
-const store = new MongoStore({
-    uri: link,
-    collection: 'sessions'
-});
-
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
+app.set("view engine", "ejs")
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
   name: process.env.SesNAME,
   secret: process.env.SesSECRET,
@@ -27,8 +42,8 @@ app.use(session({
   saveUninitialized: true,
   store: store
 }));
-app.use(isLoggedInMiddleware);
-
+const methodOverride = require('method-override');
+app.use(methodOverride('_method'));
 
 
 const mongoose = require('mongoose');
@@ -45,10 +60,7 @@ const Comment = require('./models/Comment')
 const Post = require('./models/Post')
 const React = require('./models/React')
 
-app.use(express.json())
-app.use(express.urlencoded({extended: true}))
-app.set("view engine", "ejs")
-app.use(express.static('public'));
+
 
 
 app.get("/index", (req, res) => {
@@ -61,9 +73,7 @@ app.get("/index", (req, res) => {
     //req.session.destroy();
   } else{res.redirect('/login')}
 });
-
-
-
+app.use(isLoggedInMiddleware);
 
 app.get("/index", (req, res)=>{
     res.render("index")
@@ -72,7 +82,9 @@ app.get("/index", (req, res)=>{
 app.get("/register", (req, res)=>{
   res.render("register")
 })
-//app.use(authRoutes);
+app.get("/success", (req, res)=>{
+  res.render("success")
+})
 app.get("/login", (req, res)=>{
   res.render("login")
 })
@@ -81,6 +93,37 @@ app.get("/logout", (req, res)=>{
   console.log("not logged in");
   res.render("logout")
 })
+
+app.get("/profile/edit/:id", async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const user = await User.findById(userId);
+
+    res.render("profile-edit", { user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred while fetching user information." });
+  }
+});
+
+app.get("/newPost", (req, res)=>{
+  res.render("newPost")
+})
+
+app.get("/editPost", (req, res)=>{
+  res.render("editPost")
+})
+
+app.get("/newComment", (req, res)=>{
+  res.render("newComment")
+})
+
+app.get("/editComment", (req, res)=>{
+  res.render("editComment")
+})
+
+
+
 
 //logging in
 app.post("/login", async (req, res) => {
@@ -102,6 +145,7 @@ app.post("/login", async (req, res) => {
 
     if (remember) {
       // Set a longer expiration time for the session cookie
+      console.log(remember)
       req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 21; // 21 days
     }
     
@@ -146,7 +190,7 @@ app.post("/api/user", async (req, res) => {
     savedUser.userId = savedUser._id;
     await savedUser.save();
 
-    res.redirect("/login");
+    res.redirect("/success");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred while saving the user." });
@@ -155,10 +199,10 @@ app.post("/api/user", async (req, res) => {
 
 
 
-app.patch("/api/user/:id", async(req, res)=>{
-  const data = await User.findByIdAndUpdate(req.params.id, req.body, {new:true,})
-  res.json(data)
-})
+// app.patch("/api/user/:id", async(req, res)=>{
+//   const data = await User.findByIdAndUpdate(req.params.id, req.body, {new:true,})
+//   res.json(data)
+// })
 
 app.get("/success", (req, res) => {
   // Render the success page
@@ -171,7 +215,10 @@ app.get("/profile", async (req, res) => {
     if (req.session.isLoggedIn) {
       // Fetch user information from MongoDB based on the logged-in user's ID
       const userId = req.session.userId;
-      const user = await User.findById(userId).populate('posts').populate('comments');
+      
+      const user = await User.findById(userId);
+      const posts = await Post.find({ userID: userId }).exec()
+      user.posts = posts;
       console.log(userId);
       console.log(user);
       // Render the profile page with the user's information
@@ -186,13 +233,64 @@ app.get("/profile", async (req, res) => {
   }
 });
 
+app.patch("/profile/edit/:id", async(req, res) =>{
+  try {
+    if (req.session.isLoggedIn) {
+      if (req.body._method === "PATCH") {
+        const { username, photo, aboutme, password ,repassword } = req.body;
 
-//To DO
-//patch user profile
-//post, patch, delete post
-//post, patch, delete comment
-//add reaction
-//patch/remove reaction
+        // Fetch the user information from the database
+        const userId = req.session.userId;
+        const user = await User.findById(userId);
 
-//DONE
-//login, signup, logout (still need to fix some things)
+        user.username = username;
+        user.aboutme = aboutme;
+        user.password = password;
+        user.photo = photo;
+
+        await user.save();
+
+        // Redirect back to the profile page
+        res.redirect("/profile");
+      }else {
+        res.status(400).json({ error: "Invalid request method." });
+      }
+    } else {
+      // Redirect to the login page if not logged in
+      res.redirect("/login");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred while updating the profile." });
+  }
+});
+
+
+app.post("/api/post", async(req, res) =>{
+  try {
+    if (req.session.isLoggedIn) {
+        const userId = req.session.userId;
+        const user = await User.findById(userId);
+        const { title, content, createDate } = req.body;
+
+          // Create a new post object
+        const newPost = new Post({
+          userID: user._id,
+          title,
+          content,
+          createDate,
+        });
+
+      // Save the new post object to the database
+      await newPost.save();
+        res.redirect("/index");
+    } else {
+      // Redirect to the login page if not logged in
+      //also shud display a message "you need to login first!"
+      res.redirect("/login");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred while updating the profile." });
+  }
+})

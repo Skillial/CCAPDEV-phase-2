@@ -16,7 +16,8 @@
     <div class="content_list" id="forum">
     <div class="headers">
         All Snaccs
-        <button class="newPost" id="newPostWrite">+ New Snacc</button>	
+        <button class="newPost" id="newPostWrite">+ New Snacc old</button>	
+        <a href="/newPost" class="newPost" id="newPostWrite">+New Snacc</a>
     </div>
     
     <hr>
@@ -39,27 +40,26 @@
         </table>
     </div>
     <div id="newPostFormContainer">
-        <h2>New Post</h2>
-        <form id="postForm">
-            <label for="postTitle">Title:</label>
-            <input type="text" id="postTitle" name="postTitle" required>
-            
-            <label for="postContent">Content:</label>
-            <textarea id="postContent" name="postContent" required></textarea>
-            <label for="media">Media:</label>
-            <input type="file" id="media" name="media">
-            <label for="tag">Tag:</label>
-            
+        <h2>New Post old</h2>
+        <form id="postForm" method="POST" action="<%= '/api/post' %>">
+            <label for="title">Title:</label>
+            <input type="text" id="postTitle" name="title" required>
+            <label for="content">Content:</label>
+            <textarea id="postContent" name="content" required></textarea>
+            <label for="content">Media:</label>
+            <input type="file" id="postMedia" name="media">
             <div class="flex">
                 <button class="newPostButtons" type="submit">Post</button>
                 <button class="newPostButtons" type="reset">Clear</button>
                 <button class="newPostButtons" id="cancelButton">Cancel</button>
                 
-                <button class="cancel" id="yCancelButton">Yes</button>
-                <button class="cancel" id="nCancelButton">No</button>
+                <button class="cancel" id="yCancelButton">Confirm Cancel</button>
+                <button class="cancel" id="nCancelButton">Deny Cancel</button>
             </div>
           </form>
-      </div>
+          
+    </div>
+    
     <script src="./javascript/newPost.js"></script>
     
     <script>

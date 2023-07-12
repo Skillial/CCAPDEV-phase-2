@@ -4,7 +4,7 @@ const PostSchema = new mongoose.Schema({
   title: String,
   content: String,
   createDate: Date,
-  isDeleted: Boolean
+  isDeleted: {type: Boolean, default: false}
 }, {versionKey: false}
 );
 

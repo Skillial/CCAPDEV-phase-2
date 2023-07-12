@@ -69,8 +69,8 @@ function createNavbar(location) {
     home.appendChild(logo);
     logo.setAttribute('height', '50px');
     logo.setAttribute('margin', 'auto');
-    logo.src = location + './images/dark/logo.png';
-    search_button_img.src = location + './images/search.png';
+    logo.src = location + '../images/dark/logo.png';
+    search_button_img.src = location + '../images/search.png';
     title.className = 'title';
     search_bar.className = 'searchbar';
 
