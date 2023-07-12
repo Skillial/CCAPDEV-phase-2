@@ -94,7 +94,7 @@ app.get("/logout", (req, res)=>{
   res.render("logout")
 })
 
-app.get("/profile/edit/:id", async (req, res) => {
+app.get("/profile/edit/", async (req, res) => {
   try {
     const userId = req.session.userId;
     const user = await User.findById(userId);
@@ -212,7 +212,7 @@ app.get("/profile", async (req, res) => {
       const userId = req.session.userId;
       
       const user = await User.findById(userId);
-      const posts = await Post.find({ userID: userId }).exec()
+      const posts = await Post.find({ userID: userId, isDeleted:false }).exec()
       user.posts = posts;
       console.log(userId);
       console.log(user);
@@ -228,7 +228,7 @@ app.get("/profile", async (req, res) => {
   }
 });
 
-app.patch("/profile/edit/:id", async(req, res) =>{
+app.patch("/profile/edit/", async(req, res) =>{
   try {
     if (req.session.isLoggedIn) {
       if (req.body._method === "PATCH") {
@@ -274,6 +274,41 @@ app.post("/api/post", async(req, res) =>{
           title,
           content,
           createDate,
+        });
+
+      // Save the new post object to the database
+      await newPost.save();
+        res.redirect("/index");
+    } else {
+      // Redirect to the login page if not logged in
+      //also shud display a message "you need to login first!"
+      res.redirect("/login");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred while updating the profile." });
+  }
+})
+
+
+
+//UNTESTED
+
+
+app.post("/api/comment", async(req, res) =>{
+  try {
+    if (req.session.isLoggedIn) {
+        const userId = req.session.userId;
+        const user = await User.findById(userId);
+        const { content, parentPostId, parentCommentId } = req.body;
+
+        //To Add: get  the parent post and parent comment
+          // Create a new comment object
+        const newComment = new Comment({
+          userID: user._id,
+          content,
+          parentPost: parentPostId, // Add the parent post if available
+          parentComment: parentCommentId, // Add the parent comment if available
         });
 
       // Save the new post object to the database

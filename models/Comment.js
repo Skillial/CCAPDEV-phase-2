@@ -6,8 +6,8 @@ const CommentSchema = new mongoose.Schema({
   //can be null? but if both are null then surely we can just summarize comment and post into 1 js?
   //thhat would make react.js easier as well?
   content: String,
-  createDate: Date,
-  isDeleted: Boolean
+  createDate: {type: Date, default: Date.now()},
+  isDeleted: {type: Boolean, default: false}
   //if we summarize Post.js and Comment.js into one, uncomment next line:
   //comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'post' }] 
   //pero having arrays is kinda bad?
