@@ -440,9 +440,9 @@ function profpost(pauthor,ppfp,pdesc,pcount,pid,phtml){
     comment_pfp.className = 'comment_pfp';
     comment_content_desc.className = 'comment_content_desc';
     comment_react.className='comment_react';
-    comment_like.className='comment_like';
+    comment_like.className='comment_like comment_like-hover';
     comment_count.className='comment_count';
-    comment_dislike.className='comment_dislike';
+    comment_dislike.className='comment_dislike comment_dislike-hover';
     comment_reply.className='comment_reply';
     comment_share.className='comment_share';
     comment_edit.className='comment_edit';

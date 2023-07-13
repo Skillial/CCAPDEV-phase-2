@@ -400,12 +400,9 @@ button.cancel{
 	margin:auto;
 	cursor: pointer;
 }
-.like:hover{
+.like-hover:hover{
 	background-image: url("./../images/reacts/up.png");
 }
-.no-hover {
-	pointer-events: none;	
-  }
 
 .dislike{
 	background-image: url("./../images/reacts/no_down.png");
@@ -416,7 +413,7 @@ button.cancel{
 	margin:auto;
 	cursor: pointer;
 }
-.dislike:hover{
+.dislike-hover:hover{
 	background-image: url("./../images/reacts/down.png");
 }
 
@@ -605,7 +602,7 @@ hr{
 	background-size:contain; 
 	margin-right: 5px;
 }
-.comment_like:hover{
+.comment_like-hover:hover{
 	background-image: url("./../images/reacts/up.png");
 }
 .comment_dislike{
@@ -616,7 +613,7 @@ hr{
 	background-size:contain; 
 	margin-right: 25px;
 }
-.comment_dislike:hover{
+.comment_dislike-hover:hover{
 	background-image: url("./../images/reacts/down.png");
 }
 
