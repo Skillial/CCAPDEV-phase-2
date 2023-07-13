@@ -63,15 +63,25 @@ const React = require('./models/React')
 
 
 
-app.get("/index", (req, res) => {
+app.get("/index", async (req, res) => {
   if (req.session?.isLoggedIn) {
     console.log(req.sessionID);
-    console.log("LLLLLL");
     console.log(req.session.isLoggedIn);
-    res.render("index");
     req.session.userId = User.userId;
+    const posts = await Post.find().limit(0); 
+    res.render("index", { posts });
+    //res.render("index");
     //req.session.destroy();
-  } else{res.redirect('/login')}
+  } else{
+    //res.redirect('/login')
+    console.log("Currently not logged in, showing a limited number of posts!")
+    const limit = 20; // Change the limit value as needed
+    const posts = await Post.find().limit(limit);
+      
+    // Render the index template with the limited posts data
+    res.render("index", { posts });
+
+  }
 });
 app.use(isLoggedInMiddleware);
 
@@ -228,7 +238,7 @@ app.get("/profile", async (req, res) => {
   }
 });
 
-app.patch("/profile/edit/", async(req, res) =>{
+app.patch("/api/user/:username", async(req, res) =>{
   try {
     if (req.session.isLoggedIn) {
       if (req.body._method === "PATCH") {
@@ -260,7 +270,7 @@ app.patch("/profile/edit/", async(req, res) =>{
   }
 });
 
-
+//new post (save to db)
 app.post("/api/post", async(req, res) =>{
   try {
     if (req.session.isLoggedIn) {
@@ -321,6 +331,6 @@ app.post("/api/comment", async(req, res) =>{
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while updating the profile." });
+    res.status(500).json({ error: "An error occurred." });
   }
 })

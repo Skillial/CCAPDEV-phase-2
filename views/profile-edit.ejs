@@ -25,25 +25,17 @@
             <button type="submit">Save Changes</button>
           </form> -->
 
-          <form id="profile-form" action="/profile/edit/<%= user._id %>" method="PATCH">
-            <input type="hidden" name="_method" value="PATCH">
+          <form id="profile-form" action="/api/user/<%= user.username %>" method="PATCH"> <!--can i do this differently?-->
+            <!--input type="hidden" name="_method" value="PATCH"-->
             <input type="text" name="username" value="<%= user.username %>" placeholder="Enter new username">
             <!-- <input type="text" name="aboutme" value="<%= user.aboutme %>" placeholder="Enter new aboutme">
             <input type="text" name="photo" value="<%= user.photo %>" placeholder="Enter new photo">
             <input type="password" name="password" placeholder="Enter new password">
             <input type="password" name="repassword" placeholder="Re-enter new password"> -->
             <button type="submit">Save Changes</button>
-          </form>
-          
-          
+          </form>      
           
     </div>
-
-
-
-
-
-
 
     </body>
 </html>
