@@ -12,7 +12,7 @@ require('dotenv').config();
 const link = process.env.DB_URL;
 const authRoutes = require('./sessions/router');
 const { isLoggedInMiddleware } = require('./lib/middleware');
-//const { userIDMiddleware } = require('./lib/middleware');
+const { userIDMiddleware } = require('./lib/middleware');
 const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongodb-session')(session);
@@ -38,7 +38,6 @@ app.use(session({
   secret: process.env.SesSECRET,
   httpOnly: true,
   secure: true,
-  maxAge: null,
   resave: false,
   saveUninitialized: true,
   store: store
@@ -64,12 +63,13 @@ const React = require('./models/React')
 
 
 app.use(isLoggedInMiddleware);
+app.use(userIDMiddleware);
 app.get("/index", async (req, res) => {
   if (req.session?.isLoggedIn) {
     console.log(req.sessionID);
     console.log(req.session.isLoggedIn);
-    req.session.userId = User.userId;
-    const posts = await Post.find().limit(0); 
+    //const posts = await Post.find().limit(0); 
+    posts = [];
     res.render("index", { posts });
     //res.render("index");
     //req.session.destroy();
@@ -157,6 +157,8 @@ app.post("/login", async (req, res) => {
       // Set a longer expiration time for the session cookie
       console.log(remember)
       req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 21; // 21 days
+    }else{
+      req.session.cookie.expires = null; //idk why it doesnt work lol
     }
     //res.redirect("/index");
     res.redirect("/profile");
