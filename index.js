@@ -10,13 +10,13 @@
 
 require('dotenv').config();
 const link = process.env.DB_URL;
-
 const authRoutes = require('./sessions/router');
 const { isLoggedInMiddleware } = require('./lib/middleware');
 const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongodb-session')(session);
 const app = express();
+
 const store = new MongoStore({
   uri: link,
   collection: 'sessions'
@@ -62,7 +62,7 @@ const React = require('./models/React')
 
 
 
-
+app.use(isLoggedInMiddleware);
 app.get("/index", async (req, res) => {
   if (req.session?.isLoggedIn) {
     console.log(req.sessionID);
@@ -79,11 +79,11 @@ app.get("/index", async (req, res) => {
     const posts = await Post.find().limit(limit);
       
     // Render the index template with the limited posts data
-    res.render("index", { posts });
+    res.render("index", { posts});
 
   }
 });
-app.use(isLoggedInMiddleware);
+
 
 app.get("/index", (req, res)=>{
     res.render("index")

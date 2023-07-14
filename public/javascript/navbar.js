@@ -47,7 +47,7 @@ var objPeople = [
 ]
 
 
-function createNavbar(location) {
+function createNavbar(location,isLoggedIn) {
 
     let navbar = document.createElement('div'),
         title = document.createElement('div'),
@@ -107,7 +107,6 @@ function createNavbar(location) {
     login_button.textContent = 'Login';
     login_button.className = 'pointer';
     sign_up_button.className = 'pointer';
-
     login_button.onclick = function() {
         window.location.href = "/login";
     };
@@ -128,12 +127,23 @@ function createNavbar(location) {
     profile_button.onclick = function() {
         window.location.href = "/profile";
     };
-
+    if (isLoggedIn){
+        login_button.style.display='none';
+        sign_up_button.style.display='none';
+        // logout_button.style.display='block';
+        // profile_button.style.display='block';
+    }else{
+        // login_button.style.display='block';
+        // sign_up_button.style.display='block';
+        logout_button.style.display='none';
+        profile_button.style.display='none';
+    }
     
     tr.appendChild(login_button);
     tr.appendChild(sign_up_button);
-    tr.appendChild(logout_button);
     tr.appendChild(profile_button);
+    tr.appendChild(logout_button);
+    
     tbody.appendChild(tr);
     table.appendChild(tbody);
     login.appendChild(table);
