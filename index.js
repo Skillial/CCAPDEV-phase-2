@@ -68,13 +68,11 @@ app.get("/index", async (req, res) => {
   if (req.session?.isLoggedIn) {
     console.log(req.sessionID);
     console.log(req.session.isLoggedIn);
-    //const posts = await Post.find().limit(0); 
-    posts = [];
+    const userId = req.session.userId;
+    console.log(userId);
+    const posts = await Post.find().limit(0); 
     res.render("index", { posts });
-    //res.render("index");
-    //req.session.destroy();
   } else{
-    //res.redirect('/login')
     console.log("Currently not logged in, showing a limited number of posts!")
     const limit = 20; // Change the limit value as needed
     const posts = await Post.find().limit(limit);
