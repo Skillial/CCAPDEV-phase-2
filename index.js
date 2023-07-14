@@ -12,6 +12,7 @@ require('dotenv').config();
 const link = process.env.DB_URL;
 const authRoutes = require('./sessions/router');
 const { isLoggedInMiddleware } = require('./lib/middleware');
+//const { userIDMiddleware } = require('./lib/middleware');
 const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongodb-session')(session);
@@ -145,20 +146,19 @@ app.post("/login", async (req, res) => {
     if (!user || user.password !== password) {
       return res.status(400).json({ error: "Invalid username or password." });
     }
-    req.session.isLoggedIn = true;
-
     if (!user._id) {
       return res.status(500).json({ error: "An error occurred while retrieving user ID." });
     }
+    req.session.isLoggedIn = true;
 
     req.session.userId = user._id;
-
+    console.log("user id of session: ", req.session.userId)
     if (remember) {
       // Set a longer expiration time for the session cookie
       console.log(remember)
       req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 21; // 21 days
     }
-    
+    //res.redirect("/index");
     res.redirect("/profile");
   } catch (error) {
     console.error(error);
@@ -214,16 +214,29 @@ app.get("/success", (req, res) => {
   res.render("success");
 });
 
+let user, posts;
 
 app.get("/profile", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
       // Fetch user information from MongoDB based on the logged-in user's ID
-      const userId = req.session.userId;
       
-      const user = await User.findById(userId);
-      const posts = await Post.find({ userID: userId, isDeleted:false }).exec()
-      user.posts = posts;
+      const userId = req.session.userId;
+      console.log(userId);
+      user = await User.findById(userId);
+      posts = await Post.find({ userID: userId, isDeleted:false })
+      console.log("session id: ", req.sessionID);
+      //console.log("profile of ", user.username);
+      console.log(posts !== null);
+      
+      console.log(posts);
+      if(posts.length === 0){
+        user.posts = user.posts;
+      }
+      else{
+        user.posts = posts;
+      }
+      
       console.log(userId);
       console.log(user);
       // Render the profile page with the user's information
@@ -257,6 +270,7 @@ app.patch("/api/user/:username", async(req, res) =>{
 
         // Redirect back to the profile page
         res.redirect("/profile");
+        //res.redirect("/index");
       }else {
         res.status(400).json({ error: "Invalid request method." });
       }
