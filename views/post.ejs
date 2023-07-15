@@ -3,17 +3,17 @@
     <head>
 		<meta charset="UTF-8">
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-		<script src="../../react.js"></script>
-        <script src="../../postView.js"></script>
+		<script src="/javascript/react.js"></script>
+        <script src="/javascript/postView.js"></script>
 		<title>
-			Snacc
+			<%= post.title %>
 		</title>
-		<link rel="icon" href="../../resources/icon.png" sizes="32x32" type="image/png">
-		<link rel="stylesheet" type="text/css" href="../../styles.css">
+        <link rel="icon" href="../images/icon.png" sizes="32x32" type="image/png">
+        <link rel="stylesheet" type="text/css" href="/css/styles.css">
 	</head>
 	<body>
-		<script src="../../navbar.js"></script>
-		<script src="../../userView.js"></script>
+		<script src="/javascriptuserView.js"></script>
+        <script src="/javascript/navbar.js" type="text/javascript"></script>
 		<script>
 			createNavbar('../../' ,<%= isLoggedIn %>);
 		</script>
@@ -21,8 +21,27 @@
 			<div class="content_list">
 			
 			</div>
-
             <script>
+                let pauthor = '<%= post.author %>',
+                    ptitle = '<%= post.title %>',
+                    pdesc = '<%= post.content %>',
+                    ppostedDate = new Date('<%= post.createDate %>').toLocaleString();
+                    let peditedDate = '<%= post.editDate %>';
+                    if (peditedDate) {
+                        peditedDate = new Date(peditedDate).toLocaleString();
+                    } else {
+                        peditedDate = '- Not Edited'; //not edited
+                    }
+                    ptags = '<%= post.tags %>', //remove
+                    pcount = '<%= post.commentCount %>', //to code
+                    pmedia = '<%= post.media %>'; //remove?
+              
+                let ppfp = '<%= author.pfp_link %>';
+                
+                $('.content_list').append(posthtml(pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, ptags, pcount, pmedia));
+              </script>
+
+            <!-- <script>
 				let pauthor = 'Kinkey',
                     ptitle = 'Advice needed',
 					ppfp = '../sample users/Kinkey.jpg',
@@ -37,11 +56,11 @@
 					pcount = '999',
                     pmedia= '';
 				$('.content_list').append(posthtml(pauthor,ptitle,ppfp,pdesc,pposted,pedited,ptags,pcount,pmedia) );
-			</script>
+			</script> -->
 
 
 
-            <script>
+            <!-- <script>
                 pauthor = 'Ecola',    
                 ppfp = '../sample users/Ecola.jpg',
                 pdesc = 'Look up some videos on YouTube on technique for how to hold the knife, where to rest it on your knuckle etc... and stick to it no matter '+
@@ -69,7 +88,7 @@
                 pcount = '1.5k',
                 pid='2.1';
                 $('#2').append(postreply(pauthor,ppfp,pdesc,pcount,pid) );
-            </script>
+            </script> -->
 		</div>
 	</body>
 </html>

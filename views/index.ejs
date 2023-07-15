@@ -123,7 +123,8 @@
               <% const post = posts[i]; %>
               <% let { title, content, author, rating, tags, media, profile, link } = post; %>
               <% profile = "/profile/" + author %>
-              <% link = "/posts/" + title %>
+              <% profile = "/post/" + encodeURIComponent(title) %>
+              <% link = "/post/" + encodeURIComponent(title) %>
               <script>
                 $('#forum').append(createPost('<%= title %>', '<%= content %>', '<%= author %>', '<%= rating %>', '<%= tags %>', '<%= media %>', '<%= profile %>', '<%= link %>'));
               </script>

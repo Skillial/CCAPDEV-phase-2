@@ -5,8 +5,10 @@
 //add reaction patch/remove reaction
 
 //SEMI-Done
-//login, signup, logout (mostly just need to fix landing pages, especially if kapag may error)
-//post post -> needs links and implementation in homepage
+//post post -> fix links, add date in part of post
+
+//DONE FOR SURE
+// login, signup, logout
 
 require('dotenv').config();
 const link = process.env.DB_URL;
@@ -76,7 +78,6 @@ app.get("/index", async (req, res) => {
     //const posts = await Post.find().limit(0); 
     posts = await Post.find().limit(0);
 
-
     res.render("index", { posts });
   } else{
     console.log("Currently not logged in, showing a limited number of posts!")
@@ -125,10 +126,6 @@ app.get("/profile/edit/", async (req, res) => {
     res.status(500).json({ error: "An error occurred while fetching user information." });
   }
 });
-
-app.get("/newPost", (req, res)=>{
-  res.render("newPost")
-})
 
 app.get("/editPost", (req, res)=>{
   res.render("editPost")
@@ -359,7 +356,30 @@ app.post("/api/post", async(req, res) =>{
   }
 })
 
+app.get("/post/:title", async (req, res) => {
+  try {
+    if (req.session.isLoggedIn) {
+      const title = req.params.title;
 
+      // Retrieve the post from the database based on the title
+      const post = await Post.findOne({ title });
+
+      if (!post) {
+        return res.status(404).json({ error: "Post not found." });
+      }
+
+      const author = await User.findOne({ username: post.author });
+
+      res.render("post", { post, author });
+    } else {
+      // Redirect to the login page if not logged in
+      res.redirect("/login");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred while retrieving the post." });
+  }
+});
 
 //UNTESTED
 
