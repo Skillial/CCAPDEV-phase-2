@@ -5,7 +5,7 @@
 //add reaction patch/remove reaction in database
 
 //SEMI-Done
-//post post -> fix links and formatting
+//post post -> fix links and formatting, also should show delete  button for the user that posts the post
 
 //DONE FOR SURE
 // login, signup, logout
@@ -381,21 +381,24 @@ app.get("/post/:title", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
       const title = req.params.title;
-
+      //currently logged in user
+      const userId = req.session.userId;
+      const user = await User.findById(userId);
       // Retrieve the post from the database based on the title
       const post = await Post.findOne({ title });
 
       if (!post) {
         return res.status(404).json({ error: "Post not found." });
       }
-
+      //author of the post
       const author = await User.findOne({ username: post.author });
       const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
       const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
       const ratingCount = positiveCount - negativeCount;
       post.rating = ratingCount;
+      let isCurrUserTheAuthor = author.username === user.username;
 
-      res.render("post", { post, author });
+      res.render("post", { user, post, author, isCurrUserTheAuthor });
     } else {
       // Redirect to the login page if not logged in
       res.redirect("/login");
