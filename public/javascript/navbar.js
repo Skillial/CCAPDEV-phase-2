@@ -125,7 +125,7 @@ function createNavbar(location,isLoggedIn) {
     profile_button.textContent = 'Profile';
     profile_button.className = 'pointer';
     profile_button.onclick = function() {
-        window.location.href = "/profile";
+        window.location.href = "/profile" ;
     };
     if (isLoggedIn){
         login_button.style.display='none';

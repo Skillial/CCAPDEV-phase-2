@@ -15,6 +15,7 @@ const { isLoggedInMiddleware } = require('./lib/middleware');
 const { userIDMiddleware } = require('./lib/middleware');
 const express = require('express');
 const session = require('express-session');
+const ejs = require('ejs-async');
 const MongoStore = require('connect-mongodb-session')(session);
 const app = express();
 
@@ -30,6 +31,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
+
 app.set("view engine", "ejs")
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -39,6 +41,7 @@ app.use(session({
   httpOnly: true,
   secure: true,
   resave: false,
+  maxAge: 1000 * 60 * 60 * 24, //1d day
   saveUninitialized: true,
   store: store
 }));
@@ -70,7 +73,10 @@ app.get("/index", async (req, res) => {
     console.log(req.session.isLoggedIn);
     const userId = req.session.userId;
     console.log(userId);
-    const posts = await Post.find().limit(0); 
+    //const posts = await Post.find().limit(0); 
+    posts = await Post.find().limit(0);
+
+
     res.render("index", { posts });
   } else{
     console.log("Currently not logged in, showing a limited number of posts!")
@@ -102,6 +108,11 @@ app.get("/logout", (req, res)=>{
   console.log("not logged in");
   res.render("logout")
 })
+
+// app.get("/profile", async(req, res) =>{
+//   username =
+//   res.render("/profile/" + username);
+// })
 
 app.get("/profile/edit/", async (req, res) => {
   try {
@@ -251,6 +262,39 @@ app.get("/profile", async (req, res) => {
   }
 });
 
+app.get("/profile/:username", async (req, res) => {
+  try {
+    if (req.session.isLoggedIn) {
+      // Fetch user information from MongoDB based on the logged-in user's ID
+      const { username } = req.params;
+      user = await User.findOne({ username });
+      userId = user._id;
+      console.log("viewing profile of: ", userId, " with username: ", username);
+      posts = await Post.find({ userID: userId, isDeleted:false })
+      console.log(posts);
+      if(posts.length === 0){
+        user.posts = user.posts;
+      }
+      else{
+        user.posts = posts;
+      }
+      
+      console.log(userId);
+      console.log(user);
+      // Render the profile page with the user's information
+      res.render("profile", { user });
+    } else {
+      // Redirect to the login page if not logged in
+      res.redirect("/login");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred while fetching user information." });
+  }
+});
+
+
+
 app.patch("/api/user/:username", async(req, res) =>{
   try {
     if (req.session.isLoggedIn) {
@@ -269,7 +313,7 @@ app.patch("/api/user/:username", async(req, res) =>{
         await user.save();
 
         // Redirect back to the profile page
-        res.redirect("/profile");
+        res.redirect("/profile/" + user.username);
         //res.redirect("/index");
       }else {
         res.status(400).json({ error: "Invalid request method." });
@@ -297,6 +341,7 @@ app.post("/api/post", async(req, res) =>{
           userID: user._id,
           title,
           content,
+          author: user.username,
           createDate,
         });
 
