@@ -4,6 +4,7 @@ const PostSchema = new mongoose.Schema({
   title: String,
   content: String,
   author: String,
+  rating: {type: Number, default: 0},
   createDate: {type: Date, default: Date.now()},
   editDate: {type: Date, default: null},
   isDeleted: {type: Boolean, default: false}

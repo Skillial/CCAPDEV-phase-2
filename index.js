@@ -2,10 +2,10 @@
 //patch profile --> doesnt work
 //patch, delete post
 //post, patch, delete comment
-//add reaction patch/remove reaction
+//add reaction patch/remove reaction in database
 
 //SEMI-Done
-//post post -> fix links, add date in part of post
+//post post -> fix links and formatting
 
 //DONE FOR SURE
 // login, signup, logout
@@ -70,23 +70,44 @@ const React = require('./models/React')
 app.use(isLoggedInMiddleware);
 app.use(userIDMiddleware);
 app.get("/index", async (req, res) => {
-  if (req.session?.isLoggedIn) {
-    console.log(req.sessionID);
-    console.log(req.session.isLoggedIn);
-    const userId = req.session.userId;
-    console.log(userId);
-    //const posts = await Post.find().limit(0); 
-    posts = await Post.find().limit(0);
+  try {
+    if (req.session?.isLoggedIn) {
+      console.log(req.sessionID);
+      console.log(req.session.isLoggedIn);
+      const userId = req.session.userId;
+      console.log(userId);
+      const posts = await Post.find().limit(0);
 
-    res.render("index", { posts });
-  } else{
-    console.log("Currently not logged in, showing a limited number of posts!")
-    const limit = 20; // Change the limit value as needed
-    const posts = await Post.find().limit(limit);
+      // Get the number of positive and negative votes for each post
+      for (let i = 0; i < posts.length; i++) {
+        const post = posts[i];
+        const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
+        const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
+        const ratingCount = positiveCount - negativeCount;
+        post.rating = ratingCount;
+      }
+
+      res.render("index", { posts });
+    } else {
+      console.log("Currently not logged in, showing a limited number of posts!")
+      const limit = 20; // Change the limit value as needed
+      const posts = await Post.find().limit(limit);
       
-    // Render the index template with the limited posts data
-    res.render("index", { posts});
+      // Get the number of positive and negative votes for each post
+      for (let i = 0; i < posts.length; i++) {
+        const post = posts[i];
+        const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
+        const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
+        const ratingCount = positiveCount - negativeCount;
+        post.rating = ratingCount;
+      }
 
+      // Render the index template with the limited posts data
+      res.render("index", { posts });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred while fetching posts." });
   }
 });
 
@@ -369,6 +390,10 @@ app.get("/post/:title", async (req, res) => {
       }
 
       const author = await User.findOne({ username: post.author });
+      const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
+      const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
+      const ratingCount = positiveCount - negativeCount;
+      post.rating = ratingCount;
 
       res.render("post", { post, author });
     } else {

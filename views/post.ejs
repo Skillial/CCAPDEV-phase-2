@@ -33,12 +33,12 @@
                         peditedDate = '- Not Edited'; //not edited
                     }
                     ptags = '<%= post.tags %>', //remove
-                    pcount = '<%= post.commentCount %>', //to code
+                    prating = '<%= post.rating %>', //to code
                     pmedia = '<%= post.media %>'; //remove?
               
                 let ppfp = '<%= author.pfp_link %>';
                 
-                $('.content_list').append(posthtml(pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, ptags, pcount, pmedia));
+                $('.content_list').append(posthtml(pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, ptags, prating, pmedia));
               </script>
 
             <!-- <script>
