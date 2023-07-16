@@ -463,14 +463,15 @@ app.patch("/api/post/:id", async (req, res) => {
     const postId = req.params.id;
     // Fetch the post from the database based on the postId
     const post = await Post.findById(postId);
-
+    const user = await User.findById(req.session.userId)
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
-    if (post.userID !== req.session.userId) {
+    if (post.userID.toString() != req.session.userId.toString()) {
       return res.status(403).json({ error: 'You are not authorized to edit this post.' });
     }
-
+    console.log("is user the author? ", post.author != user.username, " ", post.author, " ", user.username);
+    console.log("is user the author2? ", post.userID.toString() != req.session.userId.toString(), " ", post.userID.toString(), " ", req.session.userId.toString());
     // Update the post fields based on the data in the request body
     if (req.body.title) {
       post.title = req.body.title;
@@ -552,6 +553,8 @@ app.post('/api/react', async (req, res) => {
         existingReact.voteValue = reactionValue;
         if(reactionValue == 0){
           existingReact.isVoted = false;
+        }else{
+          existingReact.isVoted = true;
         }
         await existingReact.save();
       } else {
