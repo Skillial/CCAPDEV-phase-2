@@ -21,7 +21,8 @@
 			
 			</div>
             <script>
-                let pauthor = '<%= post.author %>',
+                let postID = '<%= post._id %>',
+                    pauthor = '<%= post.author %>',
                     ptitle = '<%= post.title %>',
                     pdesc = '<%= post.content %>',
                     ppostedDate = new Date('<%= post.createDate %>').toLocaleString();
@@ -36,7 +37,7 @@
               
                 let ppfp = '<%= author.pfp_link %>';
                 
-                $('.content_list').append(newPost(pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia));
+                $('.content_list').append(newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia));
               </script>
             <div id="comments-container">
                 <!-- Existing comments go here -->

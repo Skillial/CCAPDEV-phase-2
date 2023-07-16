@@ -1,4 +1,4 @@
-function newPost(pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia) {
+function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia) {
     const infoList = document.createElement('div');
     infoList.className = 'info_list';
   
@@ -13,7 +13,7 @@ function newPost(pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating
     headers.appendChild(titleElement);
   
     const authorSpan = document.createElement('span');
-    authorSpan.textContent = `posted by ${pauthor}`;
+    authorSpan.textContent = ` - posted by ${pauthor}`;
     authorSpan.style.cursor = 'pointer';
     authorSpan.addEventListener('click', () => {
       window.location.href = `/profile/${pauthor}`;
@@ -64,14 +64,16 @@ function newPost(pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating
     const commentReply = document.createElement('div');
     commentReply.textContent = 'Reply';
     commentReply.style.margin = buttonMargin;
+    commentReply.style.cursor = 'pointer';
     commentReply.addEventListener('click', () => {
-      handleReply(comment.pid);
+      handleReply(postID);
     });
     buttons.appendChild(commentReply);
   
     const commentShare = document.createElement('div');
     commentShare.textContent = 'Share';
     commentShare.style.margin = buttonMargin;
+    commentShare.style.cursor = 'pointer';
     commentShare.addEventListener('click', () => {
       // Handle share functionality
     });
@@ -80,6 +82,7 @@ function newPost(pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating
     const commentEdit = document.createElement('div');
     commentEdit.textContent = 'Edit';
     commentEdit.style.margin = buttonMargin;
+    commentEdit.style.cursor = 'pointer';
     commentEdit.addEventListener('click', () => {
       // Handle edit functionality
     });
@@ -88,6 +91,7 @@ function newPost(pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating
     const commentDelete = document.createElement('div');
     commentDelete.textContent = 'Delete';
     commentDelete.style.margin = buttonMargin;
+    commentDelete.style.cursor = 'pointer';
     commentDelete.addEventListener('click', () => {
       // Handle delete functionality
     });
@@ -102,6 +106,8 @@ function newPost(pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating
   }
   
   function newComment(pauthor, ppfp, pdesc, pcount, pid) {
+    const buttonMargin = '0 8px';
+
     const commentAlign = document.createElement('div');
     commentAlign.className = 'comment_align';
   
@@ -151,7 +157,7 @@ function newPost(pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating
     commentReply.textContent = 'Reply';
     commentReply.style.margin = buttonMargin;
     commentReply.addEventListener('click', () => {
-      handleReply(comment.pid); // Pass the comment ID to the reply handler
+      handleReply(pid); // Pass the comment ID to the reply handler
     });
     commentReact.appendChild(commentReply);
   
@@ -177,13 +183,13 @@ function newPost(pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating
     return commentAlign;
   }
   
-  function handleReply(commentId) {
+  function handleReply(postID) {
     const replyContent = prompt('Enter your reply:');
     if (replyContent) {
       // Send an HTTP request to your server to save the reply
       const requestBody = {
         content: replyContent,
-        parentCommentId: commentId
+        parentPostID: postID
       };
       fetch('/api/comment', {
         method: 'POST',
@@ -196,6 +202,7 @@ function newPost(pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating
           if (response.ok) {
             // Handle successful reply creation
             // Reload or update the comments section if needed
+            window.location.href = "/post/" + encodeURIComponent(ptitle);
           } else {
             throw new Error('Failed to create reply');
           }

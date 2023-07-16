@@ -361,38 +361,6 @@ app.patch('/api/user/:username', async (req, res) => {
 });
 
 
-// app.patch("/api/user/:id", async(req, res) =>{
-//   try {
-//     if (req.session.isLoggedIn) {
-//       if (req.body._method === "PATCH") {
-//         //const { username, photo, aboutme, password ,repassword } = req.body;
-//         const { username} = req.body;
-//         // Fetch the user information from the database
-//         const userId = req.session.userId;
-//         const user = await User.findById(userId);
-
-//         user.username = username;
-//         // user.aboutme = aboutme;
-//         // user.password = password;
-//         // user.photo = photo;
-
-//         await user.save();
-
-//         // Redirect back to the profile page
-//         res.redirect("/profile/" + user.username);
-//         //res.redirect("/index");
-//       }else {
-//         res.status(400).json({ error: "Invalid request method." });
-//       }
-//     } else {
-//       // Redirect to the login page if not logged in
-//       res.redirect("/login");
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "An error occurred while updating the profile." });
-//   }
-// });
 
 //new post (save to db)
 app.post("/api/post", async(req, res) =>{
@@ -440,13 +408,14 @@ app.get("/post/:title", async (req, res) => {
       }
       //author of the post
       const author = await User.findOne({ username: post.author });
+      const postID = post._id;
       const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
       const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
       const ratingCount = positiveCount - negativeCount;
       post.rating = ratingCount;
       let isCurrUserTheAuthor = author.username === user.username;
 
-      res.render("post", { user, post, author, isCurrUserTheAuthor });
+      res.render("post", { postID, user, post, author, isCurrUserTheAuthor });
     } else {
       // Redirect to the login page if not logged in
       res.redirect("/login");
@@ -466,11 +435,12 @@ app.post("/api/comment", async (req, res) => {
       const userId = req.session.userId;
       const user = await User.findById(userId);
       const { content, parentPostId, parentCommentId } = req.body;
+      const parentPost = await Post.findById(parentPostId); //need to do recursively?
 
-      //To Add: get the parent post and parent comment
       // Create a new comment object
       const newComment = new Comment({
         userID: user._id,
+        //might add author field
         content,
         parentPost: parentPostId, // Add the parent post if available
         parentComment: parentCommentId, // Add the parent comment if available
@@ -478,7 +448,7 @@ app.post("/api/comment", async (req, res) => {
 
       // Save the new comment object to the database
       await newComment.save();
-      res.redirect(`/post/${encodeURIComponent(title)}`);
+      res.redirect(`/post/${encodeURIComponent(parentPost.title)}`);
     } else {
       // Redirect to the login page if not logged in
       // Also, display a message "you need to login first!"
