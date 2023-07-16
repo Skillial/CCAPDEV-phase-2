@@ -12,7 +12,6 @@
         <link rel="stylesheet" type="text/css" href="/css/styles.css">
 	</head>
 	<body>
-		<script src="/javascriptuserView.js"></script>
         <script src="/javascript/navbar.js" type="text/javascript"></script>
 		<script>
 			createNavbar('../../' ,<%= isLoggedIn %>);
@@ -32,15 +31,18 @@
                     } else {
                         peditedDate = '- Not Edited'; //not edited
                     }
-                    ptags = '<%= post.tags %>', //remove
                     prating = '<%= post.rating %>', //to code
                     pmedia = '<%= post.media %>'; //remove?
               
                 let ppfp = '<%= author.pfp_link %>';
                 
-                $('.content_list').append(posthtml(pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, ptags, prating, pmedia));
+                $('.content_list').append(newPost(pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia));
               </script>
+            <div id="comments-container">
+                <!-- Existing comments go here -->
+            </div>
               
+
             <!-- <script>
                 pauthor = 'Ecola',    
                 ppfp = '../sample users/Ecola.jpg',

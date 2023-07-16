@@ -1,11 +1,12 @@
 //To DO
-//patch profile --> doesnt work
+
 //patch, delete post
 //post, patch, delete comment
 //add reaction patch/remove reaction in database
 
 //SEMI-Done
 //post post -> fix links and formatting, also should show delete  button for the user that posts the post
+//patch profile -> need to fix profile pic, also displaying of posts in /profile (idk why it broke)
 
 //DONE FOR SURE
 // login, signup, logout
@@ -140,7 +141,7 @@ app.get("/profile/edit/", async (req, res) => {
   try {
     const userId = req.session.userId;
     const user = await User.findById(userId);
-
+    console.log("app.get profile edit username: ", user.username);
     res.render("profile-edit", { user });
   } catch (error) {
     console.error(error);
@@ -311,40 +312,87 @@ app.get("/profile/:username", async (req, res) => {
   }
 });
 
+// app.patch("/api/user/:username", async(req, res) =>{
+//   try {
+//       userID = req.session.userID;
+//       const updateData = await User.findByIdAndUpdate(userID, req.body, {new:true,})
+//       res.json(updateData)
+    
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "An error occurred while updating the profile." });
+//   }
+// });
 
-
-app.patch("/api/user/:username", async(req, res) =>{
+app.patch('/api/user/:username', async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
-      if (req.body._method === "PATCH") {
-        const { username, photo, aboutme, password ,repassword } = req.body;
-
-        // Fetch the user information from the database
-        const userId = req.session.userId;
-        const user = await User.findById(userId);
-
-        user.username = username;
-        user.aboutme = aboutme;
-        user.password = password;
-        user.photo = photo;
-
-        await user.save();
-
-        // Redirect back to the profile page
-        res.redirect("/profile/" + user.username);
-        //res.redirect("/index");
-      }else {
-        res.status(400).json({ error: "Invalid request method." });
+      const username = req.params.username;
+      const newUsername = req.body.username;
+      const newPassword = req.body.password;
+      const updateData = req.body;
+      if (newPassword !== "" && req.body.password === req.body.repassword) {
+        // If the new password is provided, hash and update the password field
+        updateData.password = newPassword;
+      }else{
+        delete updateData.password;
       }
-    } else {
-      // Redirect to the login page if not logged in
+      console.log(username);
+      // Assuming you want to find the user by the username
+      const user = await User.findOneAndUpdate({ username }, updateData, { new: true });
+      await Post.updateMany({ author: username }, { author: newUsername });
+      await Comment.updateMany({ author: username }, { author: newUsername });
+
+      if (user) {
+        // User found and updated successfully
+        return res.json(user);
+        //return res.redirect("/profile");
+      } else {
+        // User not found, return appropriate response
+        return res.status(404).json({ error: 'User not found' });
+      }
+    }else{
       res.redirect("/login");
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while updating the profile." });
+    return res.status(500).json({ error: 'An error occurred while updating the profile' });
   }
 });
+
+
+// app.patch("/api/user/:id", async(req, res) =>{
+//   try {
+//     if (req.session.isLoggedIn) {
+//       if (req.body._method === "PATCH") {
+//         //const { username, photo, aboutme, password ,repassword } = req.body;
+//         const { username} = req.body;
+//         // Fetch the user information from the database
+//         const userId = req.session.userId;
+//         const user = await User.findById(userId);
+
+//         user.username = username;
+//         // user.aboutme = aboutme;
+//         // user.password = password;
+//         // user.photo = photo;
+
+//         await user.save();
+
+//         // Redirect back to the profile page
+//         res.redirect("/profile/" + user.username);
+//         //res.redirect("/index");
+//       }else {
+//         res.status(400).json({ error: "Invalid request method." });
+//       }
+//     } else {
+//       // Redirect to the login page if not logged in
+//       res.redirect("/login");
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "An error occurred while updating the profile." });
+//   }
+// });
 
 //new post (save to db)
 app.post("/api/post", async(req, res) =>{
@@ -412,32 +460,32 @@ app.get("/post/:title", async (req, res) => {
 //UNTESTED
 
 
-app.post("/api/comment", async(req, res) =>{
+app.post("/api/comment", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
-        const userId = req.session.userId;
-        const user = await User.findById(userId);
-        const { content, parentPostId, parentCommentId } = req.body;
+      const userId = req.session.userId;
+      const user = await User.findById(userId);
+      const { content, parentPostId, parentCommentId } = req.body;
 
-        //To Add: get  the parent post and parent comment
-          // Create a new comment object
-        const newComment = new Comment({
-          userID: user._id,
-          content,
-          parentPost: parentPostId, // Add the parent post if available
-          parentComment: parentCommentId, // Add the parent comment if available
-        });
+      //To Add: get the parent post and parent comment
+      // Create a new comment object
+      const newComment = new Comment({
+        userID: user._id,
+        content,
+        parentPost: parentPostId, // Add the parent post if available
+        parentComment: parentCommentId, // Add the parent comment if available
+      });
 
-      // Save the new post object to the database
-      await newPost.save();
-        res.redirect("/index");
+      // Save the new comment object to the database
+      await newComment.save();
+      res.redirect(`/post/${encodeURIComponent(title)}`);
     } else {
       // Redirect to the login page if not logged in
-      //also shud display a message "you need to login first!"
+      // Also, display a message "you need to login first!"
       res.redirect("/login");
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred." });
+    res.status(500).json({ error: "An error occurred while creating the comment." });
   }
-})
+});

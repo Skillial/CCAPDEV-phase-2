@@ -16,24 +16,43 @@
 			createNavbar('',<%= isLoggedIn %>);
 		</script>
     <div class="border">
-        <!-- <form id="profile-form" action="/profile/edit" method="PATCH">
-            <input type="text" name="username" value="<%= user.username %>" placeholder = "Enter new username">
-            <input type="text" name="aboutme" value="<%= user.aboutme %>">
-            <input type="text" name="photo" value="<%= user.photo %>">
-             <input type="password" name="password" placeholder="Enter new password">
-            <input type="password" name="repassword" placeholder="Re Enter new password"> 
-            <button type="submit">Save Changes</button>
-          </form> -->
-
           <form id="profile-form" action="/api/user/<%= user.username %>" method="PATCH"> <!--can i do this differently?-->
-            <!--input type="hidden" name="_method" value="PATCH"-->
+            <input type="hidden" name="_method" value="PATCH">
             <input type="text" name="username" value="<%= user.username %>" placeholder="Enter new username">
-            <!-- <input type="text" name="aboutme" value="<%= user.aboutme %>" placeholder="Enter new aboutme">
+            <input type="text" name="aboutme" value="<%= user.aboutme %>" placeholder="Enter new aboutme">
             <input type="text" name="photo" value="<%= user.photo %>" placeholder="Enter new photo">
             <input type="password" name="password" placeholder="Enter new password">
-            <input type="password" name="repassword" placeholder="Re-enter new password"> -->
+            <input type="password" name="repassword" placeholder="Re-enter new password">
             <button type="submit">Save Changes</button>
           </form>      
+          <script>
+            document.getElementById('profile-form').addEventListener('submit', function (event) {
+              event.preventDefault(); // Prevent the default form submission behavior
+          
+              // Get the form data
+              const formData = new FormData(event.target);
+          
+              // Send the PATCH request using fetch
+              fetch(`/api/user/${encodeURIComponent('<%= user.username %>')}`, {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Object.fromEntries(formData))
+              })
+                .then(response => {
+                  if (response.ok) {
+                    window.location.href = '/profile';
+                  } else {
+                    console.error('Failed to update profile. Please try again later.');
+                  }
+                })
+                .catch(error => {
+                  console.error(error);
+                  // Handle error (if needed)
+                });
+            });
+          </script>
           
     </div>
 
