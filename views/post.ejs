@@ -21,58 +21,57 @@
 			
 			</div>
             <script>
-                let postID = '<%= post._id %>',
-                    pauthor = '<%= post.author %>',
-                    ptitle = '<%= post.title %>',
-                    pdesc = '<%= post.content %>',
-                    ppostedDate = new Date('<%= post.createDate %>').toLocaleString();
-                    let peditedDate = '<%= post.editDate %>';
-                    if (peditedDate) {
-                        peditedDate = new Date(peditedDate).toLocaleString();
-                    } else {
-                        peditedDate = '- Not Edited'; //not edited
-                    }
-                    prating = '<%= post.rating %>', //to code
-                    pmedia = '<%= post.media %>'; //remove?
-              
-                let ppfp = '<%= author.pfp_link %>';
+                <% if (!post.isDeleted) { %>
+                  let postID = '<%= post._id %>',
+                      pauthor = '<%= post.author %>',
+                      ptitle = '<%= post.title %>',
+                      pdesc = '<%= post.content %>',
+                      ppostedDate = new Date('<%= post.createDate %>').toLocaleString();
+                  let peditedDate = '<%= post.editDate %>';
+                  if (peditedDate) {
+                    peditedDate = new Date(peditedDate).toLocaleString();
+                  } else {
+                    peditedDate = '- Not Edited'; //not edited
+                  }
+                  prating = '<%= post.rating %>', 
+                  pmedia = '<%= post.media %>'; //remove?
                 
-                $('.content_list').append(newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia));
+                  let ppfp = '<%= author.pfp_link %>';
+                
+                  $('.content_list').append(newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia));
+                <% } else { %>
+                  // Display a message when the post is deleted
+                  $('.content_list').append('<div>The original post was deleted, but you can still view the comments.</div>');
+                <% } %>
               </script>
-            <div id="comments-container">
-                <!-- Existing comments go here -->
-            </div>
               
 
-            <!-- <script>
-                pauthor = 'Ecola',    
-                ppfp = '../sample users/Ecola.jpg',
-                pdesc = 'Look up some videos on YouTube on technique for how to hold the knife, where to rest it on your knuckle etc... and stick to it no matter '+
-                        'how slow you are. With proper technique the risk of injury is extremely low. Let speed come naturally - don’t try to force it. Also make '+
-                        'sure your knives are sharp',
 
-                pcount = '1.5k';
-                let pid='1';
-                $('.border').append(postreply(pauthor,ppfp,pdesc,pcount,pid) );
-            </script>
+                <div class="comments-section" id="commentsContainer">
+                    <!-- Comments will be dynamically added here -->
+                </div>
 
-            <script>
-                pauthor = 'Matrix',    
-                ppfp = '../sample users/Matrix.jpg',
-                pdesc = 'La technique. Start here: https://www.youtube.com/watch?v=JMA2SqaDgG8',
-                pcount = '1.5k',
-                pid='2';
-                $('.border').append(postreply(pauthor,ppfp,pdesc,pcount,pid) );
-            </script>
-            <script>
-                pauthor = 'denial',    
-                ppfp = '../sample users/denial.jpg',
-                pdesc = 'Make sure you\'re using the right knife for the job. Too big or too small can work against you. I agree looking up ' +
-                        'some YouTube videos for improving your grip.',
-                pcount = '1.5k',
-                pid='2.1';
-                $('#2').append(postreply(pauthor,ppfp,pdesc,pcount,pid) );
-            </script> -->
+                <script>
+                    // Get the comments data from the server-side and convert it to a JavaScript object
+                    const commentsData = <%= JSON.stringify(comments) %>;
+
+                    // Function to append comments to the comments container
+                    function appendComments(commentsData) {
+                    const commentsContainer = document.getElementById('commentsContainer');
+
+                    commentsData.forEach((comment) => {
+                        const commentElement = newComment(comment.author, comment.ppfp, comment.content, comment.pcount, comment._id, comment.children);
+                        commentsContainer.appendChild(commentElement);
+                    });
+                    }
+
+                    // Append the comments after the page loads
+                    document.addEventListener('DOMContentLoaded', () => {
+                    appendComments(commentsData);
+                    });
+                </script>
+
+            
 		</div>
 	</body>
 </html>

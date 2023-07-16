@@ -93,7 +93,7 @@ function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate,
     commentDelete.style.margin = buttonMargin;
     commentDelete.style.cursor = 'pointer';
     commentDelete.addEventListener('click', () => {
-      // Handle delete functionality
+      handleDeletePost(postID);
     });
     buttons.appendChild(commentDelete);
   
@@ -105,7 +105,35 @@ function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate,
     return infoList;
   }
   
-  function newComment(pauthor, ppfp, pdesc, pcount, pid) {
+  // ... (your existing code for newPost)
+
+    function appendComments(commentsData) {
+      const commentsContainer = document.getElementById('commentsContainer');
+    
+      commentsData.forEach((comment) => {
+        const commentElement = newComment(comment.author, comment.ppfp, comment.content, comment.pcount, comment._id, comment.children);
+        commentsContainer.appendChild(commentElement);
+      });
+    }
+    
+    // Get the comments data from the EJS template
+    const commentsData = JSON.stringify(comments);
+    
+    // Generate and append the comments after the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      appendComments(commentsData);
+    });
+  
+
+    // ... (your existing code for newComment and handleReply)
+
+
+
+
+
+
+
+  function newComment(pauthor, ppfp, pdesc, pcount, pid, children) {
     const buttonMargin = '0 8px';
 
     const commentAlign = document.createElement('div');
@@ -174,15 +202,32 @@ function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate,
       // Handle edit functionality
     });
     commentReact.appendChild(commentEdit);
+    
+    const childrenContainer = document.createElement('div');
+    childrenContainer.className = 'children-container';
   
+    // Recursively add the children comments
+    if (children && children.length > 0) {
+      children.forEach((child) => {
+        const childComment = newComment(child.pauthor, child.ppfp, child.pdesc, child.pcount, child.pid, child.children);
+        childrenContainer.appendChild(childComment);
+      });
+    }
+
     commentContainer.appendChild(commentReact);
     commentForum.appendChild(commentContainer);
+    
+    // Append the children container to the commentForum if it contains nested comments
+    if (childrenContainer.children.length > 0) {
+      commentForum.appendChild(childrenContainer);
+    }
+
     commentAlign.appendChild(commentForum);
     commentAlign.id = pid;
   
     return commentAlign;
   }
-  
+
   function handleReply(postID) {
     const replyContent = prompt('Enter your reply:');
     if (replyContent) {
@@ -213,4 +258,30 @@ function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate,
         });
     }
   }
+
+  function handleDeletePost(postID) {
+    // Show a confirmation dialog before deleting the post
+    if (confirm('Are you sure you want to delete this post?')) {
+      // Send an HTTP request to your server to update the post data
+      fetch(`/api/post/${postID}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ isDeleted: true })
+      })
+        .then(response => {
+          if (response.ok) {
+            window.location.href = "/post/" + encodeURIComponent(ptitle);
+          } else {
+            throw new Error('Failed to delete the post');
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          // Handle error
+        });
+    }
+  }
+  
   

@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const CommentSchema = new mongoose.Schema({
   userID: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
-  parentPostID:{ type: mongoose.Schema.Types.ObjectId, ref: 'post'}, //refers to the PARENT post!
-  parentCommentID:{ type: mongoose.Schema.Types.ObjectId, ref: 'comment'}, 
+  parentPostID:{ type: mongoose.Schema.Types.ObjectId, ref: 'post' }, //refers to the PARENT post!
+  parentCommentID:{ type: mongoose.Schema.Types.ObjectId, ref: 'comment', default: null}, 
   //can be null? but if both are null then surely we can just summarize comment and post into 1 js?
   //thhat would make react.js easier as well?
   content: String,

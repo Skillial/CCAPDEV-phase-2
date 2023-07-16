@@ -77,7 +77,7 @@ app.get("/index", async (req, res) => {
       console.log(req.session.isLoggedIn);
       const userId = req.session.userId;
       console.log(userId);
-      const posts = await Post.find().limit(0);
+      const posts = await Post.find({ isDeleted: false }).limit(0);
 
       // Get the number of positive and negative votes for each post
       for (let i = 0; i < posts.length; i++) {
@@ -92,7 +92,7 @@ app.get("/index", async (req, res) => {
     } else {
       console.log("Currently not logged in, showing a limited number of posts!")
       const limit = 20; // Change the limit value as needed
-      const posts = await Post.find().limit(limit);
+      const posts = await Post.find({ isDeleted: false }).limit(limit);
       
       // Get the number of positive and negative votes for each post
       for (let i = 0; i < posts.length; i++) {
@@ -287,7 +287,7 @@ app.get("/profile/:username", async (req, res) => {
       // Fetch user information from MongoDB based on the logged-in user's ID
       const { username } = req.params;
       user = await User.findOne({ username });
-      userId = user._id;
+      let userId = user._id;
       console.log("viewing profile of: ", userId, " with username: ", username);
       posts = await Post.find({ userID: userId, isDeleted:false })
       console.log(posts);
@@ -393,6 +393,7 @@ app.post("/api/post", async(req, res) =>{
   }
 })
 
+//display posts
 app.get("/post/:title", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
@@ -406,6 +407,27 @@ app.get("/post/:title", async (req, res) => {
       if (!post) {
         return res.status(404).json({ error: "Post not found." });
       }
+      // Fetch all top-level comments for the post
+      const topLevelComments = await Comment.find({ parentPostID: post._id, parentCommentID: null })
+            .populate("userID") // Populate the user details for each comment
+            .exec();
+    
+      // A recursive function to fetch comments of comments and so on
+      const fetchChildComments = async (comment) => {
+        const children = await Comment.find({ parentCommentID: comment._id })
+            .populate("userID") // Populate the user details for each comment
+            .exec();
+        comment.children = children;
+        for (const child of children) {
+          await fetchChildComments(child);
+        }
+      };
+    
+      // Fetch all child comments recursively for each top-level comment
+      for (const comment of topLevelComments) {
+        await fetchChildComments(comment);
+      }
+
       //author of the post
       const author = await User.findOne({ username: post.author });
       const postID = post._id;
@@ -415,7 +437,13 @@ app.get("/post/:title", async (req, res) => {
       post.rating = ratingCount;
       let isCurrUserTheAuthor = author.username === user.username;
 
-      res.render("post", { postID, user, post, author, isCurrUserTheAuthor });
+      console.log("num of top level comments: ",topLevelComments.length);
+      console.log("this post's id: ", post._id);
+      console.log("this post's id: ", postID);
+
+      let comments = topLevelComments;
+      console.log(comments);
+      res.render("post", { postID, user, post, author, isCurrUserTheAuthor, comments });
     } else {
       // Redirect to the login page if not logged in
       res.redirect("/login");
@@ -426,7 +454,28 @@ app.get("/post/:title", async (req, res) => {
   }
 });
 
-//UNTESTED
+app.patch("/api/post/:id", async (req, res) => {
+  try {
+    const postId = req.params.id;
+    // Fetch the post from the database based on the postId
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    // Update the post's isDeleted field to true
+    post.isDeleted = true;
+    // Save the updated post in the database
+    await post.save();
+
+    res.json({ message: "Post deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 
 app.post("/api/comment", async (req, res) => {
@@ -434,21 +483,24 @@ app.post("/api/comment", async (req, res) => {
     if (req.session.isLoggedIn) {
       const userId = req.session.userId;
       const user = await User.findById(userId);
-      const { content, parentPostId, parentCommentId } = req.body;
-      const parentPost = await Post.findById(parentPostId); //need to do recursively?
-
+      const { content, parentPostID, parentCommentID } = req.body;
+      console.log("parent post id as string:", parentPostID);
+      let parentPostIdObject = new mongoose.Types.ObjectId(parentPostID); //converts the string representation parentPostID to mongoose id
+      console.log("parent post id as object: ", parentPostIdObject)
+      const masterPost = await Post.findById(parentPostIdObject); //gets master post of the comment, no matter the depth
+      console.log("Master post object: ", masterPost);
       // Create a new comment object
       const newComment = new Comment({
         userID: user._id,
-        //might add author field
+        author: user.username,
         content,
-        parentPost: parentPostId, // Add the parent post if available
-        parentComment: parentCommentId, // Add the parent comment if available
+        parentPostID: parentPostIdObject, // Add the parent post if available
+        parentCommentID: parentCommentID, // Add the parent comment if available
       });
 
       // Save the new comment object to the database
       await newComment.save();
-      res.redirect(`/post/${encodeURIComponent(parentPost.title)}`);
+      res.redirect(`/post/${encodeURIComponent(masterPost.title)}`);
     } else {
       // Redirect to the login page if not logged in
       // Also, display a message "you need to login first!"
