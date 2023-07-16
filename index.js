@@ -529,32 +529,6 @@ app.post("/api/comment", async (req, res) => {
   }
 });
 
-app.get("/search/:key", async (req, res) => {
-  try {
-    const regex = new RegExp(req.params.key, 'i'); // 'i' flag for case-insensitive search
-
-    const userData = await User.find({
-      username: { $regex: regex }
-    });
-
-    const postData = await Post.find({
-      $or: [
-        { title: { $regex: regex } },
-        { content: { $regex: regex } }
-      ]
-    });
-    
-    const commentData = await Comment.find({
-      content: { $regex: regex }
-    });
-    const combinedData = [...userData,...postData, ...commentData];
-    res.json(combinedData); // Sending the retrieved data as JSON response
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "An error occurred during the search." });
-  }
-});
-
 app.get("/searchuser/:key", async (req, res) => {
   try {
     const regex = new RegExp(req.params.key, 'i'); // 'i' flag for case-insensitive search
