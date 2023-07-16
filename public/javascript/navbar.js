@@ -83,9 +83,14 @@ function createNavbar(location,isLoggedIn) {
     form.appendChild(search_button);
     
 
-    let search_choices = document.createElement('ul');
-    search_choices.className = 'search_choices';
+    let search_choices_user = document.createElement('ul');
+    search_choices_user.className = 'search_choices';
+    search_choices_user.id = 'search_choices_user'
 
+
+    let search_choices_post = document.createElement('ul');
+    search_choices_post.className = 'search_choices';
+    search_choices_post.id = 'search_choices_post';
 
     
 
@@ -97,15 +102,16 @@ function createNavbar(location,isLoggedIn) {
     search_input.setAttribute('placeholder', 'Search...');
     search_input.setAttribute('autofocus', 'required');
 
-    search_input.addEventListener('input', async (event) => {
-        const key = event.target.value;
-        searchForKey(key);
-      });
+    // search_input.addEventListener('input', async (event) => {
+    //     const key = event.target.value;
+    //     searchForKey(key);
+    //   });
 
     search_button.setAttribute('type', 'submit');
     search_button.appendChild(search_button_img);
     search_bar.appendChild(form);
-    search_bar.appendChild(search_choices);
+    search_bar.appendChild(search_choices_user);
+    search_bar.appendChild(search_choices_post);
     
 
     var table = document.createElement('table'),
@@ -178,10 +184,13 @@ function yes() {
 	console.log('yes')
 }
 
-async function updateSearchChoices(choices) {
-    let search_choices = document.querySelector('.search_choices');
+async function updateUserChoices(choices) {
+    let search_choices = document.querySelector('#search_choices_user');
     search_choices.innerHTML = '';
-  
+    let search_bar_label = document.createElement('div');
+    search_bar_label.textContent="Search from users";
+    search_bar_label.className = "search_bar_label";
+    search_choices.appendChild(search_bar_label);
     choices.forEach(choice => {
       let li = document.createElement('li');
       li.textContent = choice.username;
@@ -193,11 +202,11 @@ async function updateSearchChoices(choices) {
 
   let searchTimeout;
 
-async function searchForKey(key) {
+async function searchForUser(key) {
   try {
     clearTimeout(searchTimeout); // Cancel any pending search requests
 
-    const searchChoices = document.querySelector('.search_choices');
+    const searchChoices = document.querySelector('#search_choices_user');
     if (key.trim() === '') {
       // If the search key is empty, clear the search results and return
       searchChoices.innerHTML = '';
@@ -205,12 +214,56 @@ async function searchForKey(key) {
       return;
     }
 
-    const response = await fetch(`/search/${key}`);
+    const response = await fetch(`/searchuser/${key}`);
     const data = await response.json();
 
     if (data.length > 0) {
       // If there are search results, update the choices
-      updateSearchChoices(data);
+      updateUserChoices(data);
+      isSearchResultDisplayed = true;
+    } else {
+      // If no search results, clear the choices
+      searchChoices.innerHTML = '';
+      isSearchResultDisplayed = false;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function updatePostChoices(choices) {
+    let search_choices = document.querySelector('#search_choices_post');
+    search_choices.innerHTML = '';
+    let search_bar_label = document.createElement('div');
+    search_bar_label.textContent="Search from posts";
+    search_bar_label.className = "search_bar_label";
+    search_choices.appendChild(search_bar_label);
+    choices.forEach(choice => {
+      let li = document.createElement('li');
+      li.textContent = choice.title;
+      search_choices.appendChild(li);
+    });
+  }
+  
+
+async function searchForPost(key) {
+  try {
+    clearTimeout(searchTimeout); // Cancel any pending search requests
+
+    const searchChoices = document.querySelector('#search_choices_post');
+    if (key.trim() === '') {
+      // If the search key is empty, clear the search results and return
+      searchChoices.innerHTML = '';
+      isSearchResultDisplayed = false;
+      return;
+    }
+
+    const response = await fetch(`/searchpost/${key}`);
+    const data = await response.json();
+
+    if (data.length > 0) {
+      // If there are search results, update the choices
+      updatePostChoices(data);
       isSearchResultDisplayed = true;
     } else {
       // If no search results, clear the choices
@@ -232,8 +285,9 @@ document.addEventListener('keyup', (event) => {
 
     // Delay the search request by 300 milliseconds after the key is released
     searchTimeout = setTimeout(() => {
-      searchForKey(key);
-    }); //can add ,300 after }
+      searchForUser(key);
+      searchForPost(key);
+    },100); //can add ,300 after }
 
     if (key.trim() === '' && isSearchResultDisplayed) {
       // If the search input is empty and search results are displayed, clear the choices

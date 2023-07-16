@@ -516,11 +516,61 @@ app.get("/search/:key", async (req, res) => {
   try {
     const regex = new RegExp(req.params.key, 'i'); // 'i' flag for case-insensitive search
 
-    const data = await User.find({
+    const userData = await User.find({
       username: { $regex: regex }
     });
 
-    res.json(data); // Sending the retrieved data as JSON response
+    const postData = await Post.find({
+      $or: [
+        { title: { $regex: regex } },
+        { content: { $regex: regex } }
+      ]
+    });
+    
+    const commentData = await Comment.find({
+      content: { $regex: regex }
+    });
+    const combinedData = [...userData,...postData, ...commentData];
+    res.json(combinedData); // Sending the retrieved data as JSON response
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred during the search." });
+  }
+});
+
+app.get("/searchuser/:key", async (req, res) => {
+  try {
+    const regex = new RegExp(req.params.key, 'i'); // 'i' flag for case-insensitive search
+
+    const userData = await User.find({
+      username: { $regex: regex }
+    });
+
+   
+    res.json(userData); // Sending the retrieved data as JSON response
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred during the search." });
+  }
+});
+
+app.get("/searchpost/:key", async (req, res) => {
+  try {
+    const regex = new RegExp(req.params.key, 'i'); // 'i' flag for case-insensitive search
+
+
+    const postData = await Post.find({
+      $or: [
+        { title: { $regex: regex } },
+        { content: { $regex: regex } }
+      ]
+    });
+    
+    const commentData = await Comment.find({
+      content: { $regex: regex }
+    });
+    const combinedData = [...postData, ...commentData];
+    res.json(combinedData); // Sending the retrieved data as JSON response
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred during the search." });
