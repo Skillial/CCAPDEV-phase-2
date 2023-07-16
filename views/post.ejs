@@ -18,9 +18,10 @@
 		</script>
 		<div class="border">
 			<div class="content_list">
-			
+                
 			</div>
             <script>
+                
                 <% if (!post.isDeleted) { %>
                   let postID = '<%= post._id %>',
                       pauthor = '<%= post.author %>',
@@ -37,8 +38,11 @@
                   pmedia = '<%= post.media %>'; //remove?
                 
                   let ppfp = '<%= author.pfp_link %>';
+                  let preactValue = '<%= reactValue %>';
+                  let isCurrUserTheAuthor = '<%=isCurrUserTheAuthor%>';
+                  console.log(isCurrUserTheAuthor);
                 
-                  $('.content_list').append(newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia));
+                  $('.content_list').append(newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia, preactValue, isCurrUserTheAuthor ));
                 <% } else { %>
                   // Display a message when the post is deleted
                   $('.content_list').append('<div>The original post was deleted, but you can still view the comments.</div>');
