@@ -7,13 +7,14 @@
 //SEMI-Done
 //post post -> fix links and formatting
 //patch profile -> need to fix profile pic, also displaying of posts in /profile (breaks when >1 post)
-//patch, delete post -> only the author of the post can edit and delete
+
 //search (WIP by jean)
 //reacting -> works sa /post, not in /index
 //index.ejs - fix all the formatting and links
 
 //DONE FOR SURE
 // login, signup, logout -> to add: hashing password
+//patch, delete post -> maybe paganda patching, like takign the inputs (currently uses alerts)
 
 require('dotenv').config();
 const link = process.env.DB_URL;
@@ -316,18 +317,6 @@ app.get("/profile/:username", async (req, res) => {
   }
 });
 
-// app.patch("/api/user/:username", async(req, res) =>{
-//   try {
-//       userID = req.session.userID;
-//       const updateData = await User.findByIdAndUpdate(userID, req.body, {new:true,})
-//       res.json(updateData)
-    
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "An error occurred while updating the profile." });
-//   }
-// });
-
 app.patch('/api/user/:username', async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
@@ -363,7 +352,6 @@ app.patch('/api/user/:username', async (req, res) => {
     return res.status(500).json({ error: 'An error occurred while updating the profile' });
   }
 });
-
 
 
 //new post (save to db)
@@ -479,6 +467,9 @@ app.patch("/api/post/:id", async (req, res) => {
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
+    if (post.userID !== req.session.userId) {
+      return res.status(403).json({ error: 'You are not authorized to edit this post.' });
+    }
 
     // Update the post fields based on the data in the request body
     if (req.body.title) {
@@ -559,6 +550,9 @@ app.post('/api/react', async (req, res) => {
       if (existingReact) {
         // User has already reacted, update the voteValue
         existingReact.voteValue = reactionValue;
+        if(reactionValue == 0){
+          existingReact.isVoted = false;
+        }
         await existingReact.save();
       } else {
         // User has not reacted, create a new React document
