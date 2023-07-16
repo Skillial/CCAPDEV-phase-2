@@ -80,7 +80,7 @@ function createNavbar(location,isLoggedIn) {
     
     form.appendChild(search_label);
     form.appendChild(search_input);
-    form.appendChild(search_button);
+    
     
 
     let search_choices_user = document.createElement('ul');
@@ -98,7 +98,9 @@ function createNavbar(location,isLoggedIn) {
     search_label.textContent = 'Search for stuff';
 
     search_input.id = 'search';
-    search_input.setAttribute('type', 'search');
+    // search_input.setAttribute('type', 'search');
+    // search_button.appendChild(search_button_img);
+    // form.appendChild(search_button); // for search
     search_input.setAttribute('placeholder', 'Search...');
     search_input.setAttribute('autofocus', 'required');
 
@@ -108,7 +110,7 @@ function createNavbar(location,isLoggedIn) {
     //   });
 
     search_button.setAttribute('type', 'submit');
-    search_button.appendChild(search_button_img);
+    
     search_bar.appendChild(form);
     search_bar.appendChild(search_choices_user);
     search_bar.appendChild(search_choices_post);
@@ -194,6 +196,9 @@ async function updateUserChoices(choices) {
     choices.forEach(choice => {
       let li = document.createElement('li');
       li.textContent = choice.username;
+      li.onclick = () => {
+        window.location.href = `/profile/${encodeURIComponent(choice.username)}`;
+      };
       search_choices.appendChild(li);
     });
   }
@@ -232,16 +237,20 @@ async function searchForUser(key) {
 }
 
 async function updatePostChoices(choices) {
-    let search_choices = document.querySelector('#search_choices_post');
-    search_choices.innerHTML = '';
-    let search_bar_label = document.createElement('div');
-    search_bar_label.textContent="Search from posts";
+    const searchChoices = document.querySelector('#search_choices_post');
+    searchChoices.innerHTML = '';
+    const search_bar_label = document.createElement('div');
+    search_bar_label.textContent = "Search from posts";
     search_bar_label.className = "search_bar_label";
-    search_choices.appendChild(search_bar_label);
+    searchChoices.appendChild(search_bar_label);
+    
     choices.forEach(choice => {
-      let li = document.createElement('li');
+      const li = document.createElement('li');
       li.textContent = choice.title;
-      search_choices.appendChild(li);
+      li.onclick = () => {
+        window.location.href = `/post/${encodeURIComponent(choice.title)}`;
+      };
+      searchChoices.appendChild(li);
     });
   }
   
@@ -287,7 +296,7 @@ document.addEventListener('keyup', (event) => {
     searchTimeout = setTimeout(() => {
       searchForUser(key);
       searchForPost(key);
-    },100); //can add ,300 after }
+    },400); //can add ,300 after }
 
     if (key.trim() === '' && isSearchResultDisplayed) {
       // If the search input is empty and search results are displayed, clear the choices
@@ -296,3 +305,4 @@ document.addEventListener('keyup', (event) => {
     }
   }
 });
+

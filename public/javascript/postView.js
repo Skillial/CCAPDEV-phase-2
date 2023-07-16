@@ -1,4 +1,4 @@
-function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia, preactValue) {
+function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia, preactValue, isCurrUserTheAuthor) {
     const infoList = document.createElement('div');
     infoList.className = 'info_list';
     infoList.style.display = 'flex';
@@ -127,11 +127,12 @@ function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate,
   
     if (peditedDate !== '- Not Edited') {
       const edited = document.createElement('p');
-      edited.textContent = 'Edited ';
+      edited.innerHTML = 'Edited:&nbsp;';
       info.appendChild(edited);
   
       const editedDateElement = document.createElement('span');
       editedDateElement.textContent = new Date(peditedDate).toLocaleString();
+      //editedDateElement.style.whiteSpace = 'nowrap';
       info.appendChild(editedDateElement);
     }
   
@@ -150,33 +151,38 @@ function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate,
     });
     buttons.appendChild(commentReply);
   
-    const commentShare = document.createElement('div');
-    commentShare.textContent = 'Share';
-    commentShare.style.margin = buttonMargin;
-    commentShare.style.cursor = 'pointer';
-    commentShare.addEventListener('click', () => {
-      // Handle share functionality
-    });
-    buttons.appendChild(commentShare);
-  
-    const commentEdit = document.createElement('div');
-    commentEdit.textContent = 'Edit';
-    commentEdit.style.margin = buttonMargin;
-    commentEdit.style.cursor = 'pointer';
-    commentEdit.addEventListener('click', () => {
-      handleEditPost(postID, ptitle, pdesc); // Pass the post ID and current description to the edit handler
-    });
-    buttons.appendChild(commentEdit);
-  
-    const commentDelete = document.createElement('div');
-    commentDelete.textContent = 'Delete';
-    commentDelete.style.margin = buttonMargin;
-    commentDelete.style.cursor = 'pointer';
-    commentDelete.addEventListener('click', () => {
-      handleDeletePost(postID);
-    });
-    buttons.appendChild(commentDelete);
-  
+    // const commentShare = document.createElement('div');
+    // commentShare.textContent = 'Share';
+    // commentShare.style.margin = buttonMargin;
+    // commentShare.style.cursor = 'pointer';
+    // commentShare.addEventListener('click', () => {
+    //   // Handle share functionality
+    // });
+    // buttons.appendChild(commentShare);
+    
+    console.log("outside if: is current user the author? ", isCurrUserTheAuthor);
+    if (isCurrUserTheAuthor == 'true') {
+      console.log("inside if: is current user the author? ", isCurrUserTheAuthor);
+      const commentEdit = document.createElement('div');
+      commentEdit.textContent = 'Edit';
+      commentEdit.style.margin = buttonMargin;
+      commentEdit.style.cursor = 'pointer';
+      commentEdit.addEventListener('click', () => {
+        handleEditPost(postID, ptitle, pdesc); // Pass the post ID and current description to the edit handler
+      });
+      buttons.appendChild(commentEdit);
+    
+      const commentDelete = document.createElement('div');
+      commentDelete.textContent = 'Delete';
+      commentDelete.style.margin = buttonMargin;
+      commentDelete.style.cursor = 'pointer';
+      commentDelete.addEventListener('click', () => {
+        handleDeletePost(postID);
+      });
+      buttons.appendChild(commentDelete);
+    }
+
+
     info.appendChild(buttons);
     topic.appendChild(info);
     infoList.appendChild(topic);
