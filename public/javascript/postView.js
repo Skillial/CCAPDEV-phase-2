@@ -84,7 +84,7 @@ function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate,
     commentEdit.style.margin = buttonMargin;
     commentEdit.style.cursor = 'pointer';
     commentEdit.addEventListener('click', () => {
-      // Handle edit functionality
+      handleEditPost(postID, ptitle, pdesc); // Pass the post ID and current description to the edit handler
     });
     buttons.appendChild(commentEdit);
   
@@ -275,6 +275,41 @@ function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate,
             window.location.href = "/post/" + encodeURIComponent(ptitle);
           } else {
             throw new Error('Failed to delete the post');
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          // Handle error
+        });
+    }
+  }
+  
+  function handleEditPost(postID, currentTitle, currentDescription) {
+    const newTitle = prompt('Edit your post title:', currentTitle);
+    const newDescription = prompt('Edit your post content:', currentDescription);
+  
+    if (newTitle !== null || newDescription !== null) {
+      // Send an HTTP request to update the post on the server
+      const requestBody = {
+        title: newTitle,
+        content: newDescription
+      };
+  
+      fetch(`/api/post/${postID}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      })
+        .then(response => {
+          if (response.ok) {
+            // Handle successful post update
+            // Reload the page to see the updated post details
+            const encodedTitle = encodeURIComponent(newTitle); // Assuming newTitle is the updated title
+            window.location.replace(`/post/${encodedTitle}`);
+          } else {
+            throw new Error('Failed to update post');
           }
         })
         .catch(error => {

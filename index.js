@@ -1,15 +1,17 @@
 //To DO
-
-//patch, delete post
-//post, patch, delete comment
+//Overall: HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
+//    input sanitization and general checking
+//post, patch, delete comment -> comments are stored in the db na
 //add reaction patch/remove reaction in database
 
 //SEMI-Done
-//post post -> fix links and formatting, also should show delete  button for the user that posts the post
-//patch profile -> need to fix profile pic, also displaying of posts in /profile (idk why it broke)
+//post post -> fix links and formatting
+//patch profile -> need to fix profile pic, also displaying of posts in /profile (breaks when >1 post)
+//patch, delete post -> only the author of the post can edit and delete, and reactions
+//search (WIP)
 
 //DONE FOR SURE
-// login, signup, logout
+// login, signup, logout -> to add: hashing password
 
 require('dotenv').config();
 const link = process.env.DB_URL;
@@ -454,6 +456,7 @@ app.get("/post/:title", async (req, res) => {
   }
 });
 
+//edit post
 app.patch("/api/post/:id", async (req, res) => {
   try {
     const postId = req.params.id;
@@ -464,18 +467,32 @@ app.patch("/api/post/:id", async (req, res) => {
       return res.status(404).json({ error: "Post not found" });
     }
 
-    // Update the post's isDeleted field to true
-    post.isDeleted = true;
+    // Update the post fields based on the data in the request body
+    if (req.body.title) {
+      post.title = req.body.title;
+    }
+
+    if (req.body.content) {
+      post.content = req.body.content;
+    }
+
+    // Check if the 'isDeleted' field exists in the request body
+    // If it does, update the 'isDeleted' field in the post
+    if (req.body.isDeleted !== undefined) {
+      post.isDeleted = req.body.isDeleted;
+    }
+
+    post.editDate = Date.now();
+
     // Save the updated post in the database
     await post.save();
 
-    res.json({ message: "Post deleted successfully" });
+    res.json({ message: "Post updated successfully", post });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
   }
 });
-
 
 
 app.post("/api/comment", async (req, res) => {
