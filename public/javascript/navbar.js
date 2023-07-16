@@ -77,10 +77,17 @@ function createNavbar(location,isLoggedIn) {
 
     form.setAttribute('onsubmit', 'event.preventDefault();');
     form.setAttribute('role', 'search');
-    search_bar.appendChild(form);
+    
     form.appendChild(search_label);
     form.appendChild(search_input);
     form.appendChild(search_button);
+    
+
+    let search_choices = document.createElement('ul');
+    search_choices.className = 'search_choices';
+
+
+    
 
     search_label.setAttribute('for', 'search');
     search_label.textContent = 'Search for stuff';
@@ -90,10 +97,15 @@ function createNavbar(location,isLoggedIn) {
     search_input.setAttribute('placeholder', 'Search...');
     search_input.setAttribute('autofocus', 'required');
 
+    search_input.addEventListener('input', async (event) => {
+        const key = event.target.value;
+        searchForKey(key);
+      });
+
     search_button.setAttribute('type', 'submit');
     search_button.appendChild(search_button_img);
-
-
+    search_bar.appendChild(form);
+    search_bar.appendChild(search_choices);
     
 
     var table = document.createElement('table'),
@@ -165,3 +177,68 @@ function createNavbar(location,isLoggedIn) {
 function yes() {
 	console.log('yes')
 }
+
+async function updateSearchChoices(choices) {
+    let search_choices = document.querySelector('.search_choices');
+    search_choices.innerHTML = '';
+  
+    choices.forEach(choice => {
+      let li = document.createElement('li');
+      li.textContent = choice.username;
+      search_choices.appendChild(li);
+    });
+  }
+  
+  let isSearchResultDisplayed = false;
+
+  let searchTimeout;
+
+async function searchForKey(key) {
+  try {
+    clearTimeout(searchTimeout); // Cancel any pending search requests
+
+    const searchChoices = document.querySelector('.search_choices');
+    if (key.trim() === '') {
+      // If the search key is empty, clear the search results and return
+      searchChoices.innerHTML = '';
+      isSearchResultDisplayed = false;
+      return;
+    }
+
+    const response = await fetch(`/search/${key}`);
+    const data = await response.json();
+
+    if (data.length > 0) {
+      // If there are search results, update the choices
+      updateSearchChoices(data);
+      isSearchResultDisplayed = true;
+    } else {
+      // If no search results, clear the choices
+      searchChoices.innerHTML = '';
+      isSearchResultDisplayed = false;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+document.addEventListener('keyup', (event) => {
+  const searchInput = document.getElementById('search');
+  const searchChoices = document.querySelector('.search_choices');
+  const key = searchInput.value;
+
+  if (event.target === searchInput) {
+    clearTimeout(searchTimeout); // Cancel any pending search requests
+
+    // Delay the search request by 300 milliseconds after the key is released
+    searchTimeout = setTimeout(() => {
+      searchForKey(key);
+    }); //can add ,300 after }
+
+    if (key.trim() === '' && isSearchResultDisplayed) {
+      // If the search input is empty and search results are displayed, clear the choices
+      searchChoices.innerHTML = '';
+      isSearchResultDisplayed = false;
+    }
+  }
+});
