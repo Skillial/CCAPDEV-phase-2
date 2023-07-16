@@ -196,7 +196,7 @@ body{
 	font-size: 1rem;
 	color: #2E3440;
 	font-family: var(--font);
-	height: 500px;
+	max-height: 500px;
 	z-index: 9999;
   }
   
