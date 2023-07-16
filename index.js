@@ -2,13 +2,15 @@
 //Overall: HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
 //    input sanitization and general checking
 //post, patch, delete comment -> comments are stored in the db na
-//add reaction patch/remove reaction in database
+
 
 //SEMI-Done
 //post post -> fix links and formatting
 //patch profile -> need to fix profile pic, also displaying of posts in /profile (breaks when >1 post)
-//patch, delete post -> only the author of the post can edit and delete, and reactions
-//search (WIP)
+//patch, delete post -> only the author of the post can edit and delete
+//search (WIP by jean)
+//reacting -> works sa /post, not in /index
+//index.ejs - fix all the formatting and links
 
 //DONE FOR SURE
 // login, signup, logout -> to add: hashing password
@@ -409,6 +411,7 @@ app.get("/post/:title", async (req, res) => {
       if (!post) {
         return res.status(404).json({ error: "Post not found." });
       }
+
       // Fetch all top-level comments for the post
       const topLevelComments = await Comment.find({ parentPostID: post._id, parentCommentID: null })
             .populate("userID") // Populate the user details for each comment
@@ -445,7 +448,17 @@ app.get("/post/:title", async (req, res) => {
 
       let comments = topLevelComments;
       console.log(comments);
-      res.render("post", { postID, user, post, author, isCurrUserTheAuthor, comments });
+
+      //if user has already reacted or not
+      const react = await React.findOne({ userID: user._id, parentPostID: post._id });
+      let reactValue = 0;
+      if (react) {
+        reactValue = react.voteValue;
+      }
+      console.log("react object: ", react)
+      console.log("react value: ", reactValue)
+
+      res.render("post", { postID, user, post, author, isCurrUserTheAuthor, comments, reactValue });
     } else {
       // Redirect to the login page if not logged in
       res.redirect("/login");
@@ -529,6 +542,47 @@ app.post("/api/comment", async (req, res) => {
   }
 });
 
+app.post('/api/react', async (req, res) => {
+  try {
+    if (req.session.isLoggedIn) {
+      const userId = req.session.userId;
+      const user = await User.findById(userId);
+      const postId = req.body.postID;
+      const reactionValue = req.body.reactionValue;
+      const post = await Post.findById(postId);
+
+      if (!post) {
+        return res.status(404).json({ error: 'Post not found' });
+      }
+
+      const existingReact = await React.findOne({ userID: userId, parentPostID: postId });
+      if (existingReact) {
+        // User has already reacted, update the voteValue
+        existingReact.voteValue = reactionValue;
+        await existingReact.save();
+      } else {
+        // User has not reacted, create a new React document
+        const newReact = new React({
+          userID: userId,
+          parentPostID: postId,
+          isVoted: true,
+          voteValue: reactionValue
+        });
+        await newReact.save();
+      }
+
+      res.json({ message: 'Reaction updated successfully' });
+    } else{
+      res.redirect("/login");
+    }
+  }catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+
 app.get("/search/:key", async (req, res) => {
   try {
     const regex = new RegExp(req.params.key, 'i'); // 'i' flag for case-insensitive search
@@ -595,7 +649,3 @@ app.get("/searchpost/:key", async (req, res) => {
 });
 
 
-// app.get("/search/:key", async(req, resp) => {
-//   let data = await User.find()
-//   resp.send(data);
-// });

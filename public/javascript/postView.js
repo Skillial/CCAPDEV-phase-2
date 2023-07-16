@@ -1,7 +1,87 @@
-function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia) {
+function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia, preactValue) {
     const infoList = document.createElement('div');
     infoList.className = 'info_list';
+    infoList.style.display = 'flex';
+    infoList.style.alignItems = 'center';
+    infoList.style.marginBottom = '16px';
+    infoList.style.minWidth = '20%';
+    infoList.style.maxWidth = '80%';
   
+
+    const reactButtons = document.createElement('div');
+    reactButtons.className = 'react_buttons';
+    reactButtons.style.display = 'flex';
+    reactButtons.style.flexDirection = 'column';
+    reactButtons.style.alignItems = 'center';
+    reactButtons.style.marginRight = '8px';
+
+    const likeButton = document.createElement('img');
+    likeButton.src = preactValue == 1 ? '../images/reacts/up.png' : '../images/reacts/no_up.png'; // Set the path to the grayscale like image
+    likeButton.style.marginLeft = '8px';
+    likeButton.style.cursor = 'pointer';
+    likeButton.style.width = '24px';
+    likeButton.style.height = '48px';
+    let likeClicked = preactValue == 1; 
+    let dislikeClicked = preactValue == -1;
+    likeButton.addEventListener('click', () => {
+      if (likeClicked) {
+        // If Like button is already clicked, remove the like
+        handleReact(postID, 'unlike'); // Handle unlike functionality
+        likeClicked = false;
+        likeButton.src = '../images/reacts/no_up.png'; // Set the path to the grayscale like image
+      } else {
+        // If Like button is not clicked, add the like
+        handleReact(postID, 'like'); // Handle like functionality
+        likeClicked = true;
+        likeButton.src = '../images/reacts/up.png'; // Set the path to the colored like image
+    
+        // If Dislike button is clicked, set Dislike button to grayscale
+        if (dislikeClicked) {
+          dislikeClicked = false;
+          dislikeButton.src = '../images/reacts/no_down.png'; // Set the path to the grayscale dislike image
+        }
+      }
+    });
+    reactButtons.appendChild(likeButton);
+    
+    const ratingDisplay = document.createElement('span');
+    ratingDisplay.textContent = `${prating}`;
+    ratingDisplay.style.display = 'flex';
+    ratingDisplay.style.alignItems = 'center'; 
+    ratingDisplay.style.marginLeft = '8px'; 
+    reactButtons.appendChild(ratingDisplay);
+    
+    // Create the Dislike button with grayscale and colored images
+    const dislikeButton = document.createElement('img');
+    dislikeButton.src = preactValue == -1 ? '../images/reacts/down.png' : '../images/reacts/no_down.png'; // Set the path to the grayscale dislike image
+    dislikeButton.style.marginLeft = '8px';
+    dislikeButton.style.cursor = 'pointer';
+    dislikeButton.style.width = '24px';
+    dislikeButton.style.height = '48px';
+    //let dislikeClicked = false; // Variable to keep track of whether the Dislike button is clicked or not
+    dislikeButton.addEventListener('click', () => {
+      if (dislikeClicked) {
+        // If Dislike button is already clicked, remove the dislike
+        handleReact(postID, 'undislike'); // Handle undislike functionality
+        dislikeClicked = false;
+        dislikeButton.src = '../images/reacts/no_down.png'; // Set the path to the grayscale dislike image
+      } else {
+        // If Dislike button is not clicked, add the dislike
+        handleReact(postID, 'dislike'); // Handle dislike functionality
+        dislikeClicked = true;
+        dislikeButton.src = '../images/reacts/down.png'; // Set the path to the colored dislike image
+    
+        // If Like button is clicked, set Like button to grayscale
+        if (likeClicked) {
+          likeClicked = false;
+          likeButton.src = '../images/reacts/no_up.png'; // Set the path to the grayscale like image
+        }
+      }
+    });
+    reactButtons.appendChild(dislikeButton);
+    infoList.appendChild(reactButtons);
+
+
     const topic = document.createElement('div');
     topic.className = 'topic';
   
@@ -98,7 +178,6 @@ function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate,
     buttons.appendChild(commentDelete);
   
     info.appendChild(buttons);
-  
     topic.appendChild(info);
     infoList.appendChild(topic);
   
@@ -135,6 +214,67 @@ function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate,
 
   function newComment(pauthor, ppfp, pdesc, pcount, pid, children) {
     const buttonMargin = '0 8px';
+
+    const reactButtons = document.createElement('div');
+    reactButtons.className = 'react_buttons';
+    reactButtons.style.display = 'flex';
+    reactButtons.style.flexDirection = 'column';
+    reactButtons.style.alignItems = 'center';
+    reactButtons.style.marginRight = '8px';
+
+    const likeButton = document.createElement('img');
+    likeButton.src = '../images/reacts/no_up.png'; // Set the path to the grayscale like image
+    likeButton.style.marginLeft = '8px';
+    likeButton.style.cursor = 'pointer';
+    likeButton.style.width = '24px';
+    likeButton.style.height = '48px';
+    let likeClicked = false; // Variable to keep track of whether the Like button is clicked or not
+    likeButton.addEventListener('click', () => {
+      //handleReact(postID, 'like'); // Handle like functionality
+    
+      // Toggle the image between grayscale and colored version
+      likeClicked = !likeClicked;
+      if (likeClicked) {
+        likeButton.src = '../images/reacts/up.png'; // Set the path to the colored like image
+        // If Like button is clicked, set Dislike button to grayscale
+        dislikeButton.src = '../images/reacts/no_down.png'; // Set the path to the grayscale dislike image
+        dislikeClicked = false;
+      } else {
+        likeButton.src = '../images/reacts/no_up.png'; // Set the path to the grayscale like image
+      }
+    });
+    reactButtons.appendChild(likeButton);
+    
+    const ratingDisplay = document.createElement('span');
+    ratingDisplay.textContent = `${prating}`;
+    ratingDisplay.style.display = 'flex';
+    ratingDisplay.style.alignItems = 'center'; 
+    ratingDisplay.style.marginLeft = '8px'; 
+    reactButtons.appendChild(ratingDisplay);
+    
+    // Create the Dislike button with grayscale and colored images
+    const dislikeButton = document.createElement('img');
+    dislikeButton.src = '../images/reacts/no_down.png'; // Set the path to the grayscale dislike image
+    dislikeButton.style.marginLeft = '8px';
+    dislikeButton.style.cursor = 'pointer';
+    dislikeButton.style.width = '24px';
+    dislikeButton.style.height = '48px';
+    let dislikeClicked = false; // Variable to keep track of whether the Dislike button is clicked or not
+    dislikeButton.addEventListener('click', () => {
+      //handleReact(postID, 'dislike'); // Handle dislike functionality
+    
+      // Toggle the image between grayscale and colored version
+      dislikeClicked = !dislikeClicked;
+      if (dislikeClicked) {
+        dislikeButton.src = '../images/reacts/down.png'; // Set the path to the colored dislike image
+        // If Dislike button is clicked, set Like button to grayscale
+        likeButton.src = '../images/reacts/no_up.png'; // Set the path to the grayscale like image
+        likeClicked = false;
+      } else {
+        dislikeButton.src = '../images/reacts/no_down.png'; // Set the path to the grayscale dislike image
+      }
+    });
+    reactButtons.appendChild(dislikeButton);
 
     const commentAlign = document.createElement('div');
     commentAlign.className = 'comment_align';
@@ -317,6 +457,52 @@ function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate,
           // Handle error
         });
     }
+  }
+  
+  function handleReact(postID, reactionType) {
+    // Determine the reaction value based on the reactionType
+    let reactionValue;
+    switch (reactionType) {
+      case 'like':
+        reactionValue = 1;
+        break;
+      case 'dislike':
+        reactionValue = -1;
+        break;
+      case 'undislike':
+      case 'unlike':
+        reactionValue = 0;
+        break;
+      default:
+        reactionValue = 0; 
+        break;
+    }
+ 
+    // Send an HTTP request to update the reaction on the server
+    const requestBody = {
+      postID: postID,
+      reactionValue: reactionValue
+    };
+  
+    fetch(`/api/react`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    })
+      .then(response => {
+        if (response.ok) {
+          // Handle successful reaction update
+          window.location.href = "/post/" + encodeURIComponent(ptitle);
+        } else {
+          throw new Error('Failed to update reaction');
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        // Handle error
+      });
   }
   
   
