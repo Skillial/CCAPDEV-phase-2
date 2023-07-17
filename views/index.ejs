@@ -65,15 +65,16 @@
           <div id="forum">
             <% for (let i = 0; i < posts.length; i++) { %>
               <% const post = posts[i]; %>
-              <% let { title, content, author, rating, media, profile, link } = post; %>
+              <% let { _id, title, content, author, rating, media, profile, link } = post; %>
               <% profile = "/profile/" + author %>
               <% link = "/post/" + encodeURIComponent(title) %>
               <script>
-                $('#forum').append(createPost('<%= title %>', '<%= content %>', '<%= author %>', '<%= rating %>', '<%= media %>', '<%= profile %>', '<%= link %>'));
+                $('#forum').append(createPost('<%= title %>', '<%= content %>', '<%= author %>', '<%= rating %>', '<%= media %>', '<%= profile %>', '<%= link %>','<%= _id %>'));
               </script>
             <% } %>
           </div>
-          <script>
+          
+          <!-- <script>
             let title = 'Different salts',
                 content = "I've been wondering for a while now, what is the difference between kosher salt and iodized salt? Those tutorial vids always specify what types of salt to use, but I never understood why.",					author = 'poop bandit',
                 rating = '1.5k',
@@ -126,7 +127,7 @@
             profile='user_profiles/Kinkey.html',
             link='data/sample posts/Advice_needed.html';
             $('#forum').append(createPost(title, content, author, rating, tags, media, profile, link));
-        </script>
+        </script> -->
     
     </div>
 

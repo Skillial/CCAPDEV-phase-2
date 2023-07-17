@@ -96,7 +96,7 @@ app.get("/index", async (req, res) => {
         post.rating = ratingCount;
       }
 
-      res.render("index", { posts });
+      res.render("index", { posts});
     } else {
       console.log("Currently not logged in, showing a limited number of posts!")
       const limit = 20; // Change the limit value as needed

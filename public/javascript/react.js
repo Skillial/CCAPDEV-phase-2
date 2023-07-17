@@ -110,7 +110,8 @@ function handleReact(postID, reactionType) {
       .then(response => {
         if (response.ok) {
           // Handle successful reaction update
-          window.location.href = "/post/" + encodeURIComponent(ptitle);
+        //   window.location.href = "/post/" + encodeURIComponent(ptitle);
+		window.location.reload();
         } else {
           throw new Error('Failed to update reaction');
         }
