@@ -31,7 +31,7 @@ nCancelButton.addEventListener("click", () => {
 });
 
   
-function createPost(title, desc, author, rating, media, profile, link) {
+function createPost(title, desc, author, rating, media, profile, link,pid) {
 	let post = document.createElement('div'),
 	content_div = document.createElement('div'),
 	post_title = document.createElement('div'),
@@ -66,7 +66,7 @@ function createPost(title, desc, author, rating, media, profile, link) {
 	content_div.appendChild(post_title);
 	content_div.appendChild(post_description);
 
-	post.appendChild(createReaction(rating));
+	post.appendChild(createReaction(rating,0,pid));
 	post.appendChild(content_div);
   callCount++;
 	return post;

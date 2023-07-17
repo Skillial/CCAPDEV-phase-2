@@ -21,7 +21,7 @@
                 
 			</div>
             <script>
-                
+                // console.log('<%= user.username %>');
                 <% if (!post.isDeleted) { %>
                   let postID = '<%= post._id %>',
                   
@@ -53,7 +53,7 @@
               
               <% comments.forEach(comment => { %>
                  <script>
-                  $('.border').append(postreply('<%= comment.userID.username %>','<%= comment.userID.ppfp %>','<%= comment.content %>', '<%= comment.rating %>', '<%= comment._id %>'));
+                  $('.border').append(postreply('<%= comment.userID.username %>','<%= comment.userID.ppfp %>','<%= comment.content %>', '<%= comment.rating %>', '<%= comment._id %>','<%= user.username %>'));
                 </script>
                   <!-- <p>1<%= comment.userID.username %>:</p> 
                   <p>2<%= comment.content %></p> 
@@ -62,7 +62,7 @@
                   <p>5<%= comment._id %></p> -->
                       <% comment.children.forEach(child => { %>
                         <script>
-                          $('.border').append(postreply('<%= child.userID.username %>','<%= child.userID.ppfp %>','<%= child.content %>', '<%= child.rating %>', '<%= child._id %>'));
+                          $('.border').append(postreply('<%= child.userID.username %>','<%= child.userID.ppfp %>','<%= child.content %>', '<%= child.rating %>', '<%= child._id %>','<%= user.username %>'));
                         </script>
                       <% }); %>
               <% }); %>

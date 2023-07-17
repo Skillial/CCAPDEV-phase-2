@@ -216,7 +216,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
 
 
 // new reply
-function postreply(pauthor,ppfp,pdesc,pcount,pid){
+function postreply(pauthor,ppfp,pdesc,pcount,pid,user){
     let 
     comment_align = document.createElement('div'),
     comment_forum = document.createElement('div'),
@@ -269,7 +269,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid){
     desc.textContent=pdesc;
     comment_profile.style.cursor = 'pointer';
     comment_profile.onclick = function(){
-        window.location.href = "../../user_profiles/"+pauthor+".html";
+      window.location.href = `/profile/${pauthor}`;
     }
     comment_content_desc.appendChild(desc);
     comment_delete.textContent="Delete";
@@ -320,10 +320,13 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid){
         }
    
     }
-    comment_react.appendChild(comment_delete);
+    if (user==pauthor){
+      comment_react.appendChild(comment_delete);
+    }
+    
     comment_react.appendChild(comment_reply);
     comment_share.textContent="Share";
-    comment_react.appendChild(comment_share);
+    // comment_react.appendChild(comment_share);
     comment_edit.textContent="Edit";
     comment_edited.textContent="Edited";
     comment_save.textContent="Save";
@@ -344,7 +347,10 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid){
         }
 
     };
-    comment_react.appendChild(comment_edit);
+    if (user==pauthor){
+      comment_react.appendChild(comment_edit);
+    }
+    
     comment_content_desc.appendChild(comment_react);
     comment_container.appendChild(comment_content_desc);
 	comment_forum.appendChild(createReaction(pcount));
