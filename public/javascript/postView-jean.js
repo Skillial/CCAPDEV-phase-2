@@ -216,7 +216,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
 
 
 // new reply / new comment
-function postreply(pauthor,ppfp,pdesc,pcount,pid,user){
+function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID){
     let 
     comment_align = document.createElement('div'),
     comment_forum = document.createElement('div'),
@@ -332,10 +332,11 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user){
     comment_edited.textContent="Edited";
     comment_save.textContent="Save";
     comment_delete.onclick = function() {
-        author.textContent="Deleted";
-        pfp.src="";
-        desc.textContent="Deleted";
-        count.textContent="Deleted";
+        // author.textContent="Deleted";
+        // pfp.src="";
+        // desc.textContent="Deleted";
+        // count.textContent="Deleted";
+        handleDeleteComment(pid);
     };
     comment_edit.onclick = function() {
         comment_save.style.display = 'block';
