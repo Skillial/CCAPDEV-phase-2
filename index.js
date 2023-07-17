@@ -1,19 +1,18 @@
 //To DO
 //Overall: HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
 //    input sanitization and general checking
-//post, patch, delete comment -> comments are stored in the db na
-
 
 //SEMI-Done
-//post post -> fix formatting
 //patch profile -> need to fix profile pic, also displaying of posts in /profile (breaks when >1 post)
-
-//reacting -> works sa /post, not in /index//index.ejs - fix reacting in index.js
+//reacting -> check if works for comments. works everywhere else.
+//post, patch, delete comment -> comments are stored in the db na, to fix reacting
 
 //DONE FOR SURE
 // login, signup, logout -> to add: hashing password
+//post post -> fix formatting
 //patch, delete post -> maybe paganda patching, like takign the inputs (currently uses alerts)
-//search (WIP by jean)
+
+//search 
 
 require('dotenv').config();
 const link = process.env.DB_URL;
@@ -90,6 +89,13 @@ app.get("/index", async (req, res) => {
       // Get the number of positive and negative votes for each post
       for (let i = 0; i < posts.length; i++) {
         const post = posts[i];
+        const userReaction = await React.findOne({
+          userID: userId,
+          parentPostID: post._id,
+          isVoted: true,
+        });
+        post.userReaction = userReaction ? userReaction.voteValue : 0;
+
         const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
         const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
         const ratingCount = positiveCount - negativeCount;
@@ -149,7 +155,6 @@ app.get("/profile/edit/", async (req, res) => {
   try {
     const userId = req.session.userId;
     const user = await User.findById(userId);
-    console.log("app.get profile edit username: ", user.username);
     res.render("profile-edit", { user });
   } catch (error) {
     console.error(error);
