@@ -238,22 +238,38 @@ async function searchForUser(key) {
 }
 
 async function updatePostChoices(choices) {
-    const searchChoices = document.querySelector('#search_choices_post');
-    searchChoices.innerHTML = '';
-    const search_bar_label = document.createElement('div');
-    search_bar_label.textContent = "Search from posts";
-    search_bar_label.className = "search_bar_label";
-    searchChoices.appendChild(search_bar_label);
-    
-    choices.forEach(choice => {
+  const searchChoices = document.querySelector('#search_choices_post');
+  searchChoices.innerHTML = '';
+  const search_bar_label = document.createElement('div');
+  search_bar_label.textContent = "Search from comments/posts";
+  search_bar_label.className = "search_bar_label";
+  searchChoices.appendChild(search_bar_label);
+
+  const existingTextContent = new Set();
+
+  for (const choice of choices) {
+    const { title, parentPostID } = choice;
+    let textContent = '';
+
+    if (title) {
+      textContent = title;
+    } else if (parentPostID) {
+      const response = await fetch(`/searchcomment/${parentPostID}`);
+      const data = await response.json();
+      textContent = data.postTitle || '';
+    }
+
+    if (textContent && !existingTextContent.has(textContent)) {
       const li = document.createElement('li');
-      li.textContent = choice.title;
+      li.textContent = textContent;
       li.onclick = () => {
-        window.location.href = `/post/${encodeURIComponent(choice.title)}`;
+        window.location.href = `/post/${encodeURIComponent(li.textContent)}`;
       };
       searchChoices.appendChild(li);
-    });
+      existingTextContent.add(textContent);
+    }
   }
+}
   
 
 async function searchForPost(key) {

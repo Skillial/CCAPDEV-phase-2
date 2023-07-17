@@ -437,47 +437,55 @@ app.get("/post/:title", async (req, res) => {
 
       // Fetch all top-level comments for the post
       const topLevelComments = await Comment.find({ parentPostID: post._id, parentCommentID: null })
-            .populate("userID") // Populate the user details for each comment
-            .exec();
-    
+        .populate("userID") // Populate the user details for each comment
+        .exec();
+
       // A recursive function to fetch comments of comments and so on
-      const fetchChildComments = async (comment) => {
-        const children = await Comment.find({ parentCommentID: comment._id })
-            .populate("userID") // Populate the user details for each comment
-            .exec();
-        comment.children = children;
-        for (const child of children) {
-          await fetchChildComments(child);
+      async function fetchChildComments(comment) {
+        const childComments = await Comment.find({ parentCommentID: comment._id })
+          .populate("userID")
+          .exec();
+
+        if (childComments.length === 0) {
+          return [];
         }
-      };
-    
-      // Fetch all child comments recursively for each top-level comment
-      for (const comment of topLevelComments) {
-        await fetchChildComments(comment);
+
+        const recursiveChildComments = await Promise.all(
+          childComments.map(async (childComment) => {
+            childComment.childComments = await fetchChildComments(childComment);
+            return childComment;
+          })
+        );
+
+        return recursiveChildComments;
       }
 
-      //author of the post
+      // Fetch comments recursively for each top-level comment
+      const comments = await Promise.all(
+        topLevelComments.map(async (comment) => {
+          comment.childComments = await fetchChildComments(comment);
+          return comment;
+        })
+      );
+
+      // Author of the post
       const author = await User.findOne({ username: post.author });
       const postID = post._id;
       const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
       const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
       const ratingCount = positiveCount - negativeCount;
       post.rating = ratingCount;
-      let isCurrUserTheAuthor = author.username === user.username;
+      const isCurrUserTheAuthor = author.username === user.username;
 
-      console.log("num of top level comments: ",topLevelComments.length);
+      console.log("num of top level comments: ", topLevelComments.length);
       console.log("this post's id: ", post._id);
       console.log("this post's id: ", postID);
 
-      let comments = topLevelComments;
       console.log(comments);
 
       //if user has already reacted or not
       const react = await React.findOne({ userID: user._id, parentPostID: post._id });
-      let reactValue = 0;
-      if (react) {
-        reactValue = react.voteValue;
-      }
+      const reactValue = react ? react.voteValue : 0;
       console.log("react object: ", react)
       console.log("react value: ", reactValue)
 
@@ -659,6 +667,25 @@ app.get("/searchpost/:key", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred during the search." });
+  }
+});
+
+app.get('/searchcomment/:key', async (req, res) => {
+  try {
+    const parentPostID = req.params.key;
+
+    // Perform the necessary logic to retrieve the post title based on the parentPostID
+    // For example:
+    const post = await Post.findOne({ _id: parentPostID });
+    if (post) {
+      const postTitle = post.title;
+      res.json({ postTitle });
+    } else {
+      res.status(404).json({ error: 'Post not found.' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while searching for the post.' });
   }
 });
 

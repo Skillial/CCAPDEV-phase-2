@@ -114,7 +114,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
             border.removeChild(comment_text_area);
             border.removeChild(cancel_save_wrap);
             // border.append(postreply(userID,"",newcomment,0,postID+1)); //change to currently logged in
-            handleReply(postID,newcomment);
+            handleReply(postID,newcomment,'a',0);
         }
       });
 
@@ -216,7 +216,14 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
 
 
 // new reply
-function postreply(pauthor,ppfp,pdesc,pcount,pid,user){
+function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID){
+  console.log('pauthor:', pauthor);
+console.log('ppfp:', ppfp);
+console.log('pdesc:', pdesc);
+console.log('pcount:', pcount);
+console.log('pid:', pid);
+console.log('user:', user);
+console.log('parentID:', parentID);
     let 
     comment_align = document.createElement('div'),
     comment_forum = document.createElement('div'),
@@ -315,7 +322,8 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user){
             let newcomment = text_area_value.value;
             comment_wrapping.removeChild(comment_text_area);
             comment_wrapping.removeChild(cancel_save_wrap);
-            comment_align.append(postreply("poop bandit","../sample users/poop bandit.jpg",newcomment,0,pid+1));
+            // comment_align.append(postreply("poop bandit","../sample users/poop bandit.jpg",newcomment,0,pid+1));
+            handleReply(pid,newcomment,parentID,1);
                 
         }
    
@@ -475,13 +483,24 @@ function profpost(pauthor,ppfp,pdesc,pcount,pid,phtml){
 
 }
 
-function handleReply(postID,replyContent) {
+function handleReply(postID,replyContent,parentID,checker) {
     if (replyContent) {
       // Send an HTTP request to your server to save the reply
-      const requestBody = {
-        content: replyContent,
-        parentPostID: postID
-      };
+      var requestBody;
+      if (checker==0){
+         requestBody = {
+          content: replyContent,
+          parentPostID: postID
+        };
+      } 
+      if (checker==1){
+         requestBody = {
+          content: replyContent,
+          parentPostID: parentID,
+          parentCommentID: postID
+        };
+      } 
+      
       fetch('/api/comment', {
         method: 'POST',
         headers: {
