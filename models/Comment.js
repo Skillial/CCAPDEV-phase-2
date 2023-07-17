@@ -8,6 +8,7 @@ const CommentSchema = new mongoose.Schema({
   content: String,
   author: String,
   rating: {type: Number, default: 0},
+  userReaction: {type: Number, default: 0},
   createDate: {type: Date, default: Date.now()},
   editDate: {type: Date, default: null},
   isDeleted: {type: Boolean, default: false}

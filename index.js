@@ -1,19 +1,18 @@
 //To DO
 //Overall: HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
 //    input sanitization and general checking
-//post, patch, delete comment -> comments are stored in the db na
-
 
 //SEMI-Done
-//post post -> fix formatting
 //patch profile -> need to fix profile pic, also displaying of posts in /profile (breaks when >1 post)
-
-//reacting -> works sa /post, not in /index//index.ejs - fix reacting in index.js
+//reacting -> check if works for comments. works everywhere else.
+//post, patch, delete comment -> comments are stored in the db na, to fix reacting
 
 //DONE FOR SURE
 // login, signup, logout -> to add: hashing password
+//post post -> fix formatting
 //patch, delete post -> maybe paganda patching, like takign the inputs (currently uses alerts)
-//search (WIP by jean)
+
+//search 
 
 require('dotenv').config();
 const link = process.env.DB_URL;
@@ -90,6 +89,13 @@ app.get("/index", async (req, res) => {
       // Get the number of positive and negative votes for each post
       for (let i = 0; i < posts.length; i++) {
         const post = posts[i];
+        const userReaction = await React.findOne({
+          userID: userId,
+          parentPostID: post._id,
+          isVoted: true,
+        });
+        post.userReaction = userReaction ? userReaction.voteValue : 0;
+
         const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
         const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
         const ratingCount = positiveCount - negativeCount;
@@ -149,7 +155,6 @@ app.get("/profile/edit/", async (req, res) => {
   try {
     const userId = req.session.userId;
     const user = await User.findById(userId);
-    console.log("app.get profile edit username: ", user.username);
     res.render("profile-edit", { user });
   } catch (error) {
     console.error(error);
@@ -492,7 +497,7 @@ app.patch("/api/post/:id", async (req, res) => {
   try {
     const postId = req.params.id;
     // Fetch the post from the database based on the postId
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId, {isDeleted:false});
     const user = await User.findById(req.session.userId)
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
@@ -529,7 +534,7 @@ app.patch("/api/post/:id", async (req, res) => {
   }
 });
 
-
+//post new comment
 app.post("/api/comment", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
@@ -538,6 +543,10 @@ app.post("/api/comment", async (req, res) => {
       const { content, parentPostID, parentCommentID } = req.body;
       console.log("parent post id as string:", parentPostID);
       let parentPostIdObject = new mongoose.Types.ObjectId(parentPostID); //converts the string representation parentPostID to mongoose id
+      let parentCommentIdObject = null;
+      if(parentCommentID){
+        parentCommentIdObject = new mongoose.Types.ObjectId(parentCommentID);
+      }
       console.log("parent post id as object: ", parentPostIdObject)
       const masterPost = await Post.findById(parentPostIdObject); //gets master post of the comment, no matter the depth
       console.log("Master post object: ", masterPost);
@@ -547,7 +556,7 @@ app.post("/api/comment", async (req, res) => {
         author: user.username,
         content,
         parentPostID: parentPostIdObject, // Add the parent post if available
-        parentCommentID: parentCommentID, // Add the parent comment if available
+        parentCommentID: parentCommentIdObject, // Add the parent comment if available
       });
 
       // Save the new comment object to the database
@@ -564,6 +573,45 @@ app.post("/api/comment", async (req, res) => {
   }
 });
 
+//edit and delete comments
+app.patch("/api/comment/:id", async (req, res) => {
+  try {
+    const commentId = req.params.id;
+    //Fetches the comment
+    const comment = await Post.findById(commentId, {isDeleted:false});
+    const user = await User.findById(req.session.userId)
+    if (!comment) {
+      return res.status(404).json({ error: "Comment not found" });
+    }
+    if (comment.userID.toString() != req.session.userId.toString()) {
+      return res.status(403).json({ error: 'You are not authorized to edit this comment.' });
+    }
+   
+    //Updating comment fields
+    if (comment.body.content) {
+      comment.content = req.body.content;
+    }
+
+    // Check if the 'isDeleted' field exists in the request body
+    // If it does, update the 'isDeleted' field in the post
+    if (comment.body.isDeleted !== undefined) {
+      comment.isDeleted = req.body.isDeleted;
+    }
+
+    comment.editDate = Date.now();
+
+    // Save the updated post in the database
+    await comment.save();
+
+    res.json({ message: "Comment updated successfully", comment });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+//server side for handling reactions
 app.post('/api/react', async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
