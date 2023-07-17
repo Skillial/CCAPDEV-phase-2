@@ -24,7 +24,9 @@
 					<main>
 						<%= user.username %> <!-- Display the user's display name -->
 					</main>
-					<button onclick="window.location.href = '/profile/edit';">Edit Profile</button>
+					<% if (IsCurrUserTheProfileOwner) { %>
+						<button onclick="window.location.href = '/profile/edit';">Edit Profile</button>
+					<% } %>
 				</aside>
 				<div id="profile-details">
 					<main>
