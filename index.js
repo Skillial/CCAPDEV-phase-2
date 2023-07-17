@@ -5,22 +5,22 @@
 
 
 //SEMI-Done
-//post post -> fix links and formatting
+//post post -> fix formatting
 //patch profile -> need to fix profile pic, also displaying of posts in /profile (breaks when >1 post)
 
-//search (WIP by jean)
-//reacting -> works sa /post, not in /index
-//index.ejs - fix all the formatting and links
+//reacting -> works sa /post, not in /index//index.ejs - fix reacting in index.js
 
 //DONE FOR SURE
 // login, signup, logout -> to add: hashing password
 //patch, delete post -> maybe paganda patching, like takign the inputs (currently uses alerts)
+//search (WIP by jean)
 
 require('dotenv').config();
 const link = process.env.DB_URL;
 const authRoutes = require('./sessions/router');
 const { isLoggedInMiddleware } = require('./lib/middleware');
 const { userIDMiddleware } = require('./lib/middleware');
+const { hashPassword } = require('./lib/hashing');
 const express = require('express');
 const session = require('express-session');
 const ejs = require('ejs-async');
@@ -75,6 +75,9 @@ const React = require('./models/React')
 
 app.use(isLoggedInMiddleware);
 app.use(userIDMiddleware);
+// app.use(hashPassword);
+
+
 app.get("/index", async (req, res) => {
   try {
     if (req.session?.isLoggedIn) {
@@ -265,17 +268,18 @@ app.get("/profile", async (req, res) => {
       console.log(posts !== null);
       
       console.log(posts);
-      if(posts.length === 0){
-        user.posts = user.posts;
-      }
-      else{
-        user.posts = posts;
-      }
+      // if(posts.length === 0){
+      //   user.posts = user.posts;
+      // }
+      // else{
+      //   user.posts = posts;
+      // }
       
       console.log(userId);
       console.log(user);
+      let IsCurrUserTheProfileOwner = true;
       // Render the profile page with the user's information
-      res.render("profile", { user });
+      res.render("profile", { user, IsCurrUserTheProfileOwner});
     } else {
       // Redirect to the login page if not logged in
       res.redirect("/login");
@@ -289,24 +293,35 @@ app.get("/profile", async (req, res) => {
 app.get("/profile/:username", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
-      // Fetch user information from MongoDB based on the logged-in user's ID
+      //logged in user info
+      //const userLoggedIn = User.findById(req.session.userId);
+
+      //profile of :username
       const { username } = req.params;
-      user = await User.findOne({ username });
+      let user = await User.findOne({ username });
       let userId = user._id;
+      console.log(req.session.userId.toString(), " ", userId.toString())
+
+      let IsCurrUserTheProfileOwner = false;
+      if(req.session.userId.toString() === userId.toString()){
+        IsCurrUserTheProfileOwner = true;
+        res.redirect("/profile");
+      }
+
+      
       console.log("viewing profile of: ", userId, " with username: ", username);
       posts = await Post.find({ userID: userId, isDeleted:false })
-      console.log(posts);
-      if(posts.length === 0){
-        user.posts = user.posts;
-      }
-      else{
-        user.posts = posts;
-      }
-      
+      console.log(posts.content);
+      // if(posts.length === 0){
+      //   user.posts = user.posts;
+      // }
+      // else{
+      //   user.posts = posts;
+      // }
       console.log(userId);
       console.log(user);
       // Render the profile page with the user's information
-      res.render("profile", { user });
+      res.render("profile", { user, IsCurrUserTheProfileOwner });
     } else {
       // Redirect to the login page if not logged in
       res.redirect("/login");
@@ -317,21 +332,31 @@ app.get("/profile/:username", async (req, res) => {
   }
 });
 
-app.patch('/api/user/:username', async (req, res) => {
+app.patch("/api/user/:username", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
+      const userID = req.session.userId;
       const username = req.params.username;
       const newUsername = req.body.username;
       const newPassword = req.body.password;
       const updateData = req.body;
       if (newPassword !== "" && req.body.password === req.body.repassword) {
+        newPassword = newPassword.toString();
         // If the new password is provided, hash and update the password field
+        //const hashedPassword = await hashPassword(newPassword);
         updateData.password = newPassword;
       }else{
         delete updateData.password;
       }
       console.log(username);
       // Assuming you want to find the user by the username
+      //const user = await User.findById(userId);
+      //update the user fields
+      // Object.keys(updateData).forEach((key) => {
+      //   user[key] = updateData[key];
+      // });
+      // await user.save();
+
       const user = await User.findOneAndUpdate({ username }, updateData, { new: true });
       await Post.updateMany({ author: username }, { author: newUsername });
       await Comment.updateMany({ author: username }, { author: newUsername });

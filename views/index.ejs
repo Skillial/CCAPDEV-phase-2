@@ -61,74 +61,72 @@
     </div>
     
     <script src="./javascript/newPost.js"></script>
-    
-    <script>
-        let title = 'Different salts',
-            content = "I've been wondering for a while now, what is the difference between kosher salt and iodized salt? Those tutorial vids always specify what types of salt to use, but I never understood why.",					author = 'poop bandit',
-            rating = '1.5k',
-            tags = 'General Question',
-            media = ' ',
-            profile='user_profiles/poop bandit.html',
-            link='data/sample posts/Differerent_salts.html';
-        $('#forum').append(createPost(title, content, author, rating, tags, media, profile, link));
-    </script>
-    <script>
-        title = 'Popular Filipino Dishes?';
-        content = "What are some popular Filipino dishes easily cookable at home?";
-        author = 'denial';
-        rating = '500';
-        tags = 'General Question';
-        media = ' ';
-        profile='user_profiles/denial.html',
-            link='data/sample posts/Popular_Filipino_Dishes.html';
-        $('#forum').append(createPost(title, content, author, rating, tags, media, profile, link));
-    </script>
-    <script>
-        title = 'Showcasing my dish',
-        content = "I tried my hand at cooking chicken. What do you all think?",
-        author = 'Ecola',
-        rating = '5.3k',
-        tags = 'General Question',
-        media = 'cooked_chicken.png';
-        profile='user_profiles/Ecola.html',
-            link='data/sample posts/Showcasing_my_dish.html';
-        $('#forum').append(createPost(title, content, author, rating, tags, media, profile, link));
-    </script>
-    <script>
-        title = 'Food places around DLSU',
-        content = "I'm an incoming ID 123, any good places to eat around DLSU?",
-        author = 'Matrix',
-        rating = '200',
-        tags = 'Recommendation',
-        media = ' ';
-        profile='user_profiles/Matrix.html',
-            link='data/sample posts/Food_places_around_DLSU.html';
-        $('#forum').append(createPost(title, content, author, rating, tags, media, profile, link));
-    </script>
-    <script>
-        title = 'Advice needed',
-        content = "Hi! So I'm a 17 year old who has been cooking for 2-3 years already but do not have much experience in prep work as my parents usually do it for me. Late last year, I started taking charge of prepping when I cook and learned to chop more and more but I accidentally cut a chunk of my nail out which stopped me from chopping for a while. Recently, I have tried chopping again but my finger doesn't seem to trust me anymore. My brain tells me that I'll be fine and I just have to take it slow but my finger tells me that it will slip again and chop myself. Any advice on how to get over this? I really wanna go back to chopping again as it's quite fun.",
-        author = 'Kinkey',
-        rating = '999',
-        tags = 'Recommendation',
-        media = ' ';
-        profile='user_profiles/Kinkey.html',
-        link='data/sample posts/Advice_needed.html';
-        $('#forum').append(createPost(title, content, author, rating, tags, media, profile, link));
-    </script>
 
           <div id="forum">
             <% for (let i = 0; i < posts.length; i++) { %>
               <% const post = posts[i]; %>
-              <% let { title, content, author, rating, tags, media, profile, link } = post; %>
+              <% let { title, content, author, rating, media, profile, link } = post; %>
               <% profile = "/profile/" + author %>
-              <% profile = "/post/" + encodeURIComponent(title) %>
               <% link = "/post/" + encodeURIComponent(title) %>
               <script>
-                $('#forum').append(createPost('<%= title %>', '<%= content %>', '<%= author %>', '<%= rating %>', '<%= tags %>', '<%= media %>', '<%= profile %>', '<%= link %>'));
+                $('#forum').append(createPost('<%= title %>', '<%= content %>', '<%= author %>', '<%= rating %>', '<%= media %>', '<%= profile %>', '<%= link %>'));
               </script>
             <% } %>
           </div>
+          <script>
+            let title = 'Different salts',
+                content = "I've been wondering for a while now, what is the difference between kosher salt and iodized salt? Those tutorial vids always specify what types of salt to use, but I never understood why.",					author = 'poop bandit',
+                rating = '1.5k',
+                tags = 'General Question',
+                media = ' ',
+                profile='user_profiles/poop bandit.html',
+                link='data/sample posts/Differerent_salts.html';
+            $('#forum').append(createPost(title, content, author, rating, tags, media, profile, link));
+        </script>
+        <script>
+            title = 'Popular Filipino Dishes?';
+            content = "What are some popular Filipino dishes easily cookable at home?";
+            author = 'denial';
+            rating = '500';
+            tags = 'General Question';
+            media = ' ';
+            profile='user_profiles/denial.html',
+                link='data/sample posts/Popular_Filipino_Dishes.html';
+            $('#forum').append(createPost(title, content, author, rating, tags, media, profile, link));
+        </script>
+        <script>
+            title = 'Showcasing my dish',
+            content = "I tried my hand at cooking chicken. What do you all think?",
+            author = 'Ecola',
+            rating = '5.3k',
+            tags = 'General Question',
+            media = 'cooked_chicken.png';
+            profile='user_profiles/Ecola.html',
+                link='data/sample posts/Showcasing_my_dish.html';
+            $('#forum').append(createPost(title, content, author, rating, tags, media, profile, link));
+        </script>
+        <script>
+            title = 'Food places around DLSU',
+            content = "I'm an incoming ID 123, any good places to eat around DLSU?",
+            author = 'Matrix',
+            rating = '200',
+            tags = 'Recommendation',
+            media = ' ';
+            profile='user_profiles/Matrix.html',
+                link='data/sample posts/Food_places_around_DLSU.html';
+            $('#forum').append(createPost(title, content, author, rating, tags, media, profile, link));
+        </script>
+        <script>
+            title = 'Advice needed',
+            content = "Hi! So I'm a 17 year old who has been cooking for 2-3 years already but do not have much experience in prep work as my parents usually do it for me. Late last year, I started taking charge of prepping when I cook and learned to chop more and more but I accidentally cut a chunk of my nail out which stopped me from chopping for a while. Recently, I have tried chopping again but my finger doesn't seem to trust me anymore. My brain tells me that I'll be fine and I just have to take it slow but my finger tells me that it will slip again and chop myself. Any advice on how to get over this? I really wanna go back to chopping again as it's quite fun.",
+            author = 'Kinkey',
+            rating = '999',
+            tags = 'Recommendation',
+            media = ' ';
+            profile='user_profiles/Kinkey.html',
+            link='data/sample posts/Advice_needed.html';
+            $('#forum').append(createPost(title, content, author, rating, tags, media, profile, link));
+        </script>
     
     </div>
 

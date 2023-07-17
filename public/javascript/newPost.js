@@ -57,11 +57,11 @@ function createPost(title, desc, author, rating, media, profile, link) {
 	post_title.appendChild(post_author);
 	post_description.textContent = desc;
 	post_description.setAttribute('align', 'justify');
-	if (media.localeCompare(' ') !== 0) {
-		post_description.appendChild(document.createElement('br'));
-		post_media.textContent = '(' + media + ')';
-		post_description.appendChild(post_media);
-	}
+	// if (media.localeCompare(' ') !== 0) {
+	// 	post_description.appendChild(document.createElement('br'));
+	// 	post_media.textContent = '(' + media + ')';
+	// 	post_description.appendChild(post_media);
+	// }
 
 	content_div.appendChild(post_title);
 	content_div.appendChild(post_description);
