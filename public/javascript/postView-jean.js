@@ -114,7 +114,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
             border.removeChild(comment_text_area);
             border.removeChild(cancel_save_wrap);
             // border.append(postreply(userID,"",newcomment,0,postID+1)); //change to currently logged in
-            handleReply(postID,newcomment);
+            handleReply(postID,newcomment,'a',0);
         }
       });
 
@@ -216,7 +216,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
 
 
 // new reply / new comment
-function postreply(pauthor,ppfp,pdesc,pcount,pid,user){
+function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID){
     let 
     comment_align = document.createElement('div'),
     comment_forum = document.createElement('div'),
@@ -315,8 +315,9 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user){
             let newcomment = text_area_value.value;
             comment_wrapping.removeChild(comment_text_area);
             comment_wrapping.removeChild(cancel_save_wrap);
-            comment_align.append(postreply("poop bandit","../sample users/poop bandit.jpg",newcomment,0,pid+1));
-                
+            // comment_align.append(postreply("poop bandit","../sample users/poop bandit.jpg",newcomment,0,pid+1));
+            handleReply(pid,newcomment,parentID,1);
+            
         }
    
     }
@@ -331,10 +332,11 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user){
     comment_edited.textContent="Edited";
     comment_save.textContent="Save";
     comment_delete.onclick = function() {
-        author.textContent="Deleted";
-        pfp.src="";
-        desc.textContent="Deleted";
-        count.textContent="Deleted";
+        // author.textContent="Deleted";
+        // pfp.src="";
+        // desc.textContent="Deleted";
+        // count.textContent="Deleted";
+        handleDeleteComment(pid);
     };
     comment_edit.onclick = function() {
         comment_save.style.display = 'block';
@@ -344,6 +346,8 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user){
         comment_save.onclick=function(){
             comment_save.style.display = 'none';
             desc.contentEditable = false;
+            var newCommentContent = desc.innerHTML;
+            handleEditComment(pid, newCommentContent );
         }
 
     };
@@ -475,13 +479,24 @@ function profpost(pauthor,ppfp,pdesc,pcount,pid,phtml){
 
 }
 
-function handleReply(postID,replyContent) {
+function handleReply(postID,replyContent,parentID,checker) {
     if (replyContent) {
       // Send an HTTP request to your server to save the reply
-      const requestBody = {
-        content: replyContent,
-        parentPostID: postID
-      };
+      var requestBody;
+      if (checker==0){
+         requestBody = {
+          content: replyContent,
+          parentPostID: postID
+        };
+      } 
+      if (checker==1){
+         requestBody = {
+          content: replyContent,
+          parentPostID: parentID,
+          parentCommentID: postID
+        };
+      } 
+      
       fetch('/api/comment', {
         method: 'POST',
         headers: {
@@ -568,7 +583,7 @@ function handleReply(postID,replyContent) {
     // Show a confirmation dialog before deleting the commenttastatas
     if (confirm('Are you sure you want to delete this comment?')) {
       // Send an HTTP request to your server to update the commentt data
-      fetch(`/api/post/${commentID}`, {
+      fetch(`/api/comment/${commentID}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
@@ -589,16 +604,16 @@ function handleReply(postID,replyContent) {
     }
   }
   
-  function handleEditComment(commentID, currentContent) {
-    const newContent = prompt('Edit your comment content:', currentContent);
+  function handleEditComment(commentID, newContent) {
+    // const newContent = prompt('Edit your comment content:', currentContent);
   
-    if (currentContent !== null) {
+    if (newContent !== null) {
       // Send an HTTP request to update the post on the server
       const requestBody = {
         content: newContent
       };
   
-      fetch(`/api/post/${commentID}`, {
+      fetch(`/api/comment/${commentID}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'

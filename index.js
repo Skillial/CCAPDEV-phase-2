@@ -1,6 +1,9 @@
 //To DO
 //Overall: HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
-//    input sanitization and general checking
+//        input sanitization and general checking
+//remove a lot of the isLoggedIn checks -> /post/:title  /profile/:username  
+//sort by date and by 'most popular'
+//add landing pages for errors
 
 //SEMI-Done
 //patch profile -> need to fix profile pic, also displaying of posts in /profile (breaks when >1 post)
@@ -8,10 +11,9 @@
 //post, patch, delete comment -> comments are stored in the db na, to fix reacting
 
 //DONE FOR SURE
-// login, signup, logout -> to add: hashing password
-//post post -> fix formatting
+// login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
+//post post
 //patch, delete post -> maybe paganda patching, like takign the inputs (currently uses alerts)
-
 //search 
 
 require('dotenv').config();
@@ -437,47 +439,55 @@ app.get("/post/:title", async (req, res) => {
 
       // Fetch all top-level comments for the post
       const topLevelComments = await Comment.find({ parentPostID: post._id, parentCommentID: null })
-            .populate("userID") // Populate the user details for each comment
-            .exec();
-    
+        .populate("userID") // Populate the user details for each comment
+        .exec();
+
       // A recursive function to fetch comments of comments and so on
-      const fetchChildComments = async (comment) => {
-        const children = await Comment.find({ parentCommentID: comment._id })
-            .populate("userID") // Populate the user details for each comment
-            .exec();
-        comment.children = children;
-        for (const child of children) {
-          await fetchChildComments(child);
+      async function fetchChildComments(comment) {
+        const childComments = await Comment.find({ parentCommentID: comment._id })
+          .populate("userID")
+          .exec();
+
+        if (childComments.length === 0) {
+          return [];
         }
-      };
-    
-      // Fetch all child comments recursively for each top-level comment
-      for (const comment of topLevelComments) {
-        await fetchChildComments(comment);
+
+        const recursiveChildComments = await Promise.all(
+          childComments.map(async (childComment) => {
+            childComment.childComments = await fetchChildComments(childComment);
+            return childComment;
+          })
+        );
+
+        return recursiveChildComments;
       }
 
-      //author of the post
+      // Fetch comments recursively for each top-level comment
+      const comments = await Promise.all(
+        topLevelComments.map(async (comment) => {
+          comment.childComments = await fetchChildComments(comment);
+          return comment;
+        })
+      );
+
+      // Author of the post
       const author = await User.findOne({ username: post.author });
       const postID = post._id;
       const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
       const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
       const ratingCount = positiveCount - negativeCount;
       post.rating = ratingCount;
-      let isCurrUserTheAuthor = author.username === user.username;
+      const isCurrUserTheAuthor = author.username === user.username;
 
-      console.log("num of top level comments: ",topLevelComments.length);
+      console.log("num of top level comments: ", topLevelComments.length);
       console.log("this post's id: ", post._id);
       console.log("this post's id: ", postID);
 
-      let comments = topLevelComments;
       console.log(comments);
 
       //if user has already reacted or not
       const react = await React.findOne({ userID: user._id, parentPostID: post._id });
-      let reactValue = 0;
-      if (react) {
-        reactValue = react.voteValue;
-      }
+      const reactValue = react ? react.voteValue : 0;
       console.log("react object: ", react)
       console.log("react value: ", reactValue)
 
@@ -578,23 +588,23 @@ app.patch("/api/comment/:id", async (req, res) => {
   try {
     const commentId = req.params.id;
     //Fetches the comment
-    const comment = await Post.findById(commentId, {isDeleted:false});
+    const comment = await Comment.findById(commentId, {isDeleted:false});
     const user = await User.findById(req.session.userId)
     if (!comment) {
       return res.status(404).json({ error: "Comment not found" });
     }
-    if (comment.userID.toString() != req.session.userId.toString()) {
-      return res.status(403).json({ error: 'You are not authorized to edit this comment.' });
-    }
-   
+    // if (comment.userID.toString() != req.session.userId.toString()) {
+    //   return res.status(403).json({ error: 'You are not authorized to edit this comment.' });
+    // }
+    console.log(comment)
     //Updating comment fields
-    if (comment.body.content) {
+    if (req.body.content) {
       comment.content = req.body.content;
     }
 
     // Check if the 'isDeleted' field exists in the request body
     // If it does, update the 'isDeleted' field in the post
-    if (comment.body.isDeleted !== undefined) {
+    if (req.body.isDeleted !== undefined) {
       comment.isDeleted = req.body.isDeleted;
     }
 
@@ -698,6 +708,25 @@ app.get("/searchpost/:key", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred during the search." });
+  }
+});
+
+app.get('/searchcomment/:key', async (req, res) => {
+  try {
+    const parentPostID = req.params.key;
+
+    // Perform the necessary logic to retrieve the post title based on the parentPostID
+    // For example:
+    const post = await Post.findOne({ _id: parentPostID });
+    if (post) {
+      const postTitle = post.title;
+      res.json({ postTitle });
+    } else {
+      res.status(404).json({ error: 'Post not found.' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while searching for the post.' });
   }
 });
 
