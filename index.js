@@ -543,6 +543,10 @@ app.post("/api/comment", async (req, res) => {
       const { content, parentPostID, parentCommentID } = req.body;
       console.log("parent post id as string:", parentPostID);
       let parentPostIdObject = new mongoose.Types.ObjectId(parentPostID); //converts the string representation parentPostID to mongoose id
+      let parentCommentIdObject = null;
+      if(parentCommentID){
+        parentCommentIdObject = new mongoose.Types.ObjectId(parentCommentID);
+      }
       console.log("parent post id as object: ", parentPostIdObject)
       const masterPost = await Post.findById(parentPostIdObject); //gets master post of the comment, no matter the depth
       console.log("Master post object: ", masterPost);
@@ -552,7 +556,7 @@ app.post("/api/comment", async (req, res) => {
         author: user.username,
         content,
         parentPostID: parentPostIdObject, // Add the parent post if available
-        parentCommentID: parentCommentID, // Add the parent comment if available
+        parentCommentID: parentCommentIdObject, // Add the parent comment if available
       });
 
       // Save the new comment object to the database
