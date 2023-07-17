@@ -67,7 +67,7 @@ function createNavbar(location,isLoggedIn) {
     let home = document.createElement('a');
     home.href = "/index";;
     home.appendChild(logo);
-    logo.setAttribute('height', '50px');
+    logo.setAttribute('height', '100%');
     logo.setAttribute('margin', 'auto');
     logo.src = location + '../images/dark/logo.png';
     search_button_img.src = location + '../images/search.png';
@@ -124,6 +124,7 @@ function createNavbar(location,isLoggedIn) {
         logout_button = document.createElement('td');
         profile_button = document.createElement('td');
 
+    table.setAttribute('class', 'user-control');
     login_button.textContent = 'Login';
     login_button.className = 'pointer';
     sign_up_button.className = 'pointer';
