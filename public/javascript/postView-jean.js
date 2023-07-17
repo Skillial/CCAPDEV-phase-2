@@ -1,4 +1,4 @@
-function posthtml(pauthor,ptitle,ppfp,pdesc,pposted,pedited,ptags,pcount,pmedia) {
+function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prating,pmedia, preactValue, isCurrUserTheAuthor) {
     let 
     // content_list = document.createElement('div'),
     info_list = document.createElement('div'),
@@ -11,10 +11,8 @@ function posthtml(pauthor,ptitle,ppfp,pdesc,pposted,pedited,ptags,pcount,pmedia)
     pfp = document.createElement('img'),
     posted =document.createElement('p'),
     edited =document.createElement('p'),
-    tags =document.createElement('p'),
     postedSpan=document.createElement('span'),
     editedSpan=document.createElement('span'),
-    tagsSpan=document.createElement('span'),
     media = document.createElement('img'),
     comment_reply = document.createElement('div'),
     comment_share = document.createElement('div'),
@@ -51,7 +49,9 @@ function posthtml(pauthor,ptitle,ppfp,pdesc,pposted,pedited,ptags,pcount,pmedia)
     span.innerHTML = " &bull;posted by " + pauthor;
     span.style.cursor='pointer';
     span.appendChild(pfp);
-    headers.textContent=ptitle+" ";
+    let header_title = document.createElement('p');
+    header_title.textContent=ptitle+" ";
+    headers.appendChild(header_title);
     headers.appendChild(span);
      topic.appendChild(headers);
     
@@ -63,48 +63,40 @@ function posthtml(pauthor,ptitle,ppfp,pdesc,pposted,pedited,ptags,pcount,pmedia)
     topic.appendChild(post);
     posted.textContent= "Posted ";
     info.appendChild(posted);
-    postedSpan.textContent=pposted;
+    postedSpan.textContent=ppostedDate;
     info.appendChild(postedSpan);
-    edited.textContent= "Edited ";
-    info.appendChild(edited);
-    editedSpan.textContent=pedited;
-    info.appendChild(editedSpan);
-    tags.textContent="Tags: ";
-    info.appendChild(tags);
-    tagsSpan.textContent=ptags;
-    info.appendChild(tagsSpan);
+    if (peditedDate !== '- Not Edited') {
+        edited.textContent= "Edited ";
+        info.appendChild(edited);
+        editedSpan.textContent=new Date(peditedDate).toLocaleString();
+        info.appendChild(editedSpan);
+    }
     
-
     span.onclick = function(){
-        window.location.href = "../../user_profiles/"+pauthor+".html";
+        window.location.href = `/profile/${pauthor}`;
     }
     comment_reply.textContent="Reply";
     comment_text_area_save.textContent="Save";
     comment_cancel.textContent="Cancel";
-    comment_reply.onclick = function(){ 
-        var ecolaElement = document.getElementById("Ecola");
-        var kinkeyElement = document.getElementById("Kinkey");
-        var matrixElement = document.getElementById("Matrix");
-        var denialElement = document.getElementById("denial");
-        var poop_banditElement = document.getElementById("poop bandit");
-        if (ecolaElement||kinkeyElement||matrixElement||denialElement||poop_banditElement) {
-            let textAreas = document.querySelectorAll('.comment_text_area');
-// Remove each text area from its parent "comment_wrapping" div
-textAreas.forEach(textArea => {
-  const parentElement = textArea.closest('.comment_wrapping');
-  if (parentElement) {
-    parentElement.removeChild(textArea);
-  }
-});
 
-let commentSaves = document.querySelectorAll('.cancel_save_wrap');
-// Remove each comment save element from its parent "comment_wrapping" div
-commentSaves.forEach(commentSave => {
-  const parentElement = commentSave.closest('.comment_wrapping');
-  if (parentElement) {
-    parentElement.removeChild(commentSave);
-  }
-});
+
+    comment_reply.addEventListener('click', () => {
+        let textAreas = document.querySelectorAll('.comment_text_area');
+        textAreas.forEach(textArea => {
+            const parentElement = textArea.closest('.comment_wrapping');
+            if (parentElement) {
+              parentElement.removeChild(textArea);
+            }
+          });
+
+        let commentSaves = document.querySelectorAll('.cancel_save_wrap');
+        // Remove each comment save element from its parent "comment_wrapping" div
+        commentSaves.forEach(commentSave => {
+            const parentElement = commentSave.closest('.comment_wrapping');
+            if (parentElement) {
+                parentElement.removeChild(commentSave);
+            }
+        });
         const border = document.querySelector('.border');
         border.appendChild(comment_text_area);
         cancel_save_wrap = document.createElement('div');
@@ -121,99 +113,89 @@ commentSaves.forEach(commentSave => {
             let newcomment = text_area_value.value;
             border.removeChild(comment_text_area);
             border.removeChild(cancel_save_wrap);
-            const commentAlignElement = document.querySelector('.comment_align'); 
+            // border.append(postreply(userID,"",newcomment,0,postID+1)); //change to currently logged in
+            handleReply(postID,newcomment);
+        }
+      });
 
-            if (commentAlignElement) {
-                const commentAlignId = commentAlignElement.id;
-                console.log(commentAlignId);
-                if (ecolaElement){
-                    border.append(postreply("Ecola","../sample users/Ecola.jpg",newcomment,0,commentAlignId+1));
-                }
-                if (kinkeyElement){
-                    border.append(postreply("Kinkey","../sample users/Kinkey.jpg",newcomment,0,commentAlignId+1));
-                }
-                if (matrixElement){
-                    border.append(postreply("Matrix","../sample users/Matrix.jpg",newcomment,0,commentAlignId+1));
-                }
-                if (denialElement){
-                    border.append(postreply("denial","../sample users/denial.jpg",newcomment,0,commentAlignId+1));
-                }
-                if (poop_banditElement){
-                    border.append(postreply("poop bandit","../sample users/poop bandit.jpg",newcomment,0,commentAlignId+1));
-                }
-            
-            }   
-        }
-        }else{
-            alert("You need to log in first");
-        }
-    }
-    buttons.appendChild(comment_reply);
     comment_share.textContent="Share";
-    buttons.appendChild(comment_share);
     comment_edit.textContent="Edit";
     comment_edited.textContent="Edited";
     comment_save.textContent="Save";
     comment_save.style.display = 'none';
+
+
+
     comment_edit.onclick = function() {
-        var ecolaElement = document.getElementById(pauthor);
-        if (ecolaElement) {
-            // buttons.appendChild(comment_edit);
-        
-        comment_save.style.display = 'block';
-        post_img.contentEditable = true; 
+        comment_save.style.display = 'inline';
+        post_img.contentEditable = true;
+        post_img.style.border = '1px solid red';
+        header_title.contentEditable = true;
+        header_title.style.border = '1px solid red';      
         buttons.appendChild(comment_save);
-        // buttons.appendChild(comment_edited);
-        comment_save.onclick=function(){
-            comment_save.style.display = 'none';
-            post_img.contentEditable = false;
-        }
-    }else{
-        alert("You need to log in first");
-    }
-    };
-    comment_delete.onclick = function() {
-        var ecolaElement = document.getElementById(pauthor);
-        if (ecolaElement) {
-        let commentDeleteElements = document.querySelectorAll('.content_list'); // Assuming 'content_list' is the class name of the elements you want to delete.
       
-        commentDeleteElements.forEach(function(element) {
-          element.innerHTML = '';
-        });
-      
-        commentDeleteElements = document.querySelectorAll('.comment_align'); // Assuming 'comment_align' is the class name of the elements you want to delete.
-      
-        commentDeleteElements.forEach(function(element) {
-          element.innerHTML = '';
-        });
-      
-        const border = document.querySelector('.border'); // Assuming 'border' is the class name of the container element where you want to append the new div.
-        const topDiv = document.createElement('div');
-        const topicDiv = document.createElement('div');
-        topicDiv.classList.add('content_delete');
-        topicDiv.textContent = 'Content Deleted';
-        border.appendChild(topDiv);
-        topDiv.appendChild(topicDiv);
-        topDiv.style.display = 'flex';
-        topDiv.style.justifyContent = 'center';
-        topDiv.style.alignItems = 'center';
-        topDiv.style.position = 'fixed';
-        topDiv.style.top = '50%';
-        topDiv.style.left = '50%';
-        topDiv.style.transform = 'translate(-50%, -50%)';}else{
-            alert("You need to log in first");
-        }
+        comment_save.onclick = function() {
+          comment_save.style.display = 'none';
+          post_img.contentEditable = false;
+          post_img.style.border = 'none';
+          header_title.contentEditable = false;
+          header_title.style.border = 'none';
+          
+          // Save the content of post_img and header_title to variables
+          var newDescription = post_img.innerHTML;
+          var newTitle = header_title.innerHTML;
+          handleEditPost(postID,newTitle,newDescription);
+        };
       };
+
+
+    comment_delete.onclick = function() {
+        handleDeletePost(postID);
+        // let commentDeleteElements = document.querySelectorAll('.content_list'); // Assuming 'content_list' is the class name of the elements you want to delete.
+      
+        // commentDeleteElements.forEach(function(element) {
+        //   element.innerHTML = '';
+        // });
+      
+        // commentDeleteElements = document.querySelectorAll('.comment_align'); // Assuming 'comment_align' is the class name of the elements you want to delete.
+      
+        // commentDeleteElements.forEach(function(element) {
+        //   element.innerHTML = '';
+        // });
+      
+        // const border = document.querySelector('.border'); // Assuming 'border' is the class name of the container element where you want to append the new div.
+        // const topDiv = document.createElement('div');
+        // const topicDiv = document.createElement('div');
+        // topicDiv.classList.add('content_delete');
+        // topicDiv.textContent = 'Content Deleted';
+        // border.appendChild(topDiv);
+        // topDiv.appendChild(topicDiv);
+        // topDiv.style.display = 'flex';
+        // topDiv.style.justifyContent = 'center';
+        // topDiv.style.alignItems = 'center';
+        // topDiv.style.position = 'fixed';
+        // topDiv.style.top = '50%';
+        // topDiv.style.left = '50%';
+        // topDiv.style.transform = 'translate(-50%, -50%)';
+        
+      };
+
+
     comment_delete.textContent="Delete";
-    buttons.appendChild(comment_delete);
+    if(isCurrUserTheAuthor){
+        buttons.appendChild(comment_delete);
+    }
+    
     buttons.appendChild(comment_reply);
-    buttons.appendChild(comment_share);
-    buttons.appendChild(comment_edit);
+    // buttons.appendChild(comment_share);
+    if(isCurrUserTheAuthor){
+        buttons.appendChild(comment_edit);
+    }
+    
     
 
     // buttons.appendChild(comment_save);
-    info_list.appendChild(createReaction(pcount));
-
+    info_list.appendChild(createReaction(prating,preactValue,postID));
     info.appendChild(buttons);
     topic.appendChild(info);
     info_list.appendChild(topic);
@@ -295,35 +277,29 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid){
     comment_text_area_save.textContent="Save";
     comment_cancel.textContent="Cancel";
     comment_reply.onclick = function(){
-        var ecolaElement = document.getElementById("Ecola");
-        var kinkeyElement = document.getElementById("Kinkey");
-        var matrixElement = document.getElementById("Matrix");
-        var denialElement = document.getElementById("denial");
-        var poop_banditElement = document.getElementById("poop bandit");
-        if (ecolaElement||kinkeyElement||matrixElement||denialElement||poop_banditElement) {
-            let textAreas = document.querySelectorAll('.comment_text_area');
-            // Remove each text area from its parent "comment_wrapping" div
-            textAreas.forEach(textArea => {
-              const parentElement = textArea.closest('.comment_wrapping');
-              if (parentElement) {
-                parentElement.removeChild(textArea);
-              }else{
-                const parentElement = textArea.closest('.border');
-                parentElement.removeChild(textArea);
-              }
-            });
-            
-            let commentSaves = document.querySelectorAll('.cancel_save_wrap');
-            // Remove each comment save element from its parent "comment_wrapping" div
-            commentSaves.forEach(commentSave => {
-              const parentElement = commentSave.closest('.comment_wrapping');
-              if (parentElement) {
-                parentElement.removeChild(commentSave);
-              } else{
-                const parentElement = commentSave.closest('.border');
-                parentElement.removeChild(commentSave);
-              }
-            });
+        let textAreas = document.querySelectorAll('.comment_text_area');
+        // Remove each text area from its parent "comment_wrapping" div
+        textAreas.forEach(textArea => {
+            const parentElement = textArea.closest('.comment_wrapping');
+            if (parentElement) {
+            parentElement.removeChild(textArea);
+            }else{
+            const parentElement = textArea.closest('.border');
+            parentElement.removeChild(textArea);
+            }
+        });
+        
+        let commentSaves = document.querySelectorAll('.cancel_save_wrap');
+        // Remove each comment save element from its parent "comment_wrapping" div
+        commentSaves.forEach(commentSave => {
+            const parentElement = commentSave.closest('.comment_wrapping');
+            if (parentElement) {
+            parentElement.removeChild(commentSave);
+            } else{
+            const parentElement = commentSave.closest('.border');
+            parentElement.removeChild(commentSave);
+            }
+        });
         comment_wrapping.appendChild(comment_text_area);
         cancel_save_wrap = document.createElement('div');
         cancel_save_wrap.className='cancel_save_wrap';
@@ -339,25 +315,10 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid){
             let newcomment = text_area_value.value;
             comment_wrapping.removeChild(comment_text_area);
             comment_wrapping.removeChild(cancel_save_wrap);
-            if (ecolaElement){
-                comment_align.append(postreply("Ecola","../sample users/Ecola.jpg",newcomment,0,pid+1));
-                }
-                if (kinkeyElement){
-                    comment_align.append(postreply("Kinkey","../sample users/Kinkey.jpg",newcomment,0,pid+1));
-                }
-                if (matrixElement){
-                    comment_align.append(postreply("Matrix","../sample users/Matrix.jpg",newcomment,0,pid+1));
-                }
-                if (denialElement){
-                    comment_align.append(postreply("denial","../sample users/denial.jpg",newcomment,0,pid+1));
-                }
-                if (poop_banditElement){
-                    comment_align.append(postreply("poop bandit","../sample users/poop bandit.jpg",newcomment,0,pid+1));
-                }
+            comment_align.append(postreply("poop bandit","../sample users/poop bandit.jpg",newcomment,0,pid+1));
+                
         }
-    }else{
-        alert("You need to log in first");
-    }
+   
     }
     comment_react.appendChild(comment_delete);
     comment_react.appendChild(comment_reply);
@@ -367,19 +328,12 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid){
     comment_edited.textContent="Edited";
     comment_save.textContent="Save";
     comment_delete.onclick = function() {
-        var ecolaElement = document.getElementById(pauthor);
-        if (ecolaElement) {
         author.textContent="Deleted";
         pfp.src="";
         desc.textContent="Deleted";
         count.textContent="Deleted";
-        }else{
-            alert("You need to log in first");
-        }
     };
     comment_edit.onclick = function() {
-        var ecolaElement = document.getElementById(pauthor);
-        if (ecolaElement) {
         comment_save.style.display = 'block';
         desc.contentEditable = true; 
         comment_react.appendChild(comment_save);
@@ -388,9 +342,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid){
             comment_save.style.display = 'none';
             desc.contentEditable = false;
         }
-    }else{
-        alert("You need to log in first");
-    }
+
     };
     comment_react.appendChild(comment_edit);
     comment_content_desc.appendChild(comment_react);
@@ -517,31 +469,91 @@ function profpost(pauthor,ppfp,pdesc,pcount,pid,phtml){
 
 }
 
-function profButton(){
-    const editButton = document.getElementById('edit_Button');
-						const saveButton = document.getElementById('save_Button');
-						const prof_info = document.getElementById('prof_info');
-						saveButton.style.display = 'none';
-						editButton.onclick = function() {
-                            var ecolaElement = document.getElementById("Ecola");
-        var kinkeyElement = document.getElementById("Kinkey");
-        var matrixElement = document.getElementById("Matrix");
-        var denialElement = document.getElementById("denial");
-        var poop_banditElement = document.getElementById("poop bandit");
-        let currentURL = window.location.href;
-        if ((ecolaElement!=null && currentURL.endsWith('Ecola.html')) ||
-        (kinkeyElement!=null && currentURL.endsWith('Kinkey.html')) ||
-        (matrixElement!=null && currentURL.endsWith('Matrix.html')) ||
-        (denialElement!=null && currentURL.endsWith('denial.html')) ||
-        (poop_banditElement!=null && currentURL.endsWith('bandit.html'))) {
-      prof_info.setAttribute('contenteditable', 'true');
-      saveButton.style.display = 'block';
-    } else {
-      alert("You need to log in first");
-    }};
-					  
-						saveButton.addEventListener('click', function() {
-						  saveButton.style.display = 'none';
-						  prof_info.setAttribute('contenteditable', 'false');
-						});
-}
+function handleReply(postID,replyContent) {
+    if (replyContent) {
+      // Send an HTTP request to your server to save the reply
+      const requestBody = {
+        content: replyContent,
+        parentPostID: postID
+      };
+      fetch('/api/comment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      })
+        .then(response => {
+          if (response.ok) {
+            // Handle successful reply creation
+            // Reload or update the comments section if needed
+            window.location.href = "/post/" + encodeURIComponent(ptitle);
+          } else {
+            throw new Error('Failed to create reply');
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          // Handle error
+        });
+    }
+  }
+
+
+  function handleDeletePost(postID) {
+    // Show a confirmation dialog before deleting the post
+    if (confirm('Are you sure you want to delete this post?')) {
+      // Send an HTTP request to your server to update the post data
+      fetch(`/api/post/${postID}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ isDeleted: true })
+      })
+        .then(response => {
+          if (response.ok) {
+            window.location.href = "/post/" + encodeURIComponent(ptitle);
+          } else {
+            throw new Error('Failed to delete the post');
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          // Handle error
+        });
+    }
+  }
+
+  function handleEditPost(postID, newTitle,newDescription) {
+  
+    if (newTitle !== null || newDescription !== null) {
+      // Send an HTTP request to update the post on the server
+      const requestBody = {
+        title: newTitle,
+        content: newDescription
+      };
+  
+      fetch(`/api/post/${postID}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      })
+        .then(response => {
+          if (response.ok) {
+            // Handle successful post update
+            // Reload the page to see the updated post details
+            const encodedTitle = encodeURIComponent(newTitle); // Assuming newTitle is the updated title
+            window.location.replace(`/post/${encodedTitle}`);
+          } else {
+            throw new Error('Failed to update post');
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          // Handle error
+        });
+    }
+  }

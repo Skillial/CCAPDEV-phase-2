@@ -465,50 +465,6 @@ function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate,
     }
   }
   
-  function handleReact(postID, reactionType) {
-    // Determine the reaction value based on the reactionType
-    let reactionValue;
-    switch (reactionType) {
-      case 'like':
-        reactionValue = 1;
-        break;
-      case 'dislike':
-        reactionValue = -1;
-        break;
-      case 'undislike':
-      case 'unlike':
-        reactionValue = 0;
-        break;
-      default:
-        reactionValue = 0; 
-        break;
-    }
- 
-    // Send an HTTP request to update the reaction on the server
-    const requestBody = {
-      postID: postID,
-      reactionValue: reactionValue
-    };
   
-    fetch(`/api/react`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(requestBody)
-    })
-      .then(response => {
-        if (response.ok) {
-          // Handle successful reaction update
-          window.location.href = "/post/" + encodeURIComponent(ptitle);
-        } else {
-          throw new Error('Failed to update reaction');
-        }
-      })
-      .catch(error => {
-        console.error(error);
-        // Handle error
-      });
-  }
   
   

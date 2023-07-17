@@ -4,7 +4,7 @@
 		<meta charset="UTF-8">
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script src="/javascript/react.js"></script>
-        <script src="/javascript/postView.js"></script>
+        <script src="/javascript/postView-jean.js"></script>
 		<title>
 			<%= post.title %>
 		</title>
@@ -42,7 +42,7 @@
                   let isCurrUserTheAuthor = '<%=isCurrUserTheAuthor%>';
                   console.log(isCurrUserTheAuthor);
                 
-                  $('.content_list').append(newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia, preactValue, isCurrUserTheAuthor ));
+                  $('.content_list').append(posthtml(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia, preactValue, isCurrUserTheAuthor ));
                 <% } else { %>
                   // Display a message when the post is deleted
                   $('.content_list').append('<div>The original post was deleted, but you can still view the comments.</div>');

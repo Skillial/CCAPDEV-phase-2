@@ -598,17 +598,23 @@ app.get("/searchpost/:key", async (req, res) => {
   try {
     const regex = new RegExp(req.params.key, 'i'); // 'i' flag for case-insensitive search
 
-
     const postData = await Post.find({
-      $or: [
-        { title: { $regex: regex } },
-        { content: { $regex: regex } }
+      $and: [
+        { $or: [
+          { title: { $regex: regex } },
+          { content: { $regex: regex } }
+        ] },
+        { isDeleted: false }
       ]
     });
     
     const commentData = await Comment.find({
-      content: { $regex: regex }
+      $and: [
+        { content: { $regex: regex } },
+        { isDeleted: false }
+      ]
     });
+
     const combinedData = [...postData, ...commentData];
     res.json(combinedData); // Sending the retrieved data as JSON response
   } catch (error) {
