@@ -33,10 +33,13 @@
 	flex-direction: column;
 	background-color: var(--card-color);
 	max-width: 1440px;
-	width: 40%;
+	width: 80%;
 	margin: auto;
 	border-radius: var(--corner-radius);
+	padding: 15px;
 }
+
+
 
 .profile {
 	display: flex;
@@ -892,5 +895,16 @@ padding-left:15px;
 #login-screen {
 	display: flex;
 	flex-direction: column;
-	
+	max-width: 720px;
+	width: 100%;
+}
+
+#login-screen > input[type="text"], #login-screen > input[type="password"]  {
+	border-radius: var(--corner-radius);
+	border-style: hidden;
+
+}
+
+#login-screen > input[type="submit"] {
+	width: 50%;
 }
