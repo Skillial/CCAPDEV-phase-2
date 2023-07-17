@@ -182,13 +182,13 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
 
 
     comment_delete.textContent="Delete";
-    if(isCurrUserTheAuthor){
+    if(isCurrUserTheAuthor=="true"){
         buttons.appendChild(comment_delete);
     }
     
     buttons.appendChild(comment_reply);
     // buttons.appendChild(comment_share);
-    if(isCurrUserTheAuthor){
+    if(isCurrUserTheAuthor=="true"){
         buttons.appendChild(comment_edit);
     }
     
