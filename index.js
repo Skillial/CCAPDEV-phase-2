@@ -1,6 +1,9 @@
 //To DO
 //Overall: HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
-//    input sanitization and general checking
+//        input sanitization and general checking
+//remove a lot of the isLoggedIn checks -> /post/:title  /profile/:username  
+//sort by date and by 'most popular'
+//add landing pages for errors
 
 //SEMI-Done
 //patch profile -> need to fix profile pic, also displaying of posts in /profile (breaks when >1 post)
@@ -8,10 +11,9 @@
 //post, patch, delete comment -> comments are stored in the db na, to fix reacting
 
 //DONE FOR SURE
-// login, signup, logout -> to add: hashing password
-//post post -> fix formatting
+// login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
+//post post
 //patch, delete post -> maybe paganda patching, like takign the inputs (currently uses alerts)
-
 //search 
 
 require('dotenv').config();

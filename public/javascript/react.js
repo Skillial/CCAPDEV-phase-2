@@ -46,7 +46,7 @@ $(document).on('click', '.comment_like', function() {
 	$(this).siblings('.comment_dislike').removeClass('comment_dislike_colored');
 });
 
-function createReaction(reactions, preactValue,postID) {
+function createReaction(reactions, preactValue, postID) {
 	let reaction = document.createElement('div'),
 		like = document.createElement('div'),
 		count = document.createElement('div'),
