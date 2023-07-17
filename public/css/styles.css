@@ -28,9 +28,13 @@
 }
 
 .card {
-	justify-content: center;
 	align-items: center;
 	display: flex;
+	flex-direction: column;
+	background-color: var(--card-color);
+	max-width: 1440px;
+	width: 80%;
+	margin: auto;
 }
 
 .profile {
@@ -116,7 +120,7 @@
 	top: 0;
 	z-index: 999;
 	/* overflow: hidden; */
-	height: 6.20%; 
+	height: 2.5rem; 
 }
 
 body{
@@ -876,4 +880,10 @@ padding-left:15px;
 	float:right;
 	/* margin-right: 3%; */
 	text-align: right;
+}
+
+#login-screen {
+	display: flex;
+	flex-direction: column;
+	
 }
