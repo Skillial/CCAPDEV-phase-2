@@ -177,7 +177,12 @@ app.post("/login", async (req, res) => {
   try {
     const { username, password, remember } = req.body;
     const user = await User.findOne({ username });
+        // Use the comparePassword method to check if the provided password matches the hashed password in the database
+        // const isPasswordMatch = await user.comparePassword(password);
 
+        // if (!isPasswordMatch) {
+        //   return res.status(400).json({ error: "Invalid username or password." });
+        // }
     // Check if the user exists and the password matches
     if (!user || user.password !== password) {
       return res.status(400).json({ error: "Invalid username or password." });
