@@ -323,7 +323,7 @@ function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate,
     const commentDelete = document.createElement('div');
     commentDelete.textContent = 'Delete';
     commentDelete.addEventListener('click', () => {
-      // Handle delete functionality
+      handleDeleteComment(pid);
     });
     commentReact.appendChild(commentDelete);
   
@@ -465,6 +465,61 @@ function newPost(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate,
     }
   }
   
+
+  function handleDeleteComment(commentID) {
+    // Show a confirmation dialog before deleting the commenttastatas
+    if (confirm('Are you sure you want to delete this comment?')) {
+      // Send an HTTP request to your server to update the commentt data
+      fetch(`/api/post/${commentID}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ isDeleted: true })
+      })
+        .then(response => {
+          if (response.ok) {
+            window.location.reload();
+          } else {
+            throw new Error('Failed to delete the comment');
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          // Handle error
+        });
+    }
+  }
+  
+  function handleEditComment(commentID, currentContent) {
+    const newContent = prompt('Edit your post content:', currentContent);
+  
+    if (currentContent !== null) {
+      // Send an HTTP request to update the post on the server
+      const requestBody = {
+        content: newContent
+      };
+  
+      fetch(`/api/post/${commentID}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      })
+        .then(response => {
+          if (response.ok) {
+            window.location.reload();
+          } else {
+            throw new Error('Failed to update comment');
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          // Handle error
+        });
+    }
+  }
   
   
   
