@@ -346,6 +346,8 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID){
         comment_save.onclick=function(){
             comment_save.style.display = 'none';
             desc.contentEditable = false;
+            var newCommentContent = desc.innerHTML;
+            handleEditComment(pid, newCommentContent );
         }
 
     };
@@ -602,10 +604,10 @@ function handleReply(postID,replyContent,parentID,checker) {
     }
   }
   
-  function handleEditComment(commentID, currentContent) {
-    const newContent = prompt('Edit your comment content:', currentContent);
+  function handleEditComment(commentID, newContent) {
+    // const newContent = prompt('Edit your comment content:', currentContent);
   
-    if (currentContent !== null) {
+    if (newContent !== null) {
       // Send an HTTP request to update the post on the server
       const requestBody = {
         content: newContent
