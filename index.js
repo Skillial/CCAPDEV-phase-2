@@ -588,23 +588,23 @@ app.patch("/api/comment/:id", async (req, res) => {
   try {
     const commentId = req.params.id;
     //Fetches the comment
-    const comment = await Post.findById(commentId, {isDeleted:false});
+    const comment = await Comment.findById(commentId, {isDeleted:false});
     const user = await User.findById(req.session.userId)
     if (!comment) {
       return res.status(404).json({ error: "Comment not found" });
     }
-    if (comment.userID.toString() != req.session.userId.toString()) {
-      return res.status(403).json({ error: 'You are not authorized to edit this comment.' });
-    }
-   
+    // if (comment.userID.toString() != req.session.userId.toString()) {
+    //   return res.status(403).json({ error: 'You are not authorized to edit this comment.' });
+    // }
+    console.log(comment)
     //Updating comment fields
-    if (comment.body.content) {
+    if (req.body.content) {
       comment.content = req.body.content;
     }
 
     // Check if the 'isDeleted' field exists in the request body
     // If it does, update the 'isDeleted' field in the post
-    if (comment.body.isDeleted !== undefined) {
+    if (req.body.isDeleted !== undefined) {
       comment.isDeleted = req.body.isDeleted;
     }
 

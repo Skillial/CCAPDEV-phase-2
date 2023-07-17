@@ -581,7 +581,7 @@ function handleReply(postID,replyContent,parentID,checker) {
     // Show a confirmation dialog before deleting the commenttastatas
     if (confirm('Are you sure you want to delete this comment?')) {
       // Send an HTTP request to your server to update the commentt data
-      fetch(`/api/post/${commentID}`, {
+      fetch(`/api/comment/${commentID}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
@@ -611,7 +611,7 @@ function handleReply(postID,replyContent,parentID,checker) {
         content: newContent
       };
   
-      fetch(`/api/post/${commentID}`, {
+      fetch(`/api/comment/${commentID}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
