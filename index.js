@@ -1,6 +1,9 @@
 //To DO
 //Overall: HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
-//    input sanitization and general checking
+//        input sanitization and general checking
+//remove a lot of the isLoggedIn checks -> /post/:title  /profile/:username  
+//sort by date and by 'most popular'
+//add landing pages for errors
 
 //SEMI-Done
 //patch profile -> need to fix profile pic, also displaying of posts in /profile (breaks when >1 post)
@@ -8,10 +11,9 @@
 //post, patch, delete comment -> comments are stored in the db na, to fix reacting
 
 //DONE FOR SURE
-// login, signup, logout -> to add: hashing password
-//post post -> fix formatting
+// login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
+//post post
 //patch, delete post -> maybe paganda patching, like takign the inputs (currently uses alerts)
-
 //search 
 
 require('dotenv').config();
@@ -505,7 +507,7 @@ app.patch("/api/post/:id", async (req, res) => {
   try {
     const postId = req.params.id;
     // Fetch the post from the database based on the postId
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId, {isDeleted:false});
     const user = await User.findById(req.session.userId)
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
@@ -542,7 +544,7 @@ app.patch("/api/post/:id", async (req, res) => {
   }
 });
 
-
+//post new comment
 app.post("/api/comment", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
@@ -581,6 +583,45 @@ app.post("/api/comment", async (req, res) => {
   }
 });
 
+//edit and delete comments
+app.patch("/api/comment/:id", async (req, res) => {
+  try {
+    const commentId = req.params.id;
+    //Fetches the comment
+    const comment = await Post.findById(commentId, {isDeleted:false});
+    const user = await User.findById(req.session.userId)
+    if (!comment) {
+      return res.status(404).json({ error: "Comment not found" });
+    }
+    if (comment.userID.toString() != req.session.userId.toString()) {
+      return res.status(403).json({ error: 'You are not authorized to edit this comment.' });
+    }
+   
+    //Updating comment fields
+    if (comment.body.content) {
+      comment.content = req.body.content;
+    }
+
+    // Check if the 'isDeleted' field exists in the request body
+    // If it does, update the 'isDeleted' field in the post
+    if (comment.body.isDeleted !== undefined) {
+      comment.isDeleted = req.body.isDeleted;
+    }
+
+    comment.editDate = Date.now();
+
+    // Save the updated post in the database
+    await comment.save();
+
+    res.json({ message: "Comment updated successfully", comment });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+//server side for handling reactions
 app.post('/api/react', async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
