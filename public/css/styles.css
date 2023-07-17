@@ -27,19 +27,11 @@
 	margin: 0px;
 }
 
-.card {
-	align-items: center;
+.centered {
 	display: flex;
-	flex-direction: column;
-	background-color: var(--card-color);
-	max-width: 1440px;
-	width: 80%;
+	align-items: center;
 	margin: auto;
-	border-radius: var(--corner-radius);
-	padding: 15px;
 }
-
-
 
 .profile {
 	display: flex;
@@ -155,6 +147,8 @@ body{
 	transition: all var(--dur) ;
 	font-family: var(--font);
 	font-size: 1.5rem;
+	height: 75%;
+	margin: auto ;
 	outline: 0; 
 	padding: 0.25rem 0.5rem;
 	appearance: none; 
@@ -900,11 +894,56 @@ padding-left:15px;
 }
 
 #login-screen > input[type="text"], #login-screen > input[type="password"]  {
-	border-radius: var(--corner-radius);
+	border-radius: calc(var(--corner-radius)*2);
 	border-style: hidden;
-
+	height: 2rem;
+	margin-bottom: 2rem;
+	padding: 1rem;
 }
 
 #login-screen > input[type="submit"] {
-	width: 50%;
+	max-width: 120px;
+	width: 100%;
+	margin-top: 1rem;
+}
+
+#login-screen  input[type="checkbox"] {
+	appearance: none;
+	background-color: #fff;
+	display: grid;
+	place-content: center;
+	margin: 0;
+	font: inherit;
+	color: currentColor;
+	width: 0.75em;
+	height: 0.75em;
+	border-radius:50%;
+	transform: translateY(-0.075em);
+}
+
+#login-screen input[type="checkbox"]::before {
+	border-radius:50%;
+	content: "";
+	width: 0.65em;
+	height: 0.65em;
+	transform: scale(0);
+	transition: 250ms transform cubic-bezier(.2,.1,0,3);
+	box-shadow: inset 1em 1em var(--highlight-2);
+}
+
+#login-screen input[type="checkbox"]:checked::before {
+	transform: scale(1);
+}
+
+.credential-card {
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	background-color: var(--card-color);
+	max-width: 1440px;
+	width: 80%;
+	margin: auto;
+	border-radius: var(--corner-radius);
+	padding: 15px;
+	gap: 10px;
 }
