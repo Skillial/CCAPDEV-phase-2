@@ -317,7 +317,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID){
             comment_wrapping.removeChild(cancel_save_wrap);
             // comment_align.append(postreply("poop bandit","../sample users/poop bandit.jpg",newcomment,0,pid+1));
             handleReply(pid,newcomment,parentID,1);
-                
+            
         }
    
     }
