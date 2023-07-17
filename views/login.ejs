@@ -2,8 +2,8 @@
     <head>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script src="/javascript/react.js"></script>
-        <title>
-            SnaccOverflow
+        <title>	
+            Log In
         </title>
         <link rel="icon" href="../images/icon.png" sizes="32x32" type="image/png">
         <link rel="stylesheet" type="text/css" href="/css/styles.css">
@@ -14,19 +14,17 @@
 		<script>
 			createNavbar('',<%= isLoggedIn %>);
 		</script>
-
-        
-        <form method="POST" action="/login">
-            <label for="username">Username</label>
-            <input type="text" name="username" id="username" required>
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password" required>
-            <label for="remember">Remember Me</label>
-            <input type="checkbox" name="remember" id="remember">
-            <input type="submit" value="Login">
-            
-            
-          </form>
-          
+		<div class="spacer"></div>
+        <div class="card">
+			<form id="login-screen" method="POST" action="/login">
+				<label for="username">Username</label>
+				<input type="text" name="username" id="username" required>
+				<label for="password">Password</label>
+				<input type="password" name="password" id="password" required>
+				<label for="remember">Remember Me</label>
+				<input type="checkbox" name="remember" id="remember">
+				<input type="submit" value="Login">	
+			</form>
+		</div>
     </body>
 </html>
