@@ -920,7 +920,9 @@ padding-left:15px;
 	border-radius:50%;
 	transform: translateY(-0.075em);
 }
-
+#login-screen label[for="remember"] {
+	padding-right: 10px;
+}
 #login-screen input[type="checkbox"]::before {
 	border-radius:50%;
 	content: "";
