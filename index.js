@@ -1,20 +1,20 @@
 //To DO
 //Overall: HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
 //        input sanitization and general checking
-//remove a lot of the isLoggedIn checks -> /post/:title  /profile/:username  
 //sort by date and by 'most popular'
 //add landing pages for errors
 
 //SEMI-Done
 //patch profile -> need to fix profile pic, also displaying of posts in /profile (links and formatting)
-//reacting -> check if works for comments. works everywhere else.
+
 
 //DONE FOR SURE
-// login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
-//post post
-//patch, delete post -> maybe paganda patching, like takign the inputs (currently uses alerts)
+//login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
+//post post, patch, delete post -> maybe paganda patching, make it more obvious that fields are editable
+//post, patch, delete comment -> maybe paganda patching, make it more obvious that fields are editable
+//reacting
+//remove a lot of the isLoggedIn checks -> /post/:title  /profile/:username  
 //search 
-//post, patch, delete comment ->
 
 require('dotenv').config();
 const link = process.env.DB_URL;
@@ -253,9 +253,7 @@ app.post("/api/user", async (req, res) => {
     
     const user = new User({ username, password });
     const savedUser = await user.save();
-    
-    // Assign the user's ID to the userId field
-    
+
     savedUser.userId = savedUser._id;
     await savedUser.save();
 
