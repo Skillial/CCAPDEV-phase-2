@@ -140,7 +140,11 @@ app.get("/success", (req, res)=>{
   res.render("success")
 })
 app.get("/login", (req, res)=>{
+  if(req.session.isLoggedIn){
+    res.redirect("/profile");
+  }else{
   res.render("login")
+  }
 })
 app.get("/logout", (req, res)=>{
   req.session.destroy();
