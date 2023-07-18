@@ -13,10 +13,13 @@
         
 		<script src="/javascript/navbar.js" type="text/javascript"></script>
 		<script>
-			createNavbar('',<%= isLoggedIn %>);
+			createNavbar(<%= isLoggedIn %>);
 		</script>
 		<div class="space"></div>
         <div class="credential-card">
+			<div id="login-title">
+				Log In
+			</div>
 			<form id="login-screen" method="POST" action="/login">
 				<label for="username">Username</label>
 				<input type="text" name="username" id="username" required>
@@ -27,7 +30,7 @@
 					<input type="checkbox" name="remember" id="remember">
 				</div>
 				<div class="centered">
-					<input type="submit" value="Login">	
+					<input type="submit" value="Log In">	
 				</div>
 			</form>
 		</div>
