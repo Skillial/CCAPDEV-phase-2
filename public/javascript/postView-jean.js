@@ -1,4 +1,4 @@
-function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prating,pmedia, preactValue, isCurrUserTheAuthor) {
+function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prating,pmedia, preactValue, isCurrUserTheAuthor,isLoggedIn) {
     let 
     // content_list = document.createElement('div'),
     info_list = document.createElement('div'),
@@ -81,6 +81,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
 
 
     comment_reply.addEventListener('click', () => {
+      if (isLoggedIn!=="false"){
         let textAreas = document.querySelectorAll('.comment_text_area');
         textAreas.forEach(textArea => {
             const parentElement = textArea.closest('.comment_wrapping');
@@ -116,6 +117,9 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
             // border.append(postreply(userID,"",newcomment,0,postID+1)); //change to currently logged in
             handleReply(postID,newcomment,'a',0);
         }
+      } else{
+        alert("Please log in")
+      }
       });
 
     comment_share.textContent="Share";
@@ -216,7 +220,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
 
 
 // new reply / new comment
-function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID){
+function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn){
     let 
     comment_align = document.createElement('div'),
     comment_forum = document.createElement('div'),
@@ -277,6 +281,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID){
     comment_text_area_save.textContent="Save";
     comment_cancel.textContent="Cancel";
     comment_reply.onclick = function(){
+      if (isLoggedIn!=="false"){
         let textAreas = document.querySelectorAll('.comment_text_area');
         // Remove each text area from its parent "comment_wrapping" div
         textAreas.forEach(textArea => {
@@ -319,6 +324,9 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID){
             handleReply(pid,newcomment,parentID,1);
             
         }
+      }else{
+        alert("Please log in")
+      }
    
     }
     if (user==pauthor){

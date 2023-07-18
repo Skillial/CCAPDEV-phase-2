@@ -44,8 +44,8 @@
           let ppfp = '<%= author.pfp_link %>';
           let preactValue = '<%= reactValue %>';
           let isCurrUserTheAuthor = '<%=isCurrUserTheAuthor%>';
-
-          $('.content_list').append(posthtml(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia, preactValue, isCurrUserTheAuthor));
+          let isLoggedIn = '<%=isLoggedIn%>';
+          $('.content_list').append(posthtml(postID, pauthor, ptitle, ppfp, pdesc, ppostedDate, peditedDate, prating, pmedia, preactValue, isCurrUserTheAuthor,'<%=isLoggedIn%>'));
         <% } else { %>
           // Display a message when the post is deleted
           $('.content_list').append('<div>The original post was deleted, but you can still view the comments.</div>');
@@ -54,7 +54,7 @@
 
 <% comments.forEach(comment => { %>
   <script>
-    var commentElement = postreply('<%= comment.author %>','<%= comment.userID.ppfp %>','<%= comment.content %>', '<%= comment.rating %>', '<%= comment._id %>','<%= user.username%>',postID);
+    var commentElement = postreply('<%= comment.author %>','<%= comment.userID.ppfp %>','<%= comment.content %>', '<%= comment.rating %>', '<%= comment._id %>','<%= user.username%>',postID,'<%=isLoggedIn%>');
     $('.border').append(commentElement);
   </script>
 
