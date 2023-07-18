@@ -5,6 +5,7 @@
 //app.use(isLoggedInMiddleware);
 //if(remember)
   //console.log("i remember");
+// const { log } = require("handlebars");
 
 function showSignPopup() {
     hideLogPopup();
@@ -47,7 +48,7 @@ var objPeople = [
 ]
 
 
-function createNavbar(location,isLoggedIn) {
+function createNavbar(isLoggedIn) {
 
     let navbar = document.createElement('div'),
         title = document.createElement('div'),
@@ -58,7 +59,11 @@ function createNavbar(location,isLoggedIn) {
         search_input = document.createElement('input'),
         search_button = document.createElement('button'),
         search_button_img = document.createElement('img'),
-        login = document.createElement('div');
+        left_div = document.createElement('div'),
+        right_div = document.createElement('div');
+
+	left_div.className = 'navbar-div';
+	right_div.className = 'navbar-div';
 
 	search_label.className = 'search_label';
 	form.className = 'search_form';
@@ -68,9 +73,10 @@ function createNavbar(location,isLoggedIn) {
     home.href = "/index";;
     home.appendChild(logo);
     logo.setAttribute('height', '100%');
+    logo.setAttribute('width', 'auto');
     logo.setAttribute('margin', 'auto');
-    logo.src = location + '../images/dark/logo.png';
-    search_button_img.src = location + '../images/search.png';
+    logo.src = '/images/dark/logo.png';
+    search_button_img.src = '/images/search.png';
     title.className = 'title';
     search_bar.className = 'searchbar';
 
@@ -116,18 +122,14 @@ function createNavbar(location,isLoggedIn) {
     search_bar.appendChild(search_choices_post);
     
 
-    var table = document.createElement('table'),
-        tbody = document.createElement('tbody'),
-        tr = document.createElement('tr'),
-        login_button = document.createElement('td'),
-        sign_up_button = document.createElement('td');
-        logout_button = document.createElement('td');
-        profile_button = document.createElement('td');
+    var login_button = document.createElement('div'),
+        sign_up_button = document.createElement('div');
+        logout_button = document.createElement('div');
+        profile_button = document.createElement('div');
 
-    table.setAttribute('class', 'user-control');
-    login_button.textContent = 'Login';
-    login_button.className = 'pointer';
-    sign_up_button.className = 'pointer';
+    login_button.textContent = 'Log In';
+    login_button.className = 'navbar-button';
+    sign_up_button.className = 'navbar-button';
     login_button.onclick = function() {
         window.location.href = "/login";
     };
@@ -138,49 +140,38 @@ function createNavbar(location,isLoggedIn) {
     };
 
     logout_button.textContent = 'Log Out';
-    logout_button.className = 'pointer';
+    logout_button.className = 'navbar-button';
     logout_button.onclick = function() {
         window.location.href = "/logout";
     };
 
     profile_button.textContent = 'Profile';
-    profile_button.className = 'pointer';
+    profile_button.className = 'navbar-button';
     profile_button.onclick = function() {
         window.location.href = "/profile" ;
     };
     if (isLoggedIn){
         login_button.style.display='none';
         sign_up_button.style.display='none';
-        // logout_button.style.display='block';
-        // profile_button.style.display='block';
-    }else{
-        // login_button.style.display='block';
-        // sign_up_button.style.display='block';
+    } else{
         logout_button.style.display='none';
         profile_button.style.display='none';
     }
     
-    tr.appendChild(login_button);
-    tr.appendChild(sign_up_button);
-    tr.appendChild(profile_button);
-    tr.appendChild(logout_button);
-    
-    tbody.appendChild(tr);
-    table.appendChild(tbody);
-    login.appendChild(table);
-
     navbar.className = 'navbar';
-    navbar.appendChild(title);
-    title.appendChild(home);
+
+    left_div.appendChild(home);
+    right_div.appendChild(login_button);
+    right_div.appendChild(sign_up_button);
+    right_div.appendChild(profile_button);
+    right_div.appendChild(logout_button);   
+	
+    navbar.appendChild(left_div);
     navbar.appendChild(search_bar);
-    navbar.appendChild(login);
-
-    
-
+    navbar.appendChild(right_div);
+	
     document.body.appendChild(navbar);
-
-    
-  }
+}
 
 
 function yes() {
