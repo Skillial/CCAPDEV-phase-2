@@ -36,19 +36,16 @@
     <div class="filter">
         <table>
             <tr>
-                <p>Sort:</p>
+                <p>Filter:</p>
                 <td>
                     <a href="/index?sortBy=createDate&sortOrder=desc">Newest</a>
                   </td>
                   <td>
-                    <a href="/index?sortBy=hotness&sortOrder=desc">Hot</a>
+                    <a href="/index?sortBy=hotness&sortOrder=desc">Trending</a>
                   </td>
                   <td>
-                    <a href="/index?sortBy=rating&sortOrder=desc">Top</a>
+                    <a href="/index?sortBy=rating&sortOrder=desc">Highest-rated</a>
                   </td>
-                <td>
-                    New
-                </td>
             </tr>
         </table>
     </div>
@@ -59,8 +56,8 @@
             <input type="text" id="postTitle" name="title" required>
             <label for="content">Content:</label>
             <textarea id="postContent" name="content" required></textarea>
-            <label for="content">Media:</label>
-            <input type="file" id="postMedia" name="media">
+            <!-- <label for="content">Media:</label>
+            <input type="file" id="postMedia" name="media"> -->
             <div class="flex">
                 <button class="newPostButtons" type="submit">Post</button>
                 <button class="newPostButtons" type="reset">Clear</button>
