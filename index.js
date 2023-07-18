@@ -448,7 +448,7 @@ app.get("/post/:title", async (req, res) => {
       // Retrieve the post from the database based on the title
       const title = req.params.title;
       const post = await Post.findOne({ title });
-      //currently logged in user
+      // Currently logged in user
       const userId = req.session.userId;
       const user = await User.findById(userId);
 
@@ -474,6 +474,17 @@ app.get("/post/:title", async (req, res) => {
         const recursiveChildComments = await Promise.all(
           childComments.map(async (childComment) => {
             childComment.childComments = await fetchChildComments(childComment);
+            const userReaction = await React.findOne({
+              userID: userId,
+              parentCommentID: childComment._id,
+              isVoted: true,
+            });
+            childComment.userReaction = userReaction ? userReaction.voteValue : 0;
+            // console.log(childComment.content, " ", childComment.userReaction);
+            const positiveCount = await React.countDocuments({ parentCommentID: childComment._id, voteValue: 1 });
+            const negativeCount = await React.countDocuments({ parentCommentID: childComment._id, voteValue: -1 });
+            const ratingCount = positiveCount - negativeCount;
+            childComment.rating = ratingCount;
             return childComment;
           })
         );
@@ -491,7 +502,7 @@ app.get("/post/:title", async (req, res) => {
             isVoted: true,
           });
           comment.userReaction = userReaction ? userReaction.voteValue : 0;
-          console.log(comment.content, " " , comment.userReaction)
+          // console.log(comment.content, " ", comment.userReaction);
           const positiveCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: 1 });
           const negativeCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: -1 });
           const ratingCount = positiveCount - negativeCount;
@@ -509,7 +520,7 @@ app.get("/post/:title", async (req, res) => {
       post.rating = ratingCount;
       const isCurrUserTheAuthor = author.username === user.username;
 
-      //if user has already reacted or not
+      // If user has already reacted or not
       const react = await React.findOne({ userID: user._id, parentPostID: post._id });
       const reactValue = react ? react.voteValue : 0;
 
@@ -521,7 +532,7 @@ app.get("/post/:title", async (req, res) => {
       if (!post) {
         return res.status(404).json({ error: "Post not found." });
       }
-
+ 
       // Fetch all top-level comments for the post
       const topLevelComments = await Comment.find({ parentPostID: post._id, parentCommentID: null })
         .populate("userID") // Populate the user details for each comment
@@ -563,23 +574,16 @@ app.get("/post/:title", async (req, res) => {
           return comment;
         })
       );
-
-      // Author of the post
-      const postID = post._id;
-      const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
-      const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
-      const ratingCount = positiveCount - negativeCount;
-      post.rating = ratingCount;
-      const isCurrUserTheAuthor = false;
-      let user = User.schema;
-      user.username = "visitor";
       const author = await User.findOne({ username: post.author });
       const reactValue = 0;
-      res.render("post", { postID, user, post, author, isCurrUserTheAuthor, comments, reactValue });
+      const isCurrUserTheAuthor = false;
+      const user = User.schema;
+      user.username='visitor';
+      res.render("post", { post, comments, author, reactValue,isCurrUserTheAuthor,user });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while retrieving the post." });
+    res.status(500).json({ error: "Server error." });
   }
 });
 

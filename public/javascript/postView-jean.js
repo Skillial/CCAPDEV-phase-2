@@ -366,7 +366,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
     
     comment_content_desc.appendChild(comment_react);
     comment_container.appendChild(comment_content_desc);
-    console.log(preactValue);
+    // console.log(preactValue);
 	comment_forum.appendChild(createReaction(pcount,preactValue,pid,1));
     comment_forum.appendChild(comment_container);
     comment_wrapping.appendChild(comment_forum);
