@@ -58,14 +58,6 @@ $(document).on('click', '.comment_like', function() {
 	$(this).toggleClass('comment_like_colored');
 	$(this).siblings('.comment_dislike').removeClass('comment_dislike-hover');
 	$(this).siblings('.comment_dislike').removeClass('comment_dislike_colored');
-	
-	if (isLiked) {
-	  handleReact(postID, 'unlike'); // Run handleReact with 'unlike' action
-	} else {
-	  handleReact(postID, 'like'); // Run handleReact with 'like' action
-	}
-	console.log(postID);
-
 	if (isLiked) {
 		handleReact(postID, 'unlike', 'comment'); // Run handleReact with 'unlike' action
 	  } else {
@@ -94,17 +86,29 @@ function createReaction(reactions, preactValue, postID,checker) {
 		dislike.className = 'comment_dislike comment_dislike-hover';
 	}
 	count.textContent = reactions;
-	if (preactValue == 1) {
+	if (preactValue == 1 && checker ==0) {
 		like.classList.toggle('like-hover');
 		like.classList.toggle('like_colored');
 		dislike.classList.remove('dislike-hover');
-		dislike.classList.remove('dislike-colored');
+		dislike.classList.remove('dislike_colored');
 	  }
-	 if (preactValue == -1) {
+	 if (preactValue == -1 && checker==0) {
 		dislike.classList.toggle('dislike-hover');
 		dislike.classList.toggle('dislike_colored');
 		like.classList.remove('like-hover');
-		like.classList.remove('like-colored')
+		like.classList.remove('like_colored');
+	 }
+	 if (preactValue == 1 && checker ==1) {
+		like.classList.toggle('comment_like-hover');
+		like.classList.toggle('comment_like_colored');
+		dislike.classList.remove('comment_dislike-hover');
+		dislike.classList.remove('comment_dislike_colored');
+	  }
+	 if (preactValue == -1 && checker==1) {
+		dislike.classList.toggle('comment_dislike-hover');
+		dislike.classList.toggle('comment_dislike_colored');
+		like.classList.remove('comment_like-hover');
+		like.classList.remove('comment_like_colored')
 	 }
 	return reaction; 
 }	

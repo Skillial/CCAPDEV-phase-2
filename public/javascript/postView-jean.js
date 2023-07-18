@@ -199,6 +199,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
     
 
     // buttons.appendChild(comment_save);
+    // console.log(preactValue);
     info_list.appendChild(createReaction(prating,preactValue,postID,0));
     info.appendChild(buttons);
     topic.appendChild(info);
@@ -220,7 +221,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
 
 
 // new reply / new comment
-function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn){
+function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preactValue){
     let 
     comment_align = document.createElement('div'),
     comment_forum = document.createElement('div'),
@@ -365,7 +366,8 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn){
     
     comment_content_desc.appendChild(comment_react);
     comment_container.appendChild(comment_content_desc);
-	comment_forum.appendChild(createReaction(pcount,0,pid,1));
+    console.log(preactValue);
+	comment_forum.appendChild(createReaction(pcount,preactValue,pid,1));
     comment_forum.appendChild(comment_container);
     comment_wrapping.appendChild(comment_forum);
     comment_align.appendChild(comment_wrapping);

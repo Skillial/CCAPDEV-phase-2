@@ -485,6 +485,10 @@ app.get("/post/:title", async (req, res) => {
       const comments = await Promise.all(
         topLevelComments.map(async (comment) => {
           comment.childComments = await fetchChildComments(comment);
+          const positiveCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: 1 });
+          const negativeCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: -1 });
+          const ratingCount = positiveCount - negativeCount;
+          comment.rating = ratingCount;
           return comment;
         })
       );
@@ -497,21 +501,13 @@ app.get("/post/:title", async (req, res) => {
       const ratingCount = positiveCount - negativeCount;
       post.rating = ratingCount;
       const isCurrUserTheAuthor = author.username === user.username;
-      console.log("num of top level comments: ", topLevelComments.length);
-      console.log("this post's id: ", post._id);
-      console.log("this post's id: ", postID);
-
-      console.log(comments);
 
       //if user has already reacted or not
       const react = await React.findOne({ userID: user._id, parentPostID: post._id });
       const reactValue = react ? react.voteValue : 0;
-      console.log("react object: ", react)
-      console.log("react value: ", reactValue)
 
       res.render("post", { postID, user, post, author, isCurrUserTheAuthor, comments, reactValue });
     } else {
-
       const title = req.params.title;
       const post = await Post.findOne({ title });
 
@@ -526,11 +522,11 @@ app.get("/post/:title", async (req, res) => {
 
       // A recursive function to fetch comments of comments and so on
       async function fetchChildComments(comment) {
-        console.log("poster name: ", comment.userID.username)
+        console.log("poster name: ", comment.userID.username);
         const childComments = await Comment.find({ parentCommentID: comment._id })
           .populate("userID")
           .exec();
-        
+
         if (childComments.length === 0) {
           return [];
         }
@@ -538,6 +534,10 @@ app.get("/post/:title", async (req, res) => {
         const recursiveChildComments = await Promise.all(
           childComments.map(async (childComment) => {
             childComment.childComments = await fetchChildComments(childComment);
+            const positiveCount = await React.countDocuments({ parentCommentID: childComment._id, voteValue: 1 });
+            const negativeCount = await React.countDocuments({ parentCommentID: childComment._id, voteValue: -1 });
+            const ratingCount = positiveCount - negativeCount;
+            childComment.rating = ratingCount;
             return childComment;
           })
         );
@@ -549,10 +549,14 @@ app.get("/post/:title", async (req, res) => {
       const comments = await Promise.all(
         topLevelComments.map(async (comment) => {
           comment.childComments = await fetchChildComments(comment);
+          const positiveCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: 1 });
+          const negativeCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: -1 });
+          const ratingCount = positiveCount - negativeCount;
+          comment.rating = ratingCount;
           return comment;
         })
       );
-        
+
       // Author of the post
       const postID = post._id;
       const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
@@ -560,14 +564,10 @@ app.get("/post/:title", async (req, res) => {
       const ratingCount = positiveCount - negativeCount;
       post.rating = ratingCount;
       const isCurrUserTheAuthor = false;
-     
-      //console.log(comments);
-
-      //if user has already reacted or not (not, since di naka log in)
-      const reactValue = 0;
-      let  user = User.schema;
-      user.username = 'visitor';
+      let user = User.schema;
+      user.username = "visitor";
       const author = await User.findOne({ username: post.author });
+      const reactValue = 0;
       res.render("post", { postID, user, post, author, isCurrUserTheAuthor, comments, reactValue });
     }
   } catch (error) {

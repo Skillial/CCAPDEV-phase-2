@@ -55,7 +55,7 @@
 <% comments.forEach(comment => { %>
   <% if (!comment.isDeleted){ %>
   <script>
-      var commentElement = postreply('<%= comment.author %>','<%= comment.userID.ppfp %>','<%= comment.content %>', '<%= comment.rating %>', '<%= comment._id %>','<%= user.username%>',postID,'<%=isLoggedIn%>');
+      var commentElement = postreply('<%= comment.author %>','<%= comment.userID.ppfp %>','<%= comment.content %>', '<%= comment.rating %>', '<%= comment._id %>','<%= user.username%>',postID,'<%=isLoggedIn%>','<%= comment.rating %>');
       $('.border').append(commentElement);
   </script>
   <% } else { %>
