@@ -68,7 +68,7 @@ function createPost(title, desc, author, rating, media, profile, link, pid, user
 	content_div.appendChild(post_title);
 	content_div.appendChild(post_description);
 
-	post.appendChild(createReaction(rating, userReaction, pid,0));
+	post.appendChild(createReaction(rating, userReaction, pid,0,0));
 	post.appendChild(content_div);
   callCount++;
 	return post;
