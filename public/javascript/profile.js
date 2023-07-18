@@ -21,6 +21,7 @@ function createComment(content, date) {
 		spacer = document.createElement('div');
 
 	article.textContent = content;
+	tempdate.textContent = date;
 	article.setAttribute('align', 'justify');
 	tempdate.setAttribute('align', 'justify');
 	spacer.className = 'space';
