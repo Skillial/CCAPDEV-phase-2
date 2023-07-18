@@ -9,9 +9,9 @@ $(document).on('click', '.dislike', function() {
 	$(this).siblings('.like').removeClass('like_colored');
 	
 	if (isDisliked) {
-	  handleReact(postID, 'undislike'); // Run handleReact with 'undislike' action
+	  handleReact(postID, 'undislike', 'post'); // Run handleReact with 'undislike' action
 	} else {
-	  handleReact(postID, 'dislike'); // Run handleReact with 'dislike' action
+	  handleReact(postID, 'dislike', 'post'); // Run handleReact with 'dislike' action
 	}
   });
   
@@ -26,23 +26,32 @@ $(document).on('click', '.dislike', function() {
 	$(this).siblings('.dislike').removeClass('dislike_colored');
 	
 	if (isLiked) {
-	  handleReact(postID, 'unlike'); // Run handleReact with 'unlike' action
+	  handleReact(postID, 'unlike', 'post'); // Run handleReact with 'unlike' action
 	} else {
-	  handleReact(postID, 'like'); // Run handleReact with 'like' action
+	  handleReact(postID, 'like', 'post'); // Run handleReact with 'like' action
 	}
   });
 
 $(document).on('click', '.comment_dislike', function() {
+	var reactionDiv = $(this).closest('.reactions');
+	var postID = reactionDiv.attr('id');
+	var isDisliked = $(this).hasClass('comment_dislike_colored');
+
 	$(this).siblings('.comment_dislike').toggleClass('comment_dislike-hover');
 	$(this).toggleClass('comment_dislike_colored');
 	$(this).siblings('.comment_like').removeClass('comment_like-hover');
 	$(this).siblings('.comment_like').removeClass('comment_like_colored');
+
+	if (isDisliked) {
+		handleReact(postID, 'undislike', 'comment'); // Run handleReact with 'undislike' action
+	  } else {
+		handleReact(postID, 'dislike', 'comment'); // Run handleReact with 'dislike' action
+	  }
 });
 
 $(document).on('click', '.comment_like', function() {
 	var reactionDiv = $(this).closest('.reactions');
 	var postID = reactionDiv.attr('id');
-	console.log(postID);
 	var isLiked = $(this).hasClass('comment_like_colored'); // Check if the like button is already colored
 	
 	$(this).siblings('.comment_like').toggleClass('comment_like-hover');
@@ -56,6 +65,12 @@ $(document).on('click', '.comment_like', function() {
 	  handleReact(postID, 'like'); // Run handleReact with 'like' action
 	}
 	console.log(postID);
+
+	if (isLiked) {
+		handleReact(postID, 'unlike', 'comment'); // Run handleReact with 'unlike' action
+	  } else {
+		handleReact(postID, 'like', 'comment'); // Run handleReact with 'like' action
+	  }
 });
 
 function createReaction(reactions, preactValue, postID,checker) {
@@ -94,8 +109,9 @@ function createReaction(reactions, preactValue, postID,checker) {
 	return reaction; 
 }	
 
-function handleReact(postID, reactionType) {
+function handleReact(postID, reactionType, parent) {
     // Determine the reaction value based on the reactionType
+	console.log("hi", postID);
     let reactionValue;
     switch (reactionType) {
       case 'like':
@@ -114,10 +130,21 @@ function handleReact(postID, reactionType) {
     }
  
     // Send an HTTP request to update the reaction on the server
-    const requestBody = {
-      postID: postID,
-      reactionValue: reactionValue
-    };
+	let requestBody;
+	
+		requestBody = {
+		parentId: postID,
+		reactionValue: reactionValue,
+		reactParentType: parent,
+		};
+	
+	// }else if(parent == 'comment'){}
+	// 	requestBody = {
+	// 	commentID: postID,
+	// 	reactionValue: reactionValue,
+	// 	reactParentType: parent,
+	// 	};
+	// }
   
     fetch(`/api/react`, {
       method: 'POST',
@@ -130,7 +157,7 @@ function handleReact(postID, reactionType) {
         if (response.ok) {
           // Handle successful reaction update
         //   window.location.href = "/post/" + encodeURIComponent(ptitle);
-		window.location.reload();
+		//window.location.reload();
         } else {
           throw new Error('Failed to update reaction');
         }
