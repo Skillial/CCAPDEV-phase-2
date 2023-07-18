@@ -65,7 +65,7 @@ $(document).on('click', '.comment_like', function() {
 	  }
 });
 
-function createReaction(reactions, preactValue, postID,checker) {
+function createReaction(reactions, preactValue, postID,checker,deleted) {
 	console.log(postID);
 	let reaction = document.createElement('div'),
 		like = document.createElement('div'),
@@ -109,6 +109,12 @@ function createReaction(reactions, preactValue, postID,checker) {
 		dislike.classList.toggle('comment_dislike_colored');
 		like.classList.remove('comment_like-hover');
 		like.classList.remove('comment_like_colored')
+	 }
+	 if (deleted==1){
+		like.classList.remove('comment_like-hover');
+		dislike.classList.remove('comment_dislike-hover');
+		like.style.pointerEvents='none';
+		dislike.style.pointerEvents='none';
 	 }
 	return reaction; 
 }	
