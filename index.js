@@ -478,8 +478,6 @@ app.get("/post/:title", async (req, res) => {
       const ratingCount = positiveCount - negativeCount;
       post.rating = ratingCount;
       const isCurrUserTheAuthor = author.username === user.username;
-      user.username="rawr";
-      console.log(username);
       console.log("num of top level comments: ", topLevelComments.length);
       console.log("this post's id: ", post._id);
       console.log("this post's id: ", postID);
