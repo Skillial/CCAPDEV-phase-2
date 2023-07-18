@@ -487,7 +487,7 @@ app.get("/post/:title", async (req, res) => {
 
           const userReaction = await React.findOne({
             userID: userId,
-            parentPostID: comment._id,
+            parentCommentID: comment._id,
             isVoted: true,
           });
           comment.userReaction = userReaction ? userReaction.voteValue : 0;
