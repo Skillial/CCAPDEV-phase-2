@@ -2,12 +2,23 @@
 <html>
     <head>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-		<script src="/javascript/react.js"></script>
+        <script>
+            </script>
+            <% if (isLoggedIn) {%>
+                <script src="/javascript/react.js" type="text/javascript"></script>
+            <%} else {%>
+                <script src="/javascript/no_react.js" type="text/javascript">
+            	
+                </script>
+                             <%   } %>
+        </script>
+		
         <title>
             SnaccOverflow
         </title>
         <link rel="icon" href="../images/icon.png" sizes="32x32" type="image/png">
         <link rel="stylesheet" type="text/css" href="/css/styles.css">
+        <script src="./javascript/newPost.js"></script>
     </head>
     <body> 
 		<script src="/javascript/navbar.js" type="text/javascript"></script>
@@ -25,15 +36,16 @@
     <div class="filter">
         <table>
             <tr>
+                <p>Sort:</p>
                 <td>
-                    Recent
-                </td>
-                <td>
-                    Hot
-                </td>
-                <td>
-                    Top
-                </td>
+                    <a href="/index?sortBy=createDate&sortOrder=desc">Newest</a>
+                  </td>
+                  <td>
+                    <a href="/index?sortBy=hotness&sortOrder=desc">Hot</a>
+                  </td>
+                  <td>
+                    <a href="/index?sortBy=rating&sortOrder=desc">Top</a>
+                  </td>
                 <td>
                     New
                 </td>
@@ -59,9 +71,16 @@
             </div>
           </form>
     </div>
-    
-    <script src="./javascript/newPost.js"></script>
-
+    <% if (isLoggedIn) { %>
+        <script src="./javascript/newSnacc.js"></script>
+    <% } else { %>
+        <script>
+            function showAlert() {
+                alert("Please login first!");
+            }
+            document.getElementById("newPostWrite").addEventListener("click", showAlert);
+        </script>
+    <% } %>
           <div id="forum">
             <% for (let i = 0; i < posts.length; i++) { %>
               <% const post = posts[i]; %>

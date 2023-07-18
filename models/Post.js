@@ -5,10 +5,11 @@ const PostSchema = new mongoose.Schema({
   content: String,
   author: String,
   rating: {type: Number, default: 0},
+  hotnessScore: { type: Number, default: 0 },
   userReaction: {type: Number, default: 0},
   createDate: {type: Date, default: Date.now()},
   editDate: {type: Date, default: null},
-  isDeleted: {type: Boolean, default: false}
+  isDeleted: {type: Boolean, default: false},
 }, {versionKey: false}
 );
 

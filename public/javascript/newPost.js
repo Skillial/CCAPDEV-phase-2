@@ -1,34 +1,36 @@
-const writePostButton = document.getElementById("newPostWrite");
-const postFormContainer = document.getElementById("newPostFormContainer");
-const postForm = document.getElementById("postForm");
-const cancelButton = document.getElementById("cancelButton");
-const yCancelButton = document.getElementById("yCancelButton");
-const nCancelButton = document.getElementById("nCancelButton");
+
 var maxCalls = 15;
 var callCount=0;
 
-writePostButton.addEventListener("click", () => {
-   postFormContainer.style.display = "block";
-});
+
+// const writePostButton = document.getElementById("newPostWrite");
+// const postFormContainer = document.getElementById("newPostFormContainer");
+// const postForm = document.getElementById("postForm");
+// const cancelButton = document.getElementById("cancelButton");
+// const yCancelButton = document.getElementById("yCancelButton");
+// const nCancelButton = document.getElementById("nCancelButton");
+// writePostButton.addEventListener("click", () => {
+//    postFormContainer.style.display = "block";
+// });
 
 
 
-cancelButton.addEventListener("click", () => { 
-  yCancelButton.style.display = "block";
-  nCancelButton.style.display = "block";
-});
+// cancelButton.addEventListener("click", () => { 
+//   yCancelButton.style.display = "block";
+//   nCancelButton.style.display = "block";
+// });
 
-yCancelButton.addEventListener("click", () => {
-    postForm.reset();
-    yCancelButton.style.display = "none";
-    nCancelButton.style.display = "none";
-    postFormContainer.style.display = "none";
-});
+// yCancelButton.addEventListener("click", () => {
+//     postForm.reset();
+//     yCancelButton.style.display = "none";
+//     nCancelButton.style.display = "none";
+//     postFormContainer.style.display = "none";
+// });
 
-nCancelButton.addEventListener("click", () => {
-  yCancelButton.style.display = "none";
-  nCancelButton.style.display = "none";
-});
+// nCancelButton.addEventListener("click", () => {
+//   yCancelButton.style.display = "none";
+//   nCancelButton.style.display = "none";
+// });
 
   
 function createPost(title, desc, author, rating, media, profile, link, pid, userReaction) {
@@ -66,7 +68,7 @@ function createPost(title, desc, author, rating, media, profile, link, pid, user
 	content_div.appendChild(post_title);
 	content_div.appendChild(post_description);
 
-	post.appendChild(createReaction(rating, userReaction, pid));
+	post.appendChild(createReaction(rating, userReaction, pid,0,0));
 	post.appendChild(content_div);
   callCount++;
 	return post;

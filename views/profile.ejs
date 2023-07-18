@@ -7,7 +7,8 @@
             <%= user.username %>'s' Profile - SnaccOverflow
         </title>
         <link rel="icon" href="../images/icon.png" sizes="32x32" type="image/png">
-        <script src="./javascript/profile.js"></script>
+        <script src="/javascript/profile.js"></script>
+		<script src="/javascript/postView-jean.js"></script>
         <link rel="stylesheet" type="text/css" href="/css/styles.css">
 	</head>
 	<body>
@@ -24,9 +25,9 @@
 					<main>
 						<%= user.username %> <!-- Display the user's display name -->
 					</main>
-					<% if (IsCurrUserTheProfileOwner) { %>
-						<button onclick="window.location.href = '/profile/edit';">Edit Profile</button>
-					<% } %>
+						<% if (IsCurrUserTheProfileOwner) { %>
+							<button onclick="window.location.href = '/profile/edit';">Edit Profile</button>
+						<% } %>
 				</aside>
 				<div id="profile-details">
 					<main>
@@ -35,53 +36,73 @@
 					<article align="justify">
 					  <%= user.aboutme %>
 					</article>
-					
-					<script>
-					  <% if (user.posts.length > 0) { %>
-						<% user.posts.forEach((post) => { %>
-						  let title = '<%= post.title %>';
-						  let content = '<%= post.content %>';
-						  let createDate = '<%= post.dateCreated %>'
-						  let postElement = createPost(title, content);
-						  $("#profile-details").append(postElement.spacer);
-						  $("#profile-details").append(postElement.title);
-						  $("#profile-details").append(postElement.content);
-						  $("#profile-details").append(postElement.createDate);
-						<% }) %>
-					  <% } else { %>
-						let titlePost = 'No Posts';
-						let contentPost = 'This user currently has no posts.';
-						let postElement = createPost(titlePost, contentPost);
-						$("#profile-details").append(postElement.spacer);
-						$("#profile-details").append(postElement.titlePost);
-						$("#profile-details").append(postElement.contentPost);
-					  <% } %>
-				  
-					  <% if (user.comments.length > 0) { %>
-						<% user.comments.forEach((comment) => { %>
-							let commentContent = '<%= comment.content %>';
-							let createDate = '<%= comment.dateCreated %>'
-							let commentElement = createComment(commentContent);
-
-							$("#profile-details").append(commentElement.spacer);
-							$("#profile-details").append(commentElement.content);
-							$("#profile-details").append(commentElement.createDate);
-						<% }) %>
-					  <% } else { %>
-						let titleComment = 'No Comments';
-						let contentComment = 'This user currently has no commented posts.';
-						let commentElement = createPost(titleComment, contentComment);
-						$("#profile-details").append(postElement.spacer);
-						$("#profile-details").append(postElement.title);
-						$("#profile-details").append(postElement.content);
-					  <% } %>
+								
 					</script>
+					<br><br><h2>Recent User Posts</h2>
+					<main>
+						<script>
+							//console.log("length: ")
+							<% if (user.posts.length > 0) { %>
+								
+								<% user.posts.forEach((post) => { %>
+									console.log("Post Title:", '<%= post.title %>');
+									console.log("Post Content:", '<%= post.content %>');
+									console.log("Create Date:", '<%= post.dateCreated %>');
+									var title = '<%= post.title %>';
+									var content = '<%= post.content %>';
+									var createDate = '<%= post.dateCreated %>';
+									// var postElement = createPost(title, content, createDate);
+									// $("#profile-details").append(postElement.spacer);
+									// $("#profile-details").append(postElement.title);
+									// $("#profile-details").append(postElement.content);
+									// $("#profile-details").append(postElement.createDate);
 
-					
-				  </div>
-				 
+									pauthor = '<%= user.username %>',    
+									ppfp = './images/dark/file_not_found.png' //temp
+									pdesc = '<%= post.content %>',
+									pcount = '<%= post.rating %>',
+									pid='<%= post._id %>',
+									phtml='/post/' + encodeURIComponent(title)
+									$('#profile-details').append(profilePost(pauthor,ppfp,pdesc,pcount,pid,phtml) );
+								<% }) %>
+							<% } else { %>
+								var titlePost = 'No Posts';
+								var contentPost = 'This user currently has no posts.';
+								var postElement = createPost(titlePost, contentPost, '');
+								$("#profile-details").append(postElement.spacer);
+								$("#profile-details").append(postElement.titlePost);
+								$("#profile-details").append(postElement.contentPost);
+							<% } %>
+							
+							
+						</script>
+					</main>
+				</div>
 			</div>
 		</div>
 	</body>
+	<!-- <div>   temporary basurahan for the comment shit.
+		for some reason, it causes a bug sa /profile/:username.
+		but the post shit works normally in /profile  so idk what's wrong lol
+		//might just remove since it'll be annoying to get the parentPost links for the comments :D
+							// <% if (user.comments.length > 0) { %>
+							// 	<% user.comments.forEach((comment) => { %>
+							// 		var commentContent = '<%= comment.content %>';
+							// 		var createDate = '<%= comment.dateCreated %>'
+							// 		var commentElement = createComment(commentContent, createDate);
+
+							// 		$("#profile-details").append(commentElement.spacer);
+							// 		$("#profile-details").append(commentElement.content);
+							// 		$("#profile-details").append(commentElement.createDate);
+							// 		<% }) %>
+							// <% } else { %>
+							// 	let titleComment = 'No Comments';
+							// 	let contentComment = 'This user currently has no commented posts.';
+							// 	let commentElement = createPost(titleComment, contentComment);
+							// 	$("#profile-details").append(postElement.spacer);
+							// 	$("#profile-details").append(postElement.title);
+							// 	$("#profile-details").append(postElement.content);
+							// 	<% } %>
+	</div> -->
 </html>
 	

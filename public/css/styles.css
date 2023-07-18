@@ -612,7 +612,10 @@ hr{
 	background-repeat: no-repeat;
 	background-size:contain; 
 	margin-right: 5px;
+	margin:auto;
+	cursor: pointer;
 }
+
 .comment_like-hover:hover{
 	background-image: url("./../images/reacts/up.png");
 }
@@ -623,6 +626,8 @@ hr{
 	background-repeat: no-repeat;
 	background-size:contain; 
 	margin-right: 25px;
+	margin:auto;
+	cursor: pointer;
 }
 .comment_dislike-hover:hover{
 	background-image: url("./../images/reacts/down.png");
@@ -635,6 +640,8 @@ hr{
 	background-repeat: no-repeat;
 	background-size:contain; 
 	margin-right: 5px;
+	margin:auto;
+	cursor: pointer;
 }
 .comment_like_colored:hover{
 	background-image: url("./../images/reacts/no_up.png");
@@ -646,6 +653,8 @@ hr{
 	background-repeat: no-repeat;
 	background-size:contain; 
 	margin-right: 25px;
+	margin:auto;
+	cursor: pointer;
 }
 .comment_dislike_colored:hover{
 	background-image: url("../images/reacts/no_down.png");

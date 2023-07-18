@@ -1,20 +1,26 @@
 //To DO
 //Overall: HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
 //        input sanitization and general checking
-//remove a lot of the isLoggedIn checks -> /post/:title  /profile/:username  
-//sort by date and by 'most popular'
+
 //add landing pages for errors
 
 //SEMI-Done
-//patch profile -> need to fix profile pic, also displaying of posts in /profile (breaks when >1 post)
-//reacting -> check if works for comments. works everywhere else.
-//post, patch, delete comment -> comments are stored in the db na, to fix reacting
-
+//patch profile -> need to fix profile pic
+//view profile -> maybe add displaying of comments. fix image link (to add)
+             //-> also add like datecreated maybe? and rating (?) though pahirapan pa yung rating so wag nalang (or maybe j number idk)
+             //-> pfp sa posts in the profile will break when viewing other users' posts
+//sort by date and by 'most popular' -> a little slow, and the sorting buttons can look better
+                                //   -> maybe make the mouse pointer like a loading circle... or just store the ratings in the post mismo..? 
+                                //   -> TOP is just the overall rating count currently.
+                                //   -> HOT is top posts within last 2 days. some decay factor math stuff
 //DONE FOR SURE
 // login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
-//post post
-//patch, delete post -> maybe paganda patching, like takign the inputs (currently uses alerts)
-//search 
+// post post, patch, delete post -> maybe paganda patching, make it more obvious that fields are editable
+// post, patch, delete comment -> maybe paganda patching, make it more obvious that fields are editable
+// reacting
+// remove a lot of the isLoggedIn checks 
+// search
+// /index -> maybe add the date posted? also limit the num of posts shown, maybe implement a paging function... (index/1, index/2...) that's pain.
 
 require('dotenv').config();
 const link = process.env.DB_URL;
@@ -81,12 +87,30 @@ app.use(userIDMiddleware);
 
 app.get("/index", async (req, res) => {
   try {
+    const TWO_DAYS_IN_MS = 2 * 24 * 60 * 60 * 1000;
+    const currentDate = new Date();
+    let sortBy = req.query.sortBy || "createDate"; // Default sorting by creation date
+    let sortOrder = req.query.sortOrder || "desc"; // Default sorting in descending order
+
+    // Validate the sorting criteria to avoid potential security issues
+    const allowedSortFields = ["createDate", "rating", "hotness"]; // Add more fields if needed
+    const allowedSortOrders = ["asc", "desc"];
+    if (!allowedSortFields.includes(sortBy)) {
+      sortBy = "createDate"; // Set default sorting if an invalid field is provided
+    }
+    if (!allowedSortOrders.includes(sortOrder)) {
+      sortOrder = "desc"; // Set default sorting order if an invalid order is provided
+    }
+
+    let posts = [];
+
     if (req.session?.isLoggedIn) {
       console.log(req.sessionID);
       console.log(req.session.isLoggedIn);
       const userId = req.session.userId;
       console.log(userId);
-      const posts = await Post.find({ isDeleted: false }).limit(0);
+
+      posts = await Post.find({ isDeleted: false }).limit(0);
 
       // Get the number of positive and negative votes for each post
       for (let i = 0; i < posts.length; i++) {
@@ -98,18 +122,28 @@ app.get("/index", async (req, res) => {
         });
         post.userReaction = userReaction ? userReaction.voteValue : 0;
 
-        const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
-        const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
+        const positiveCount = await React.countDocuments({
+          parentPostID: post._id,
+          voteValue: 1,
+        });
+        const negativeCount = await React.countDocuments({
+          parentPostID: post._id,
+          voteValue: -1,
+        });
         const ratingCount = positiveCount - negativeCount;
         post.rating = ratingCount;
-      }
 
-      res.render("index", { posts});
+        //calculating hotness
+        const timeDifferenceInMs = currentDate - post.createDate;
+        const decayFactor = Math.exp(-timeDifferenceInMs / TWO_DAYS_IN_MS); // Adjust the decay rate as needed
+        const ratingWithDecay = post.rating * decayFactor;
+        post.hotnessScore = ratingWithDecay;
+      }
     } else {
       console.log("Currently not logged in, showing a limited number of posts!")
       const limit = 20; // Change the limit value as needed
-      const posts = await Post.find({ isDeleted: false }).limit(limit);
-      
+      posts = await Post.find({ isDeleted: false }).limit(limit);
+
       // Get the number of positive and negative votes for each post
       for (let i = 0; i < posts.length; i++) {
         const post = posts[i];
@@ -117,16 +151,30 @@ app.get("/index", async (req, res) => {
         const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
         const ratingCount = positiveCount - negativeCount;
         post.rating = ratingCount;
-      }
 
-      // Render the index template with the limited posts data
-      res.render("index", { posts });
+        //calculating hotness
+        const timeDifferenceInMs = currentDate - post.createDate;
+        const decayFactor = Math.exp(-timeDifferenceInMs / TWO_DAYS_IN_MS); // Adjust the decay rate as needed
+        const ratingWithDecay = post.rating * decayFactor;
+        post.hotnessScore = ratingWithDecay;
+      }
     }
+
+    if (sortBy === "rating") {
+      posts.sort((a, b) => (sortOrder === "desc" ? b.rating - a.rating : a.rating - b.rating));
+    } else if (sortBy === "hotness") {
+      posts.sort((postA, postB) => postB.hotnessScore - postA.hotnessScore);
+    } else {
+      posts.sort((a, b) => (sortOrder === "desc" ? b[sortBy] - a[sortBy] : a[sortBy] - b[sortBy]));
+    }
+
+    res.render("index", { posts });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred while fetching posts." });
   }
 });
+
 
 
 app.get("/index", (req, res)=>{
@@ -140,7 +188,11 @@ app.get("/success", (req, res)=>{
   res.render("success")
 })
 app.get("/login", (req, res)=>{
+  if(req.session.isLoggedIn){
+    res.redirect("/profile");
+  }else{
   res.render("login")
+  }
 })
 app.get("/logout", (req, res)=>{
   req.session.destroy();
@@ -149,8 +201,7 @@ app.get("/logout", (req, res)=>{
 })
 
 // app.get("/profile", async(req, res) =>{
-//   username =
-//   res.render("/profile/" + username);
+//   res.render("profile")
 // })
 
 app.get("/profile/edit/", async (req, res) => {
@@ -182,34 +233,40 @@ app.get("/editComment", (req, res)=>{
 //logging in
 app.post("/login", async (req, res) => {
   try {
-    const { username, password, remember } = req.body;
-    const user = await User.findOne({ username });
-        // Use the comparePassword method to check if the provided password matches the hashed password in the database
-        // const isPasswordMatch = await user.comparePassword(password);
+    console.log("does req.session not exist?", !req.session.isLoggedIn);
+    if(!req.session.isLoggedIn){
+      const { username, password, remember } = req.body;
+      const user = await User.findOne({ username });
+          // Use the comparePassword method to check if the provided password matches the hashed password in the database
+          // const isPasswordMatch = await user.comparePassword(password);
 
-        // if (!isPasswordMatch) {
-        //   return res.status(400).json({ error: "Invalid username or password." });
-        // }
-    // Check if the user exists and the password matches
-    if (!user || user.password !== password) {
-      return res.status(400).json({ error: "Invalid username or password." });
-    }
-    if (!user._id) {
-      return res.status(500).json({ error: "An error occurred while retrieving user ID." });
-    }
-    req.session.isLoggedIn = true;
+          // if (!isPasswordMatch) {
+          //   return res.status(400).json({ error: "Invalid username or password." });
+          // }
+      // Check if the user exists and the password matches
+      if (!user || user.password !== password) {
+        return res.status(400).json({ error: "Invalid username or password." });
+      }
+      if (!user._id) {
+        return res.status(500).json({ error: "An error occurred while retrieving user ID." });
+      }
+      req.session.isLoggedIn = true;
 
-    req.session.userId = user._id;
-    console.log("user id of session: ", req.session.userId)
-    if (remember) {
-      // Set a longer expiration time for the session cookie
-      console.log(remember)
-      req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 21; // 21 days
-    }else{
-      req.session.cookie.expires = null; //idk why it doesnt work lol
+      req.session.userId = user._id;
+      console.log("user id of session: ", req.session.userId)
+      if (remember) {
+        // Set a longer expiration time for the session cookie
+        console.log(remember)
+        req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 21; // 21 days
+      }else{
+        req.session.cookie.expires = null; //idk why it doesnt work lol
+      }
+      //res.redirect("/index");
+      res.redirect("/profile");
     }
-    //res.redirect("/index");
-    res.redirect("/profile");
+    else{
+      res.redirect("/profile");
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred while logging in." });
@@ -244,9 +301,7 @@ app.post("/api/user", async (req, res) => {
     
     const user = new User({ username, password });
     const savedUser = await user.save();
-    
-    // Assign the user's ID to the userId field
-    
+
     savedUser.userId = savedUser._id;
     await savedUser.save();
 
@@ -264,28 +319,35 @@ app.get("/success", (req, res) => {
   res.render("success");
 });
 
-let user, posts;
+
 
 app.get("/profile", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
       // Fetch user information from MongoDB based on the logged-in user's ID
-      
+      let user, posts, comments;
       const userId = req.session.userId;
       console.log(userId);
       user = await User.findById(userId);
-      posts = await Post.find({ userID: userId, isDeleted:false })
+      posts = await Post.find({ userID: userId, isDeleted:false });
+      comments = await Comment.find({ userID: userId, isDeleted:false });
       console.log("session id: ", req.sessionID);
-      //console.log("profile of ", user.username);
-      console.log(posts !== null);
+      console.log("viewing profile of: ", userId, " with username: ", user.username);
+      //console.log(posts !== null);
       
       console.log(posts);
-      // if(posts.length === 0){
-      //   user.posts = user.posts;
-      // }
-      // else{
-      //   user.posts = posts;
-      // }
+      if(posts.length === 0){
+        user.posts = user.posts;
+      }
+      else{
+        user.posts = posts;
+      }
+      if(comments.length === 0){
+        user.comments = user.comments;
+      }
+      else{
+        user.comments = comments;
+      }
       
       console.log(userId);
       console.log(user);
@@ -304,40 +366,42 @@ app.get("/profile", async (req, res) => {
 
 app.get("/profile/:username", async (req, res) => {
   try {
-    if (req.session.isLoggedIn) {
+    //if (req.session.isLoggedIn) {
       //logged in user info
       //const userLoggedIn = User.findById(req.session.userId);
-
-      //profile of :username
+      let  posts, comments;
       const { username } = req.params;
       let user = await User.findOne({ username });
-      let userId = user._id;
-      console.log(req.session.userId.toString(), " ", userId.toString())
+      const userId = user._id;
+      //console.log(req.session.userId.toString(), " ", userId.toString())
 
       let IsCurrUserTheProfileOwner = false;
-      if(req.session.userId.toString() === userId.toString()){
+      if(req.session.userId != null && req.session.userId.toString() === userId.toString()){
         IsCurrUserTheProfileOwner = true;
         res.redirect("/profile");
       }
-
       
       console.log("viewing profile of: ", userId, " with username: ", username);
       posts = await Post.find({ userID: userId, isDeleted:false })
-      console.log(posts.content);
-      // if(posts.length === 0){
-      //   user.posts = user.posts;
-      // }
-      // else{
-      //   user.posts = posts;
-      // }
+      comments = await Comment.find({ userID: userId, isDeleted:false });
+      console.log(posts);
+      if(posts.length === 0){
+        user.posts = user.posts;
+      }
+      else{
+        user.posts = posts;
+      }
+      if(comments.length === 0){
+        user.comments = user.comments;
+      }
+      else{
+        user.comments = comments;
+      }
       console.log(userId);
       console.log(user);
       // Render the profile page with the user's information
       res.render("profile", { user, IsCurrUserTheProfileOwner });
-    } else {
-      // Redirect to the login page if not logged in
-      res.redirect("/login");
-    }
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred while fetching user information." });
@@ -422,16 +486,16 @@ app.post("/api/post", async(req, res) =>{
   }
 })
 
-//display posts
+
 app.get("/post/:title", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
+      // Retrieve the post from the database based on the title
       const title = req.params.title;
-      //currently logged in user
+      const post = await Post.findOne({ title });
+      // Currently logged in user
       const userId = req.session.userId;
       const user = await User.findById(userId);
-      // Retrieve the post from the database based on the title
-      const post = await Post.findOne({ title });
 
       if (!post) {
         return res.status(404).json({ error: "Post not found." });
@@ -455,6 +519,17 @@ app.get("/post/:title", async (req, res) => {
         const recursiveChildComments = await Promise.all(
           childComments.map(async (childComment) => {
             childComment.childComments = await fetchChildComments(childComment);
+            const userReaction = await React.findOne({
+              userID: userId,
+              parentCommentID: childComment._id,
+              isVoted: true,
+            });
+            childComment.userReaction = userReaction ? userReaction.voteValue : 0;
+            // console.log(childComment.content, " ", childComment.userReaction);
+            const positiveCount = await React.countDocuments({ parentCommentID: childComment._id, voteValue: 1 });
+            const negativeCount = await React.countDocuments({ parentCommentID: childComment._id, voteValue: -1 });
+            const ratingCount = positiveCount - negativeCount;
+            childComment.rating = ratingCount;
             return childComment;
           })
         );
@@ -466,6 +541,17 @@ app.get("/post/:title", async (req, res) => {
       const comments = await Promise.all(
         topLevelComments.map(async (comment) => {
           comment.childComments = await fetchChildComments(comment);
+          const userReaction = await React.findOne({
+            userID: userId,
+            parentCommentID: comment._id,
+            isVoted: true,
+          });
+          comment.userReaction = userReaction ? userReaction.voteValue : 0;
+          // console.log(comment.content, " ", comment.userReaction);
+          const positiveCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: 1 });
+          const negativeCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: -1 });
+          const ratingCount = positiveCount - negativeCount;
+          comment.rating = ratingCount;
           return comment;
         })
       );
@@ -479,26 +565,70 @@ app.get("/post/:title", async (req, res) => {
       post.rating = ratingCount;
       const isCurrUserTheAuthor = author.username === user.username;
 
-      console.log("num of top level comments: ", topLevelComments.length);
-      console.log("this post's id: ", post._id);
-      console.log("this post's id: ", postID);
-
-      console.log(comments);
-
-      //if user has already reacted or not
+      // If user has already reacted or not
       const react = await React.findOne({ userID: user._id, parentPostID: post._id });
       const reactValue = react ? react.voteValue : 0;
-      console.log("react object: ", react)
-      console.log("react value: ", reactValue)
 
       res.render("post", { postID, user, post, author, isCurrUserTheAuthor, comments, reactValue });
     } else {
-      // Redirect to the login page if not logged in
-      res.redirect("/login");
+      const title = req.params.title;
+      const post = await Post.findOne({ title });
+
+      if (!post) {
+        return res.status(404).json({ error: "Post not found." });
+      }
+ 
+      // Fetch all top-level comments for the post
+      const topLevelComments = await Comment.find({ parentPostID: post._id, parentCommentID: null })
+        .populate("userID") // Populate the user details for each comment
+        .exec();
+
+      // A recursive function to fetch comments of comments and so on
+      async function fetchChildComments(comment) {
+        console.log("poster name: ", comment.userID.username);
+        const childComments = await Comment.find({ parentCommentID: comment._id })
+          .populate("userID")
+          .exec();
+
+        if (childComments.length === 0) {
+          return [];
+        }
+
+        const recursiveChildComments = await Promise.all(
+          childComments.map(async (childComment) => {
+            childComment.childComments = await fetchChildComments(childComment);
+            const positiveCount = await React.countDocuments({ parentCommentID: childComment._id, voteValue: 1 });
+            const negativeCount = await React.countDocuments({ parentCommentID: childComment._id, voteValue: -1 });
+            const ratingCount = positiveCount - negativeCount;
+            childComment.rating = ratingCount;
+            return childComment;
+          })
+        );
+
+        return recursiveChildComments;
+      }
+
+      // Fetch comments recursively for each top-level comment
+      const comments = await Promise.all(
+        topLevelComments.map(async (comment) => {
+          comment.childComments = await fetchChildComments(comment);
+          const positiveCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: 1 });
+          const negativeCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: -1 });
+          const ratingCount = positiveCount - negativeCount;
+          comment.rating = ratingCount;
+          return comment;
+        })
+      );
+      const author = await User.findOne({ username: post.author });
+      const reactValue = 0;
+      const isCurrUserTheAuthor = false;
+      const user = User.schema;
+      user.username='visitor';
+      res.render("post", { post, comments, author, reactValue,isCurrUserTheAuthor,user });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while retrieving the post." });
+    res.status(500).json({ error: "Server error." });
   }
 });
 
@@ -627,15 +757,26 @@ app.post('/api/react', async (req, res) => {
     if (req.session.isLoggedIn) {
       const userId = req.session.userId;
       const user = await User.findById(userId);
-      const postId = req.body.postID;
+      const parentId = req.body.parentId;
+      const reactParentType = req.body.reactParentType;
       const reactionValue = req.body.reactionValue;
-      const post = await Post.findById(postId);
-
-      if (!post) {
-        return res.status(404).json({ error: 'Post not found' });
+      let post = Post.schema, comment = Comment.schema;
+      let existingReact;
+      if(reactParentType == 'post'){
+        post = await Post.findById(parentId);
+        if (!post) {
+          return res.status(404).json({ error: 'Post not found' });
+        }
+        existingReact = await React.findOne({ userID: userId, parentPostID: parentId });
+      }else{
+        comment = await Comment.findById(parentId);
+        if (!comment) {
+          return res.status(404).json({ error: 'Comment not found' });
+        }
+        existingReact = await React.findOne({ userID: userId, parentCommentID: parentId });
       }
-
-      const existingReact = await React.findOne({ userID: userId, parentPostID: postId });
+      //console.log("parent id: ", parentId);
+      //console.log("parent info: ", post," ", comment)
       if (existingReact) {
         // User has already reacted, update the voteValue
         existingReact.voteValue = reactionValue;
@@ -647,15 +788,24 @@ app.post('/api/react', async (req, res) => {
         await existingReact.save();
       } else {
         // User has not reacted, create a new React document
-        const newReact = new React({
-          userID: userId,
-          parentPostID: postId,
-          isVoted: true,
-          voteValue: reactionValue
-        });
+        let newReact;
+        if(reactParentType == 'post'){
+          newReact = new React({
+            userID: userId,
+            parentPostID: parentId,
+            isVoted: true,
+            voteValue: reactionValue
+          });
+        }else{
+          newReact = new React({
+            userID: userId,
+            parentCommentID: parentId,
+            isVoted: true,
+            voteValue: reactionValue
+          });
+        }
         await newReact.save();
       }
-
       res.json({ message: 'Reaction updated successfully' });
     } else{
       res.redirect("/login");

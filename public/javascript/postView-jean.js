@@ -1,4 +1,4 @@
-function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prating,pmedia, preactValue, isCurrUserTheAuthor) {
+function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prating,pmedia, preactValue, isCurrUserTheAuthor,isLoggedIn) {
     let 
     // content_list = document.createElement('div'),
     info_list = document.createElement('div'),
@@ -81,6 +81,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
 
 
     comment_reply.addEventListener('click', () => {
+      if (isLoggedIn!=="false"){
         let textAreas = document.querySelectorAll('.comment_text_area');
         textAreas.forEach(textArea => {
             const parentElement = textArea.closest('.comment_wrapping');
@@ -116,6 +117,9 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
             // border.append(postreply(userID,"",newcomment,0,postID+1)); //change to currently logged in
             handleReply(postID,newcomment,'a',0);
         }
+      } else{
+        alert("Please log in")
+      }
       });
 
     comment_share.textContent="Share";
@@ -185,7 +189,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
     if(isCurrUserTheAuthor=="true"){
         buttons.appendChild(comment_delete);
     }
-    
+  
     buttons.appendChild(comment_reply);
     // buttons.appendChild(comment_share);
     if(isCurrUserTheAuthor=="true"){
@@ -195,7 +199,8 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
     
 
     // buttons.appendChild(comment_save);
-    info_list.appendChild(createReaction(prating,preactValue,postID));
+    // console.log(preactValue);
+    info_list.appendChild(createReaction(prating,preactValue,postID,0,0));
     info.appendChild(buttons);
     topic.appendChild(info);
     info_list.appendChild(topic);
@@ -216,7 +221,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
 
 
 // new reply / new comment
-function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID){
+function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preactValue){
     let 
     comment_align = document.createElement('div'),
     comment_forum = document.createElement('div'),
@@ -268,15 +273,20 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID){
     comment_container.appendChild(comment_profile);
     desc.textContent=pdesc;
     comment_profile.style.cursor = 'pointer';
+    if (pcount!=="N/A"){
     comment_profile.onclick = function(){
       window.location.href = `/profile/${pauthor}`;
     }
+  } else{
+    comment_profile.style.pointerEvents='none';
+  }
     comment_content_desc.appendChild(desc);
     comment_delete.textContent="Delete";
     comment_reply.textContent="Reply";
     comment_text_area_save.textContent="Save";
     comment_cancel.textContent="Cancel";
     comment_reply.onclick = function(){
+      if (isLoggedIn!=="false"){
         let textAreas = document.querySelectorAll('.comment_text_area');
         // Remove each text area from its parent "comment_wrapping" div
         textAreas.forEach(textArea => {
@@ -319,13 +329,17 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID){
             handleReply(pid,newcomment,parentID,1);
             
         }
+      }else{
+        alert("Please log in")
+      }
    
     }
     if (user==pauthor){
       comment_react.appendChild(comment_delete);
     }
-    
-    comment_react.appendChild(comment_reply);
+    if (pcount!=="N/A"){
+      comment_react.appendChild(comment_reply);
+    }
     comment_share.textContent="Share";
     // comment_react.appendChild(comment_share);
     comment_edit.textContent="Edit";
@@ -357,7 +371,12 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID){
     
     comment_content_desc.appendChild(comment_react);
     comment_container.appendChild(comment_content_desc);
-	comment_forum.appendChild(createReaction(pcount));
+    // console.log(preactValue);
+    if (pcount!=="N/A"){
+	    comment_forum.appendChild(createReaction(pcount,preactValue,pid,1,0));
+    } else{
+      comment_forum.appendChild(createReaction(pcount,preactValue,pid,1,1));
+    }
     comment_forum.appendChild(comment_container);
     comment_wrapping.appendChild(comment_forum);
     comment_align.appendChild(comment_wrapping);
@@ -368,7 +387,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID){
 
 }
 
-function profpost(pauthor,ppfp,pdesc,pcount,pid,phtml){
+function profilePost(pauthor,ppfp,pdesc,pcount,pid,phtml){
     let 
     comment_align = document.createElement('div'),
     comment_forum = document.createElement('div'),
