@@ -7,7 +7,7 @@
             <%= user.username %>'s' Profile - SnaccOverflow
         </title>
         <link rel="icon" href="../images/icon.png" sizes="32x32" type="image/png">
-        <script src="./javascript/profile.js"></script>
+        <script src="/javascript/profile.js"></script>
         <link rel="stylesheet" type="text/css" href="/css/styles.css">
 	</head>
 	<body>
@@ -36,32 +36,36 @@
 					  <%= user.aboutme %>
 					</article>
 					
+					
 					<script>
-					  <% if (user.posts.length > 0) { %>
-						<% user.posts.forEach((post) => { %>
-						  let title = '<%= post.title %>';
-						  let content = '<%= post.content %>';
-						  let createDate = '<%= post.dateCreated %>';
-						  let postElement = createPost(title, content, createDate);
-						  $("#profile-details").append(postElement.spacer);
-						  $("#profile-details").append(postElement.title);
-						  $("#profile-details").append(postElement.content);
-						  $("#profile-details").append(postElement.createDate);
-						<% }) %>
-					  <% } else { %>information provided
-						let titlePost = 'No Posts';
-						let contentPost = 'This user currently has no posts.';
-						let postElement = createPost(titlePost, contentPost);
+					    <% if (user.posts.length > 0) { %>
+							<% user.posts.forEach((post) => { %>
+								console.log("Post Title:", '<%= post.title %>');
+									console.log("Post Content:", '<%= post.content %>');
+									console.log("Create Date:", '<%= post.dateCreated %>');
+							var title = '<%= post.title %>';
+							var content = '<%= post.content %>';
+							var createDate = '<%= post.dateCreated %>';
+							var postElement = createPost(title, content, createDate);
+							$("#profile-details").append(postElement.spacer);
+							$("#profile-details").append(postElement.title);
+							$("#profile-details").append(postElement.content);
+							$("#profile-details").append(postElement.createDate);
+							<% }) %>
+					  <% } else { %>
+						var titlePost = 'No Posts';
+						var contentPost = 'This user currently has no posts.';
+						var postElement = createPost(titlePost, contentPost);
 						$("#profile-details").append(postElement.spacer);
 						$("#profile-details").append(postElement.titlePost);
 						$("#profile-details").append(postElement.contentPost);
 					  <% } %>
-				  
+						
 					  <% if (user.comments.length > 0) { %>
 						<% user.comments.forEach((comment) => { %>
-							let commentContent = '<%= comment.content %>';
-							let createDate = '<%= comment.dateCreated %>'
-							let commentElement = createComment(commentContent);
+							var commentContent = '<%= comment.content %>';
+							var createDate = '<%= comment.dateCreated %>'
+							var commentElement = createComment(commentContent, createDate);
 
 							$("#profile-details").append(commentElement.spacer);
 							$("#profile-details").append(commentElement.content);

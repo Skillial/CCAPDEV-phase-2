@@ -149,8 +149,7 @@ app.get("/logout", (req, res)=>{
 })
 
 // app.get("/profile", async(req, res) =>{
-//   username =
-//   res.render("/profile/" + username);
+//   res.render("profile")
 // })
 
 app.get("/profile/edit/", async (req, res) => {
@@ -182,34 +181,40 @@ app.get("/editComment", (req, res)=>{
 //logging in
 app.post("/login", async (req, res) => {
   try {
-    const { username, password, remember } = req.body;
-    const user = await User.findOne({ username });
-        // Use the comparePassword method to check if the provided password matches the hashed password in the database
-        // const isPasswordMatch = await user.comparePassword(password);
+    console.log("does req.session not exist?", !req.session.isLoggedIn);
+    if(!req.session.isLoggedIn){
+      const { username, password, remember } = req.body;
+      const user = await User.findOne({ username });
+          // Use the comparePassword method to check if the provided password matches the hashed password in the database
+          // const isPasswordMatch = await user.comparePassword(password);
 
-        // if (!isPasswordMatch) {
-        //   return res.status(400).json({ error: "Invalid username or password." });
-        // }
-    // Check if the user exists and the password matches
-    if (!user || user.password !== password) {
-      return res.status(400).json({ error: "Invalid username or password." });
-    }
-    if (!user._id) {
-      return res.status(500).json({ error: "An error occurred while retrieving user ID." });
-    }
-    req.session.isLoggedIn = true;
+          // if (!isPasswordMatch) {
+          //   return res.status(400).json({ error: "Invalid username or password." });
+          // }
+      // Check if the user exists and the password matches
+      if (!user || user.password !== password) {
+        return res.status(400).json({ error: "Invalid username or password." });
+      }
+      if (!user._id) {
+        return res.status(500).json({ error: "An error occurred while retrieving user ID." });
+      }
+      req.session.isLoggedIn = true;
 
-    req.session.userId = user._id;
-    console.log("user id of session: ", req.session.userId)
-    if (remember) {
-      // Set a longer expiration time for the session cookie
-      console.log(remember)
-      req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 21; // 21 days
-    }else{
-      req.session.cookie.expires = null; //idk why it doesnt work lol
+      req.session.userId = user._id;
+      console.log("user id of session: ", req.session.userId)
+      if (remember) {
+        // Set a longer expiration time for the session cookie
+        console.log(remember)
+        req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 21; // 21 days
+      }else{
+        req.session.cookie.expires = null; //idk why it doesnt work lol
+      }
+      //res.redirect("/index");
+      res.redirect("/profile");
     }
-    //res.redirect("/index");
-    res.redirect("/profile");
+    else{
+      res.redirect("/profile");
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred while logging in." });
@@ -264,17 +269,18 @@ app.get("/success", (req, res) => {
   res.render("success");
 });
 
-let user, posts;
+
 
 app.get("/profile", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
       // Fetch user information from MongoDB based on the logged-in user's ID
-      
+      let user, posts, comments;
       const userId = req.session.userId;
       console.log(userId);
       user = await User.findById(userId);
-      posts = await Post.find({ userID: userId, isDeleted:false })
+      posts = await Post.find({ userID: userId, isDeleted:false });
+      comments = await Comment.find({ userID: userId, isDeleted:false });
       console.log("session id: ", req.sessionID);
       console.log("viewing profile of: ", userId, " with username: ", user.username);
       //console.log(posts !== null);
@@ -285,6 +291,12 @@ app.get("/profile", async (req, res) => {
       }
       else{
         user.posts = posts;
+      }
+      if(comments.length === 0){
+        user.comments = user.comments;
+      }
+      else{
+        user.comments = comments;
       }
       
       console.log(userId);
@@ -307,7 +319,7 @@ app.get("/profile/:username", async (req, res) => {
     //if (req.session.isLoggedIn) {
       //logged in user info
       //const userLoggedIn = User.findById(req.session.userId);
-
+      let  posts, comments;
       //profile of :username
       const { username } = req.params;
       let user = await User.findOne({ username });
@@ -323,12 +335,19 @@ app.get("/profile/:username", async (req, res) => {
       
       console.log("viewing profile of: ", userId, " with username: ", username);
       posts = await Post.find({ userID: userId, isDeleted:false })
+      comments = await Comment.find({ userID: userId, isDeleted:false });
       console.log(posts);
       if(posts.length === 0){
         user.posts = user.posts;
       }
       else{
         user.posts = posts;
+      }
+      if(comments.length === 0){
+        user.comments = user.comments;
+      }
+      else{
+        user.comments = comments;
       }
       console.log(userId);
       console.log(user);
