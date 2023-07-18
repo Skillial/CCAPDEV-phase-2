@@ -484,6 +484,14 @@ app.get("/post/:title", async (req, res) => {
       // Fetch comments recursively for each top-level comment
       const comments = await Promise.all(
         topLevelComments.map(async (comment) => {
+
+          const userReaction = await React.findOne({
+            userID: userId,
+            parentPostID: comment._id,
+            isVoted: true,
+          });
+          comment.userReaction = userReaction ? userReaction.voteValue : 0;
+
           comment.childComments = await fetchChildComments(comment);
           const positiveCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: 1 });
           const negativeCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: -1 });
