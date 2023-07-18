@@ -387,7 +387,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
 
 }
 
-function profpost(pauthor,ppfp,pdesc,pcount,pid,phtml){
+function profilePost(pauthor,ppfp,pdesc,pcount,pid,phtml){
     let 
     comment_align = document.createElement('div'),
     comment_forum = document.createElement('div'),
