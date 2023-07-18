@@ -45,7 +45,7 @@
 
 <% comments.forEach(comment => { %>
   <script>
-    var commentElement = postreply('<%= comment.userID.username %>','<%= comment.userID.ppfp %>','<%= comment.content %>', '<%= comment.rating %>', '<%= comment._id %>','<%= user.username%>',postID);
+    var commentElement = postreply('<%= comment.author %>','<%= comment.userID.ppfp %>','<%= comment.content %>', '<%= comment.rating %>', '<%= comment._id %>','<%= user.username%>',postID);
     $('.border').append(commentElement);
   </script>
 
