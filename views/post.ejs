@@ -53,10 +53,17 @@
       </script>
 
 <% comments.forEach(comment => { %>
+  <% if (!comment.isDeleted){ %>
   <script>
-    var commentElement = postreply('<%= comment.author %>','<%= comment.userID.ppfp %>','<%= comment.content %>', '<%= comment.rating %>', '<%= comment._id %>','<%= user.username%>',postID,'<%=isLoggedIn%>');
-    $('.border').append(commentElement);
+      var commentElement = postreply('<%= comment.author %>','<%= comment.userID.ppfp %>','<%= comment.content %>', '<%= comment.rating %>', '<%= comment._id %>','<%= user.username%>',postID,'<%=isLoggedIn%>');
+      $('.border').append(commentElement);
   </script>
+  <% } else { %>
+  <script>
+      var commentElement = postreply("deleted","deleted","The original comment was deleted, but you can still view the comments.", "N/A", '<%= comment._id %>',"visitor",postID,'<%=isLoggedIn%>');
+      $('.border').append(commentElement);
+  </script>
+  <% } %>
 
   <% const processChildComments = (childComments) => {
     childComments.forEach(child => { %>
@@ -70,12 +77,17 @@
           var rating = '<%= child.rating %>';
           var childId = '<%= child._id %>';
           var user = '<%= user.username %>';
+      
+          <% if (!child.isDeleted) { %>
           var replyResult = postreply(username, ppfp, content, rating, childId, user, postID);
+          <% } else { %>
+          var replyResult = postreply("deleted", "deleted", "The original comment was deleted, but you can still view the comments.", "N/A", '<%= child._id %>', "visitor", postID, '<%=isLoggedIn%>');
+          <% } %>
       
           <% if (child.parentCommentID === null) { %>
-            $('#' + '<%= child._id %>').append(replyResult);
+          $('#' + '<%= child._id %>').append(replyResult);
           <% } else { %>
-            $('#' + parentCommentId).append(replyResult);
+          $('#' + parentCommentId).append(replyResult);
           <% } %>
         });
       </script>

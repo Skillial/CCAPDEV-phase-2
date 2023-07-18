@@ -40,13 +40,26 @@ $(document).on('click', '.comment_dislike', function() {
 });
 
 $(document).on('click', '.comment_like', function() {
+	var reactionDiv = $(this).closest('.reactions');
+	var postID = reactionDiv.attr('id');
+	console.log(postID);
+	var isLiked = $(this).hasClass('comment_like_colored'); // Check if the like button is already colored
+	
 	$(this).siblings('.comment_like').toggleClass('comment_like-hover');
 	$(this).toggleClass('comment_like_colored');
 	$(this).siblings('.comment_dislike').removeClass('comment_dislike-hover');
 	$(this).siblings('.comment_dislike').removeClass('comment_dislike_colored');
+	
+	if (isLiked) {
+	  handleReact(postID, 'unlike'); // Run handleReact with 'unlike' action
+	} else {
+	  handleReact(postID, 'like'); // Run handleReact with 'like' action
+	}
+	console.log(postID);
 });
 
-function createReaction(reactions, preactValue, postID) {
+function createReaction(reactions, preactValue, postID,checker) {
+	console.log(postID);
 	let reaction = document.createElement('div'),
 		like = document.createElement('div'),
 		count = document.createElement('div'),
@@ -56,9 +69,15 @@ function createReaction(reactions, preactValue, postID) {
 	reaction.appendChild(count);
 	reaction.appendChild(dislike);
 	reaction.className = 'reactions';
-	like.className = 'like like-hover';
 	count.className = 'count';
-	dislike.className = 'dislike dislike-hover';
+	if (checker==0){
+		like.className = 'like like-hover';
+		dislike.className = 'dislike dislike-hover';
+	}
+	else if (checker==1){
+		like.className = 'comment_like comment_like-hover';
+		dislike.className = 'comment_dislike comment_dislike-hover';
+	}
 	count.textContent = reactions;
 	if (preactValue == 1) {
 		like.classList.toggle('like-hover');

@@ -199,7 +199,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
     
 
     // buttons.appendChild(comment_save);
-    info_list.appendChild(createReaction(prating,preactValue,postID));
+    info_list.appendChild(createReaction(prating,preactValue,postID,0));
     info.appendChild(buttons);
     topic.appendChild(info);
     info_list.appendChild(topic);
@@ -365,7 +365,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn){
     
     comment_content_desc.appendChild(comment_react);
     comment_container.appendChild(comment_content_desc);
-	comment_forum.appendChild(createReaction(pcount));
+	comment_forum.appendChild(createReaction(pcount,0,pid,1));
     comment_forum.appendChild(comment_container);
     comment_wrapping.appendChild(comment_forum);
     comment_align.appendChild(comment_wrapping);
