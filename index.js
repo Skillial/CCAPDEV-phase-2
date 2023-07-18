@@ -701,15 +701,26 @@ app.post('/api/react', async (req, res) => {
     if (req.session.isLoggedIn) {
       const userId = req.session.userId;
       const user = await User.findById(userId);
-      const postId = req.body.postID;
+      const parentId = req.body.parentId;
+      const reactParentType = req.body.reactParentType;
       const reactionValue = req.body.reactionValue;
-      const post = await Post.findById(postId);
-
-      if (!post) {
-        return res.status(404).json({ error: 'Post not found' });
+      let post = Post.schema, comment = Comment.schema;
+      let existingReact = null;
+      if(reactParentType == 'post'){
+        post = await Post.findById(parentId);
+        if (!post) {
+          return res.status(404).json({ error: 'Post not found' });
+        }
+        existingReact = await React.findOne({ userID: userId, parentPostID: parentId });
+      }else{
+        comment = await Comment.findById(parentId);
+        if (!comment) {
+          return res.status(404).json({ error: 'Comment not found' });
+        }
+        existingReact = await React.findOne({ userID: userId, parentCommentID: parentId });
       }
-
-      const existingReact = await React.findOne({ userID: userId, parentPostID: postId });
+      //console.log("parent id: ", parentId);
+      //console.log("parent info: ", post," ", comment)
       if (existingReact) {
         // User has already reacted, update the voteValue
         existingReact.voteValue = reactionValue;
@@ -721,15 +732,24 @@ app.post('/api/react', async (req, res) => {
         await existingReact.save();
       } else {
         // User has not reacted, create a new React document
-        const newReact = new React({
-          userID: userId,
-          parentPostID: postId,
-          isVoted: true,
-          voteValue: reactionValue
-        });
+        let newReact;
+        if(reactParentType == 'post'){
+          newReact = new React({
+            userID: userId,
+            parentPostID: parentId,
+            isVoted: true,
+            voteValue: reactionValue
+          });
+        }else{
+          newReact = new React({
+            userID: userId,
+            commentPostID: parentId,
+            isVoted: true,
+            voteValue: reactionValue
+          });
+        }
         await newReact.save();
       }
-
       res.json({ message: 'Reaction updated successfully' });
     } else{
       res.redirect("/login");
