@@ -41,14 +41,14 @@
 						<% user.posts.forEach((post) => { %>
 						  let title = '<%= post.title %>';
 						  let content = '<%= post.content %>';
-						  let createDate = '<%= post.dateCreated %>'
-						  let postElement = createPost(title, content);
+						  let createDate = '<%= post.dateCreated %>';
+						  let postElement = createPost(title, content, createDate);
 						  $("#profile-details").append(postElement.spacer);
 						  $("#profile-details").append(postElement.title);
 						  $("#profile-details").append(postElement.content);
 						  $("#profile-details").append(postElement.createDate);
 						<% }) %>
-					  <% } else { %>
+					  <% } else { %>information provided
 						let titlePost = 'No Posts';
 						let contentPost = 'This user currently has no posts.';
 						let postElement = createPost(titlePost, contentPost);

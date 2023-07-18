@@ -276,16 +276,16 @@ app.get("/profile", async (req, res) => {
       user = await User.findById(userId);
       posts = await Post.find({ userID: userId, isDeleted:false })
       console.log("session id: ", req.sessionID);
-      //console.log("profile of ", user.username);
-      console.log(posts !== null);
+      console.log("viewing profile of: ", userId, " with username: ", user.username);
+      //console.log(posts !== null);
       
       console.log(posts);
-      // if(posts.length === 0){
-      //   user.posts = user.posts;
-      // }
-      // else{
-      //   user.posts = posts;
-      // }
+      if(posts.length === 0){
+        user.posts = user.posts;
+      }
+      else{
+        user.posts = posts;
+      }
       
       console.log(userId);
       console.log(user);
@@ -304,7 +304,7 @@ app.get("/profile", async (req, res) => {
 
 app.get("/profile/:username", async (req, res) => {
   try {
-    if (req.session.isLoggedIn) {
+    //if (req.session.isLoggedIn) {
       //logged in user info
       //const userLoggedIn = User.findById(req.session.userId);
 
@@ -312,10 +312,10 @@ app.get("/profile/:username", async (req, res) => {
       const { username } = req.params;
       let user = await User.findOne({ username });
       let userId = user._id;
-      console.log(req.session.userId.toString(), " ", userId.toString())
+      //console.log(req.session.userId.toString(), " ", userId.toString())
 
       let IsCurrUserTheProfileOwner = false;
-      if(req.session.userId.toString() === userId.toString()){
+      if(req.session.userId != null && req.session.userId.toString() === userId.toString()){
         IsCurrUserTheProfileOwner = true;
         res.redirect("/profile");
       }
@@ -323,21 +323,21 @@ app.get("/profile/:username", async (req, res) => {
       
       console.log("viewing profile of: ", userId, " with username: ", username);
       posts = await Post.find({ userID: userId, isDeleted:false })
-      console.log(posts.content);
-      // if(posts.length === 0){
-      //   user.posts = user.posts;
-      // }
-      // else{
-      //   user.posts = posts;
-      // }
+      console.log(posts);
+      if(posts.length === 0){
+        user.posts = user.posts;
+      }
+      else{
+        user.posts = posts;
+      }
       console.log(userId);
       console.log(user);
       // Render the profile page with the user's information
       res.render("profile", { user, IsCurrUserTheProfileOwner });
-    } else {
-      // Redirect to the login page if not logged in
-      res.redirect("/login");
-    }
+    // } else {
+    //   // Redirect to the login page if not logged in
+    //   res.redirect("/login");
+    // }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred while fetching user information." });
