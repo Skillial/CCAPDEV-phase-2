@@ -6,15 +6,15 @@
 //add landing pages for errors
 
 //SEMI-Done
-//patch profile -> need to fix profile pic, also displaying of posts in /profile (breaks when >1 post)
+//patch profile -> need to fix profile pic, also displaying of posts in /profile (links and formatting)
 //reacting -> check if works for comments. works everywhere else.
-//post, patch, delete comment -> comments are stored in the db na, to fix reacting
 
 //DONE FOR SURE
 // login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
 //post post
 //patch, delete post -> maybe paganda patching, like takign the inputs (currently uses alerts)
 //search 
+//post, patch, delete comment ->
 
 require('dotenv').config();
 const link = process.env.DB_URL;
@@ -705,7 +705,7 @@ app.post('/api/react', async (req, res) => {
       const reactParentType = req.body.reactParentType;
       const reactionValue = req.body.reactionValue;
       let post = Post.schema, comment = Comment.schema;
-      let existingReact = null;
+      let existingReact;
       if(reactParentType == 'post'){
         post = await Post.findById(parentId);
         if (!post) {
@@ -743,7 +743,7 @@ app.post('/api/react', async (req, res) => {
         }else{
           newReact = new React({
             userID: userId,
-            commentPostID: parentId,
+            parentCommentID: parentId,
             isVoted: true,
             voteValue: reactionValue
           });
