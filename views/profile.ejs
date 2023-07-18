@@ -41,6 +41,7 @@
 					<br><br><h2>Recent User Posts</h2>
 					<main>
 						<script>
+							//console.log("length: ")
 							<% if (user.posts.length > 0) { %>
 								
 								<% user.posts.forEach((post) => { %>
@@ -73,7 +74,17 @@
 								$("#profile-details").append(postElement.contentPost);
 							<% } %>
 							
-							//might just remove since it'll be annoying to get the parentPost links for the comments :D
+							
+						</script>
+					</main>
+				</div>
+			</div>
+		</div>
+	</body>
+	<!-- <div>   temporary basurahan for the comment shit.
+		for some reason, it causes a bug sa /profile/:username.
+		but the post shit works normally in /profile  so idk what's wrong lol
+		//might just remove since it'll be annoying to get the parentPost links for the comments :D
 							// <% if (user.comments.length > 0) { %>
 							// 	<% user.comments.forEach((comment) => { %>
 							// 		var commentContent = '<%= comment.content %>';
@@ -92,11 +103,6 @@
 							// 	$("#profile-details").append(postElement.title);
 							// 	$("#profile-details").append(postElement.content);
 							// 	<% } %>
-						</script>
-					</main>
-				</div>
-			</div>
-		</div>
-	</body>
+	</div> -->
 </html>
 	

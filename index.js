@@ -5,16 +5,19 @@
 //add landing pages for errors
 
 //SEMI-Done
-//patch profile -> need to fix profile pic, also displaying of posts in /profile (links and formatting)
-
+//patch profile -> need to fix profile pic
+//view profile -> maybe add displaying of comments. fix image link (to add)
+             //-> also add like datecreated maybe? and rating (?) though pahirapan pa yung rating so wag nalang (or maybe j number idk)
+             //-> pfp sa posts in the profile will break when viewing other users' posts
 
 //DONE FOR SURE
 //login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
 //post post, patch, delete post -> maybe paganda patching, make it more obvious that fields are editable
 //post, patch, delete comment -> maybe paganda patching, make it more obvious that fields are editable
 //reacting
-//remove a lot of the isLoggedIn checks -> /post/:title  /profile/:username  
-//search 
+//remove a lot of the isLoggedIn checks 
+//search
+
 
 require('dotenv').config();
 const link = process.env.DB_URL;
@@ -322,10 +325,9 @@ app.get("/profile/:username", async (req, res) => {
       //logged in user info
       //const userLoggedIn = User.findById(req.session.userId);
       let  posts, comments;
-      //profile of :username
       const { username } = req.params;
       let user = await User.findOne({ username });
-      let userId = user._id;
+      const userId = user._id;
       //console.log(req.session.userId.toString(), " ", userId.toString())
 
       let IsCurrUserTheProfileOwner = false;
@@ -333,7 +335,6 @@ app.get("/profile/:username", async (req, res) => {
         IsCurrUserTheProfileOwner = true;
         res.redirect("/profile");
       }
-
       
       console.log("viewing profile of: ", userId, " with username: ", username);
       posts = await Post.find({ userID: userId, isDeleted:false })
@@ -355,10 +356,7 @@ app.get("/profile/:username", async (req, res) => {
       console.log(user);
       // Render the profile page with the user's information
       res.render("profile", { user, IsCurrUserTheProfileOwner });
-    // } else {
-    //   // Redirect to the login page if not logged in
-    //   res.redirect("/login");
-    // }
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred while fetching user information." });
