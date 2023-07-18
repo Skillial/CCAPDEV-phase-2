@@ -1,7 +1,7 @@
 //To DO
 //Overall: HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
 //        input sanitization and general checking
-//sort by date and by 'most popular'
+
 //add landing pages for errors
 
 //SEMI-Done
@@ -9,15 +9,18 @@
 //view profile -> maybe add displaying of comments. fix image link (to add)
              //-> also add like datecreated maybe? and rating (?) though pahirapan pa yung rating so wag nalang (or maybe j number idk)
              //-> pfp sa posts in the profile will break when viewing other users' posts
-
+//sort by date and by 'most popular' -> a little slow, and the sorting buttons can look better
+                                //   -> maybe make the mouse pointer like a loading circle... or just store the ratings in the post mismo..? 
+                                //   -> TOP is just the overall rating count currently.
+                                //   -> HOT is top posts within last 2 days. some decay factor math stuff
 //DONE FOR SURE
-//login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
-//post post, patch, delete post -> maybe paganda patching, make it more obvious that fields are editable
-//post, patch, delete comment -> maybe paganda patching, make it more obvious that fields are editable
-//reacting
-//remove a lot of the isLoggedIn checks 
-//search
-
+// login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
+// post post, patch, delete post -> maybe paganda patching, make it more obvious that fields are editable
+// post, patch, delete comment -> maybe paganda patching, make it more obvious that fields are editable
+// reacting
+// remove a lot of the isLoggedIn checks 
+// search
+// /index -> maybe add the date posted? also limit the num of posts shown, maybe implement a paging function... (index/1, index/2...) that's pain.
 
 require('dotenv').config();
 const link = process.env.DB_URL;
@@ -84,12 +87,30 @@ app.use(userIDMiddleware);
 
 app.get("/index", async (req, res) => {
   try {
+    const TWO_DAYS_IN_MS = 2 * 24 * 60 * 60 * 1000;
+    const currentDate = new Date();
+    let sortBy = req.query.sortBy || "createDate"; // Default sorting by creation date
+    let sortOrder = req.query.sortOrder || "desc"; // Default sorting in descending order
+
+    // Validate the sorting criteria to avoid potential security issues
+    const allowedSortFields = ["createDate", "rating", "hotness"]; // Add more fields if needed
+    const allowedSortOrders = ["asc", "desc"];
+    if (!allowedSortFields.includes(sortBy)) {
+      sortBy = "createDate"; // Set default sorting if an invalid field is provided
+    }
+    if (!allowedSortOrders.includes(sortOrder)) {
+      sortOrder = "desc"; // Set default sorting order if an invalid order is provided
+    }
+
+    let posts = [];
+
     if (req.session?.isLoggedIn) {
       console.log(req.sessionID);
       console.log(req.session.isLoggedIn);
       const userId = req.session.userId;
       console.log(userId);
-      const posts = await Post.find({ isDeleted: false }).limit(0);
+
+      posts = await Post.find({ isDeleted: false }).limit(0);
 
       // Get the number of positive and negative votes for each post
       for (let i = 0; i < posts.length; i++) {
@@ -101,18 +122,28 @@ app.get("/index", async (req, res) => {
         });
         post.userReaction = userReaction ? userReaction.voteValue : 0;
 
-        const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
-        const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
+        const positiveCount = await React.countDocuments({
+          parentPostID: post._id,
+          voteValue: 1,
+        });
+        const negativeCount = await React.countDocuments({
+          parentPostID: post._id,
+          voteValue: -1,
+        });
         const ratingCount = positiveCount - negativeCount;
         post.rating = ratingCount;
-      }
 
-      res.render("index", { posts});
+        //calculating hotness
+        const timeDifferenceInMs = currentDate - post.createDate;
+        const decayFactor = Math.exp(-timeDifferenceInMs / TWO_DAYS_IN_MS); // Adjust the decay rate as needed
+        const ratingWithDecay = post.rating * decayFactor;
+        post.hotnessScore = ratingWithDecay;
+      }
     } else {
       console.log("Currently not logged in, showing a limited number of posts!")
       const limit = 20; // Change the limit value as needed
-      const posts = await Post.find({ isDeleted: false }).limit(limit);
-      
+      posts = await Post.find({ isDeleted: false }).limit(limit);
+
       // Get the number of positive and negative votes for each post
       for (let i = 0; i < posts.length; i++) {
         const post = posts[i];
@@ -120,16 +151,30 @@ app.get("/index", async (req, res) => {
         const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
         const ratingCount = positiveCount - negativeCount;
         post.rating = ratingCount;
-      }
 
-      // Render the index template with the limited posts data
-      res.render("index", { posts });
+        //calculating hotness
+        const timeDifferenceInMs = currentDate - post.createDate;
+        const decayFactor = Math.exp(-timeDifferenceInMs / TWO_DAYS_IN_MS); // Adjust the decay rate as needed
+        const ratingWithDecay = post.rating * decayFactor;
+        post.hotnessScore = ratingWithDecay;
+      }
     }
+
+    if (sortBy === "rating") {
+      posts.sort((a, b) => (sortOrder === "desc" ? b.rating - a.rating : a.rating - b.rating));
+    } else if (sortBy === "hotness") {
+      posts.sort((postA, postB) => postB.hotnessScore - postA.hotnessScore);
+    } else {
+      posts.sort((a, b) => (sortOrder === "desc" ? b[sortBy] - a[sortBy] : a[sortBy] - b[sortBy]));
+    }
+
+    res.render("index", { posts });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred while fetching posts." });
   }
 });
+
 
 
 app.get("/index", (req, res)=>{
