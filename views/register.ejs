@@ -3,7 +3,7 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script src="/javascript/react.js"></script>
         <title>
-            SnaccOverflow
+            Sign Up
         </title>
         <link rel="icon" href="../images/icon.png" sizes="32x32" type="image/png">
         <link rel="stylesheet" type="text/css" href="/css/styles.css">
@@ -18,15 +18,29 @@
 		<div class="credential-card">
 		<div class="register title">Register</div>
 
+            <% if (typeof successFlash !== 'undefined' && successFlash.length > 0) { %>
+                <div class="alert alert-success">
+                    <%= successFlash %>
+                </div>
+            <% } %>
+
+            <% if (typeof errorFlash !== 'undefined' && errorFlash.length > 0) { %>
+                <div class="alert alert-danger">
+                    <%= errorFlash %>
+                </div>
+            <% } %>
+
+
+
         <form class="register screen" method="POST" action="/api/user">
             <label for="username">Username</label>
-            <input type="text" name="username" id="username"><br>
+            <input type="text" name="username" id="username">
             <label for="password">Password</label>
-            <input type="password" name="password" id="password" required><br>
+            <input type="password" name="password" id="password" required>
             <label for="repassword">Retype Password</label>
-            <input type="password" name="repassword" id="repassword" required><br>
+            <input type="password" name="repassword" id="repassword" required>
 			<div class="centered">
-				<input type="submit" value="Register">
+				<input type="submit" value="Sign Up">
 			</div>
         </form>
     </body>

@@ -1,26 +1,25 @@
-//To DO
-//Overall: HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
-//        input sanitization and general checking
-
-//add landing pages for errors
-
-//SEMI-Done
-//patch profile -> need to fix profile pic
-//view profile -> maybe add displaying of comments. fix image link (to add)
-             //-> also add like datecreated maybe? and rating (?) though pahirapan pa yung rating so wag nalang (or maybe j number idk)
-             //-> pfp sa posts in the profile will break when viewing other users' posts
-//sort by date and by 'most popular' -> a little slow, and the sorting buttons can look better
-                                //   -> maybe make the mouse pointer like a loading circle... or just store the ratings in the post mismo..? 
-                                //   -> TOP is just the overall rating count currently.
-                                //   -> HOT is top posts within last 2 days. some decay factor math stuff
-//DONE FOR SURE
-// login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
-// post post, patch, delete post -> maybe paganda patching, make it more obvious that fields are editable
-// post, patch, delete comment -> maybe paganda patching, make it more obvious that fields are editable
-// reacting
-// remove a lot of the isLoggedIn checks 
-// search
-// /index -> maybe add the date posted? also limit the num of posts shown, maybe implement a paging function... (index/1, index/2...) that's pain.
+// # Appdev Todo [Updated 9:30PM July 18)
+//   ## Overall:
+//    - HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
+//    - input sanitization and general checking
+//    - add landing pages for errors
+  
+//   ## SEMI-Done
+//    * Patch profile -> need to fix profile pic
+//    * View profile -> Fix image link (to add)
+//     * -> pfp sa posts in the profile will break when viewing other users' posts
+  
+  
+//   ## DONE FOR SURE
+//    - login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
+//    - post post, patch, delete post -> maybe paganda patching, make it more obvious that fields are editable
+//    - post, patch, delete comment -> maybe paganda patching, make it more obvious that fields are editable
+//    -  in index -> maybe add the date posted? 
+//     - ->Also limit the num of posts shown, maybe implement a paging function... (index/1, index/2...) that's pain.
+//    - reacting
+//    - removed a lot of the isLoggedIn checks 
+//    - search
+//   * Sort by date and by 'most popular' -> a little slow, just store the ratings in the post mismo..? (future update)
 
 require('dotenv').config();
 const link = process.env.DB_URL;
@@ -287,30 +286,89 @@ app.post("/logout", async (req, res) => {
 })
 
 //registering
+// app.post("/api/user", async (req, res) => {
+//   try {
+//     const { username, password, repassword } = req.body;
+//     if (password !== repassword) {
+//       return res.status(400).json({ error: "Passwords do not match." });
+//     }
+
+//     const existingUser = await User.findOne({ username });
+//     if (existingUser) {
+//       return res.status(400).json({ error: "Username already exists." });
+//     }
+    
+//     const user = new User({ username, password });
+//     const savedUser = await user.save();
+
+//     savedUser.userId = savedUser._id;
+//     await savedUser.save();
+
+//     res.redirect("/success");
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "An error occurred while saving the user." });
+//   }
+// });
+
+
+
+const flash = require("connect-flash");
+
+// Assuming you have set up the flash middleware
+app.use(flash());
+
+// Custom middleware to expose flash messages to views
+app.use((req, res, next) => {
+  res.locals.successFlash = req.flash("success");
+  res.locals.errorFlash = req.flash("error");
+  next();
+});
+app.get("/register", (req, res) => {
+  const isLoggedIn = req.session.isLoggedIn || false;
+  res.render("register", { isLoggedIn, successFlash: req.flash("success"), errorFlash: req.flash("error") });
+});
 app.post("/api/user", async (req, res) => {
   try {
+    //ifLoggedIn = false;
+    //console.log(isLoggedIn, successFlash, errorFlash );
     const { username, password, repassword } = req.body;
+
+    // Check if passwords match
     if (password !== repassword) {
-      return res.status(400).json({ error: "Passwords do not match." });
+      req.flash("error", "Passwords do not match.");
+      return res.redirect("/register"); // Redirect to the registration page with the flash message
+    }
+
+    // Check password length and complexity
+    const MIN_PASSWORD_LENGTH = 6; // Minimum password length
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/; // Password must contain at least one letter and one number
+    if (password.length < MIN_PASSWORD_LENGTH || !passwordRegex.test(password)) {
+      req.flash("error", "Password must be at least 6 characters long and contain both letters and numbers.");
+      return res.redirect("/register"); // Redirect to the registration page with the flash message
     }
 
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-      return res.status(400).json({ error: "Username already exists." });
+      req.flash("error", "Username already exists.");
+      return res.redirect("/register"); // Redirect to the registration page with the flash message
     }
-    
+
     const user = new User({ username, password });
     const savedUser = await user.save();
 
     savedUser.userId = savedUser._id;
     await savedUser.save();
 
-    res.redirect("/success");
+    req.flash("success", "Registration successful!"); // Flash success message
+    res.redirect("/success"); // Redirect to the login page with the success message
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while saving the user." });
+    req.flash("error", "An error occurred while saving the user.");
+    res.redirect("/register"); // Redirect to the registration page with the flash message
   }
 });
+
 
 
 
@@ -478,7 +536,7 @@ app.post("/api/post", async (req, res) => {
     } else {
       // Redirect to the login page if not logged in
       // Also, display a message "you need to login first!"
-      req.flash("error", "You need to login first!");
+      req.flash("error", "You need to login first!!");
       res.redirect("/login");
     }
   } catch (error) {
