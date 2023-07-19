@@ -377,11 +377,12 @@ button.cancel{
 
 .reactions {
 	max-width: 40px;
-	width: 100%;
+	/* width: 100%; */
 	display: flex;
 	flex-direction: column;
 	margin: 0;
 	margin-right: 10px;
+	margin-left: 10px;
 	margin-bottom: auto;
 }
 
@@ -485,6 +486,7 @@ hr{
 	font-size: var(--small-content-font-size);
 	font-family: var(--font);
 	padding-bottom: 30px;
+	word-wrap: break-word;
 }
 
 .content_footer{
@@ -542,7 +544,8 @@ hr{
 	font-size:var(--content-font-size);
 	padding-left: 15px;
 	max-width: 100%;
-	width: auto;
+	width: 100%;
+	/* width: auto; */
 }
 
 .comment_react{
@@ -603,9 +606,13 @@ hr{
 	margin-right:18px;
 	text-align: left;
 	position: relative;
-	width:100%;
-	padding-bottom: 30px;
+	width:85%;
+	min-width:85%;
+	max-width:85%;
+	padding-bottom: 30px;	
+	word-wrap: break-word;
 }
+
 
 .comment_like{
 	background-image: url("./../images/reacts/no_up.png");
@@ -688,7 +695,7 @@ hr{
 
 
 .comment_edit{
-	margin-right: 25px;
+	/* margin-right: 25px; */
 	cursor: pointer;
 }
 
@@ -733,7 +740,7 @@ cursor: pointer;
 }
 
 .comment_save{
-	margin-right: 25px;
+	/* margin-right: 25px; */
 	cursor: pointer;
 }
 
@@ -747,6 +754,7 @@ height:60px;
 }
 .post_img{
 	max-width: 100%;
+	word-wrap: break-word;
 }
 
 .post {
@@ -1093,3 +1101,7 @@ padding-left:15px;
 	transform: scale(1);
 	transition: all 100ms linear;	
 }
+
+/* img{
+	object-fit: contain;
+} */

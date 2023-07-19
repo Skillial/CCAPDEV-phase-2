@@ -353,12 +353,14 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
     };
     comment_edit.onclick = function() {
         comment_save.style.display = 'block';
+        comment_edit.style.display='none';
         desc.contentEditable = true; 
         desc.style.border = '1px solid red'; 
         comment_react.appendChild(comment_save);
         // comment_content_desc.appendChild(comment_edited);
         comment_save.onclick=function(){
             comment_save.style.display = 'none';
+            comment_edit.style.display='block';
             desc.contentEditable = false;
             var newCommentContent = desc.innerHTML;
             desc.style.border = 'none'; 
@@ -497,9 +499,12 @@ function profilePost(pauthor,ppfp,pdesc,pcount,pid,phtml){
         desc.textContent="Deleted";
         count.textContent="Deleted";
     };
+    comment_react.appendChild(comment_edit);
     comment_edit.onclick = function() {
+     
         comment_save.style.display = 'block';
         desc.contentEditable = true; 
+        
         comment_react.appendChild(comment_save);
         comment_content_desc.appendChild(comment_edited);
         comment_save.onclick=function(){
@@ -507,7 +512,7 @@ function profilePost(pauthor,ppfp,pdesc,pcount,pid,phtml){
             desc.contentEditable = false;
         }
     };
-    comment_react.appendChild(comment_edit);
+    
     // comment_content_desc.appendChild(comment_react);
     comment_container.appendChild(comment_content_desc);
     comment_forum.appendChild(comment_container);
