@@ -603,7 +603,11 @@ hr{
 	margin-right:18px;
 	text-align: left;
 	position: relative;
-	width:100%;
+	max-width: 100%;
+}
+
+.comment_content_desc > p {
+	word-wrap: break-word;
 }
 
 .comment_like{
