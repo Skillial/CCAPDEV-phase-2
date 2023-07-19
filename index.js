@@ -140,9 +140,9 @@ app.get("/index", async (req, res) => {
       }
     } else {
       console.log("Currently not logged in, showing a limited number of posts!")
-      const limit = 20; // Change the limit value as needed
-      posts = await Post.find({ isDeleted: false }).limit(limit);
-
+      //const limit = 20; // Change the limit value as needed
+      posts = await Post.find({ isDeleted: false });
+      //posts = await Post.find({ isDeleted: false }).limit(limit);
       // Get the number of positive and negative votes for each post
       for (let i = 0; i < posts.length; i++) {
         const post = posts[i];
@@ -629,7 +629,7 @@ app.get("/post/:title", async (req, res) => {
       // If user has already reacted or not
       const react = await React.findOne({ userID: user._id, parentPostID: post._id });
       const reactValue = react ? react.voteValue : 0;
-
+      console.log(author)
       res.render("post", { postID, user, post, author, isCurrUserTheAuthor, comments, reactValue });
     } else {
       const title = req.params.title;
