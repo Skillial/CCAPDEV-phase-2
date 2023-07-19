@@ -20,7 +20,8 @@
 			<div class="profile">
 				<aside>
 					<div>
-						<img src="../images/dark/file_not_found.png">
+						<img src="<%= user.photo %>">
+						<br/>
 					</div>
 					<main>
 						<%= user.username %> <!-- Display the user's display name -->
@@ -58,8 +59,8 @@
 									// $("#profile-details").append(postElement.createDate);
 
 									pauthor = '<%= user.username %>',    
-									ppfp = './images/dark/file_not_found.png' //temp
-									pdesc = '<%= post.content %>',
+									ppfp = '<%= user.photo %>', //temp
+									pdesc = '<%= post.title %>',
 									pcount = '<%= post.rating %>',
 									pid='<%= post._id %>',
 									phtml='/post/' + encodeURIComponent(title)
