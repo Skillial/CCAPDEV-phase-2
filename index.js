@@ -286,30 +286,89 @@ app.post("/logout", async (req, res) => {
 })
 
 //registering
+// app.post("/api/user", async (req, res) => {
+//   try {
+//     const { username, password, repassword } = req.body;
+//     if (password !== repassword) {
+//       return res.status(400).json({ error: "Passwords do not match." });
+//     }
+
+//     const existingUser = await User.findOne({ username });
+//     if (existingUser) {
+//       return res.status(400).json({ error: "Username already exists." });
+//     }
+    
+//     const user = new User({ username, password });
+//     const savedUser = await user.save();
+
+//     savedUser.userId = savedUser._id;
+//     await savedUser.save();
+
+//     res.redirect("/success");
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "An error occurred while saving the user." });
+//   }
+// });
+
+
+
+const flash = require("connect-flash");
+
+// Assuming you have set up the flash middleware
+app.use(flash());
+
+// Custom middleware to expose flash messages to views
+app.use((req, res, next) => {
+  res.locals.successFlash = req.flash("success");
+  res.locals.errorFlash = req.flash("error");
+  next();
+});
+app.get("/register", (req, res) => {
+  const isLoggedIn = req.session.isLoggedIn || false;
+  res.render("register", { isLoggedIn, successFlash: req.flash("success"), errorFlash: req.flash("error") });
+});
 app.post("/api/user", async (req, res) => {
   try {
+    //ifLoggedIn = false;
+    //console.log(isLoggedIn, successFlash, errorFlash );
     const { username, password, repassword } = req.body;
+
+    // Check if passwords match
     if (password !== repassword) {
-      return res.status(400).json({ error: "Passwords do not match." });
+      req.flash("error", "Passwords do not match.");
+      return res.redirect("/register"); // Redirect to the registration page with the flash message
+    }
+
+    // Check password length and complexity
+    const MIN_PASSWORD_LENGTH = 6; // Minimum password length
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/; // Password must contain at least one letter and one number
+    if (password.length < MIN_PASSWORD_LENGTH || !passwordRegex.test(password)) {
+      req.flash("error", "Password must be at least 6 characters long and contain both letters and numbers.");
+      return res.redirect("/register"); // Redirect to the registration page with the flash message
     }
 
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-      return res.status(400).json({ error: "Username already exists." });
+      req.flash("error", "Username already exists.");
+      return res.redirect("/register"); // Redirect to the registration page with the flash message
     }
-    
+
     const user = new User({ username, password });
     const savedUser = await user.save();
 
     savedUser.userId = savedUser._id;
     await savedUser.save();
 
-    res.redirect("/success");
+    req.flash("success", "Registration successful!"); // Flash success message
+    res.redirect("/success"); // Redirect to the login page with the success message
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while saving the user." });
+    req.flash("error", "An error occurred while saving the user.");
+    res.redirect("/register"); // Redirect to the registration page with the flash message
   }
 });
+
 
 
 
@@ -477,7 +536,7 @@ app.post("/api/post", async (req, res) => {
     } else {
       // Redirect to the login page if not logged in
       // Also, display a message "you need to login first!"
-      req.flash("error", "You need to login first!");
+      req.flash("error", "You need to login first!!");
       res.redirect("/login");
     }
   } catch (error) {
