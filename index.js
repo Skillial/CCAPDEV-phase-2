@@ -140,9 +140,9 @@ app.get("/index", async (req, res) => {
       }
     } else {
       console.log("Currently not logged in, showing a limited number of posts!")
-      const limit = 20; // Change the limit value as needed
-      posts = await Post.find({ isDeleted: false }).limit(limit);
-
+      //const limit = 20; // Change the limit value as needed
+      posts = await Post.find({ isDeleted: false });
+      //posts = await Post.find({ isDeleted: false }).limit(limit);
       // Get the number of positive and negative votes for each post
       for (let i = 0; i < posts.length; i++) {
         const post = posts[i];
@@ -286,30 +286,89 @@ app.post("/logout", async (req, res) => {
 })
 
 //registering
+// app.post("/api/user", async (req, res) => {
+//   try {
+//     const { username, password, repassword } = req.body;
+//     if (password !== repassword) {
+//       return res.status(400).json({ error: "Passwords do not match." });
+//     }
+
+//     const existingUser = await User.findOne({ username });
+//     if (existingUser) {
+//       return res.status(400).json({ error: "Username already exists." });
+//     }
+    
+//     const user = new User({ username, password });
+//     const savedUser = await user.save();
+
+//     savedUser.userId = savedUser._id;
+//     await savedUser.save();
+
+//     res.redirect("/success");
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "An error occurred while saving the user." });
+//   }
+// });
+
+
+
+const flash = require("connect-flash");
+
+// Assuming you have set up the flash middleware
+app.use(flash());
+
+// Custom middleware to expose flash messages to views
+app.use((req, res, next) => {
+  res.locals.successFlash = req.flash("success");
+  res.locals.errorFlash = req.flash("error");
+  next();
+});
+app.get("/register", (req, res) => {
+  const isLoggedIn = req.session.isLoggedIn || false;
+  res.render("register", { isLoggedIn, successFlash: req.flash("success"), errorFlash: req.flash("error") });
+});
 app.post("/api/user", async (req, res) => {
   try {
+    //ifLoggedIn = false;
+    //console.log(isLoggedIn, successFlash, errorFlash );
     const { username, password, repassword } = req.body;
+
+    // Check if passwords match
     if (password !== repassword) {
-      return res.status(400).json({ error: "Passwords do not match." });
+      req.flash("error", "Passwords do not match.");
+      return res.redirect("/register"); // Redirect to the registration page with the flash message
+    }
+
+    // Check password length and complexity
+    const MIN_PASSWORD_LENGTH = 6; // Minimum password length
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/; // Password must contain at least one letter and one number
+    if (password.length < MIN_PASSWORD_LENGTH || !passwordRegex.test(password)) {
+      req.flash("error", "Password must be at least 6 characters long and contain both letters and numbers.");
+      return res.redirect("/register"); // Redirect to the registration page with the flash message
     }
 
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-      return res.status(400).json({ error: "Username already exists." });
+      req.flash("error", "Username already exists.");
+      return res.redirect("/register"); // Redirect to the registration page with the flash message
     }
-    
+
     const user = new User({ username, password });
     const savedUser = await user.save();
 
     savedUser.userId = savedUser._id;
     await savedUser.save();
 
-    res.redirect("/success");
+    req.flash("success", "Registration successful!"); // Flash success message
+    res.redirect("/success"); // Redirect to the login page with the success message
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while saving the user." });
+    req.flash("error", "An error occurred while saving the user.");
+    res.redirect("/register"); // Redirect to the registration page with the flash message
   }
 });
+
 
 
 
@@ -333,8 +392,9 @@ app.get("/profile", async (req, res) => {
       console.log("session id: ", req.sessionID);
       console.log("viewing profile of: ", userId, " with username: ", user.username);
       //console.log(posts !== null);
-      
       console.log(posts);
+      let sortOrder = 'desc'
+      posts.sort((a, b) => (sortOrder === "desc" ? b["createDate"] - a["createDate"] : a["createDate"] - b["createDate"]));
       if(posts.length === 0){
         user.posts = user.posts;
       }
@@ -383,13 +443,16 @@ app.get("/profile/:username", async (req, res) => {
       console.log("viewing profile of: ", userId, " with username: ", username);
       posts = await Post.find({ userID: userId, isDeleted:false })
       comments = await Comment.find({ userID: userId, isDeleted:false });
+      let sortOrder = 'desc'
+      posts.sort((a, b) => (sortOrder === "desc" ? b["createDate"] - a["createDate"] : a["createDate"] - b["createDate"]));
       console.log(posts);
       if(posts.length === 0){
         user.posts = user.posts;
       }
       else{
-        user.posts = posts;
+        user.posts = posts;        
       }
+
       if(comments.length === 0){
         user.comments = user.comments;
       }
@@ -477,7 +540,7 @@ app.post("/api/post", async (req, res) => {
     } else {
       // Redirect to the login page if not logged in
       // Also, display a message "you need to login first!"
-      req.flash("error", "You need to login first!");
+      req.flash("error", "You need to login first!!");
       res.redirect("/login");
     }
   } catch (error) {
@@ -570,7 +633,7 @@ app.get("/post/:title", async (req, res) => {
       // If user has already reacted or not
       const react = await React.findOne({ userID: user._id, parentPostID: post._id });
       const reactValue = react ? react.voteValue : 0;
-
+      console.log(author)
       res.render("post", { postID, user, post, author, isCurrUserTheAuthor, comments, reactValue });
     } else {
       const title = req.params.title;

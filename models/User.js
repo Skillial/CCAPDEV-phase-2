@@ -5,7 +5,7 @@ const { hashPassword } = require('../lib/hashing');
 
 const UserSchema = new mongoose.Schema({
     username: { type: String, required: true, index: { unique: true } },
-    photo: {type: String, default: './images/dark/file_not_found.png'}, //url to the pic or smth like that
+    photo: {type: String, default: 'https://drive.google.com/uc?id=1R6FSSHlb7L3BO2dzLS_dSfqw_H8D_az7&export=download'}, //url to the pic or smth like that
     password: { type: String, required: true },
     aboutme: {type: String, default: 'No information provided'},
     remembered: {type: Boolean, default: false},

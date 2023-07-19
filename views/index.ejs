@@ -79,7 +79,8 @@
         </script>
     <% } %>
           <div id="forum">
-            <% for (let i = 0; i < posts.length; i++) { %>
+            <% let numPosts = 15; if(isLoggedIn){numPosts = posts.length;} %>
+            <% for (let i = 0; i < numPosts; i++) { %>
               <% const post = posts[i]; %>
               <% let { _id, title, content, author, rating, media, profile, link, userReaction } = post; %>
               <% profile = "/profile/" + author %>
