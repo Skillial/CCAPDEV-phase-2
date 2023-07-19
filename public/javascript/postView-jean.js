@@ -264,7 +264,6 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
     comment_delete.className='comment_delete';
     comment_cancel.className = 'comment_cancel';
 
-
     pfp.src = ppfp;
     comment_pfp.appendChild(pfp)
     author.textContent=pauthor;
@@ -355,12 +354,14 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
     comment_edit.onclick = function() {
         comment_save.style.display = 'block';
         desc.contentEditable = true; 
+        desc.style.border = '1px solid red'; 
         comment_react.appendChild(comment_save);
         // comment_content_desc.appendChild(comment_edited);
         comment_save.onclick=function(){
             comment_save.style.display = 'none';
             desc.contentEditable = false;
             var newCommentContent = desc.innerHTML;
+            desc.style.border = 'none'; 
             handleEditComment(pid, newCommentContent );
         }
 

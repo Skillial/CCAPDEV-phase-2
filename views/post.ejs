@@ -41,8 +41,7 @@
           prating = '<%= post.rating %>', 
           pmedia = '<%= post.media %>';
 
-          let ppfp = '<%= author.pfp_link %>';
-          console.log('<%= author.pfp_link %>');
+          let ppfp = '<%= author.photo %>';
           let preactValue = '<%= reactValue %>';
           let isCurrUserTheAuthor = '<%=isCurrUserTheAuthor%>';
           let isLoggedIn = '<%=isLoggedIn%>';
@@ -56,7 +55,7 @@
 <% comments.forEach(comment => { %>
   <% if (!comment.isDeleted){ %>
   <script>
-      var commentElement = postreply('<%= comment.author %>','<%= comment.userID.ppfp %>','<%= comment.content %>', '<%= comment.rating %>', '<%= comment._id %>','<%= user.username%>',postID,'<%=isLoggedIn%>','<%=comment.userReaction %>', '<%=comment.createDate%>','<%=comment.editDate%>');
+      var commentElement = postreply('<%= comment.author %>','<%= comment.userID.photo %>','<%= comment.content %>', '<%= comment.rating %>', '<%= comment._id %>','<%= user.username%>',postID,'<%=isLoggedIn%>','<%=comment.userReaction %>', '<%=comment.createDate%>','<%=comment.editDate%>');
       $('.border').append(commentElement);
   </script>
   <% } else { %>
@@ -73,7 +72,7 @@
           var parentCommentId = '<%= child.parentCommentID %>';
           console.log("hi " + parentCommentId);
           var username = '<%= child.userID.username %>';
-          var ppfp = '<%= child.userID.ppfp %>';
+          var ppfp = '<%= child.userID.photo %>';
           var content = '<%= child.content %>';
           var rating = '<%= child.rating %>';
           var childId = '<%= child._id %>';
