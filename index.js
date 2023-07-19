@@ -3,12 +3,13 @@
 //    - input sanitization and general checking (anti-hack stuff) -> idk if required
 //    - upload pfp's for all users
 //    - add password hashing
-//    - other of frontend work:
+//    - other frontend work:
 //     - add/fix landing pages or alerts for errors and successes
-//     - fix other pages (profile-edit.ejs, success.ejs)
+//     - fix other pages (profile-edit.ejs, success.ejs, logout.ejs)
 //     - paganda editing ng comments and post (?)
 //    - limiting number of posts/comments shown in a page (maybe add page 1, 2...)
 //    - maybe add date posted in /index. also maybe limit num of posts shown for users, then add a paging thing?
+//    - double check session/cookie lifespan
   
 //   ## Functionalities DONE FOR SURE
 //    - User: login, signup, logout, profile (updating, showing of posts)  
@@ -167,7 +168,7 @@ app.get("/index", async (req, res) => {
     res.render("index", { posts });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while fetching posts." });
+    res.status(500).json({ error: "An error occurred while fetching posts." });render/register
   }
 });
 
@@ -344,10 +345,11 @@ app.post("/api/user", async (req, res) => {
       req.flash("error", "Password must be at least 6 characters long and contain both letters and numbers.");
       return res.redirect("/register"); 
     }
-    if (!passwordRegex.test(username)) {
-      req.flash("error", "Username can only contain letters and numbers!");
-      return res.redirect("/register"); 
-    }
+    let usernameRegex = /^[a-zA-Z0-9]*$/;
+      if (!usernameRegex.test(username)) {
+        req.flash("error", "Username can only contain letters and numbers!");
+        return res.redirect("/profile-edit"); 
+      }
 
     const existingUser = await User.findOne({ username });
     if (existingUser) {
@@ -470,16 +472,43 @@ app.patch("/api/user/:username", async (req, res) => {
       const userID = req.session.userId;
       const username = req.params.username;
       const newUsername = req.body.username;
-      const newPassword = req.body.password;
+      let newPassword = req.body.password;
       const updateData = req.body;
-      if (newPassword !== "" && req.body.password === req.body.repassword) {
-        newPassword = newPassword.toString();
+      newPassword = newPassword.toString();
+      //const MIN_PASSWORD_LENGTH = 6; 
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}$/; 
+
+      //console.log(newPassword.length >= MIN_PASSWORD_LENGTH)
+      console.log(passwordRegex.test(newPassword))
+      if (newPassword !== "" && req.body.password === req.body.repassword && passwordRegex.test(newPassword)) {
+        console.log("hi")
+        //newPassword = newPassword.toString();
         // If the new password is provided, hash and update the password field
         //const hashedPassword = await hashPassword(newPassword);
         updateData.password = newPassword;
       }else{
         delete updateData.password;
       }
+      // if (newPassword !== "" && req.body.password === req.body.repassword) {
+      //   newPassword = newPassword.toString();
+      //   // If the new password is provided, hash and update the password field
+      //   //const hashedPassword = await hashPassword(newPassword);
+      //   updateData.password = newPassword;
+      // }else{
+      //   delete updateData.password;
+      // }
+      let usernameRegex = /^[a-zA-Z0-9]*$/;
+      if (!usernameRegex.test(newUsername)) {
+        req.flash("error", "Username can only contain letters and numbers!");
+        return res.redirect("/profile-edit"); 
+      }
+
+      let aboutmeRegex = /^[a-zA-Z0-9\t\n\r\s]*$/;
+      if (!aboutmeRegex.test(req.body.aboutme)) {
+        req.flash("error", "About Me can only contain letters, numbers, and spaces!");
+        return res.redirect("/profile-edit"); 
+      }
+
       console.log(username);
       // Assuming you want to find the user by the username
       //const user = await User.findById(userId);
