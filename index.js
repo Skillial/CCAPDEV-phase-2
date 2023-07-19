@@ -455,35 +455,38 @@ app.patch("/api/user/:username", async (req, res) => {
 
 
 //new post (save to db)
-app.post("/api/post", async(req, res) =>{
+app.post("/api/post", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
-        const userId = req.session.userId;
-        const user = await User.findById(userId);
-        const { title, content, createDate } = req.body;
+      const userId = req.session.userId;
+      const user = await User.findById(userId);
+      const { title, content } = req.body;
 
-          // Create a new post object
-        const newPost = new Post({
-          userID: user._id,
-          title,
-          content,
-          author: user.username,
-          createDate,
-        });
+      // Create a new post object
+      const newPost = new Post({
+        userID: user._id,
+        title,
+        content,
+        author: user.username,
+        createDate: new Date(), // Set createDate to the current date
+      });
 
       // Save the new post object to the database
       await newPost.save();
-        res.redirect("/index");
+      res.redirect("/index");
     } else {
       // Redirect to the login page if not logged in
-      //also shud display a message "you need to login first!"
+      // Also, display a message "you need to login first!"
+      req.flash("error", "You need to login first!");
       res.redirect("/login");
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while updating the profile." });
+    res
+      .status(500)
+      .json({ error: "An error occurred while updating the profile." });
   }
-})
+});
 
 
 app.get("/post/:title", async (req, res) => {

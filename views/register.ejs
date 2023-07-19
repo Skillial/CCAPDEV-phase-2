@@ -3,7 +3,7 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script src="/javascript/react.js"></script>
         <title>
-            SnaccOverflow
+            Sign Up
         </title>
         <link rel="icon" href="../images/icon.png" sizes="32x32" type="image/png">
         <link rel="stylesheet" type="text/css" href="/css/styles.css">
@@ -12,17 +12,22 @@
                 <script src="/javascript/userView.js"></script>
 		<script src="/javascript/navbar.js" type="text/javascript"></script>
 		<script>
-			createNavbar('',<%= isLoggedIn %>);
+			createNavbar(<%= isLoggedIn %>);
 		</script>
+		<div class="space"></div>
+		<div class="credential-card">
+		<div class="register title">Register</div>
 
-        <form method="POST" action="/api/user">
-            <label for="">Username</label>
+        <form class="register screen" method="POST" action="/api/user">
+            <label for="username">Username</label>
             <input type="text" name="username" id="username"><br>
-            <label for="">Password</label>
+            <label for="password">Password</label>
             <input type="password" name="password" id="password" required><br>
-            <label for="">Retype Password</label>
+            <label for="repassword">Retype Password</label>
             <input type="password" name="repassword" id="repassword" required><br>
-            <input type="submit">
+			<div class="centered">
+				<input type="submit" value="Sign Up">
+			</div>
         </form>
     </body>
 </html>

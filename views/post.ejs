@@ -20,7 +20,7 @@
   <body>
     <script src="/javascript/navbar.js" type="text/javascript"></script>
     <script>
-      createNavbar('', <%= isLoggedIn %>);
+      createNavbar(<%= isLoggedIn %>);
     </script>
     <div class="border">
       <div class="content_list">
@@ -55,12 +55,12 @@
 <% comments.forEach(comment => { %>
   <% if (!comment.isDeleted){ %>
   <script>
-      var commentElement = postreply('<%= comment.author %>','<%= comment.userID.ppfp %>','<%= comment.content %>', '<%= comment.rating %>', '<%= comment._id %>','<%= user.username%>',postID,'<%=isLoggedIn%>','<%=comment.userReaction %>');
+      var commentElement = postreply('<%= comment.author %>','<%= comment.userID.ppfp %>','<%= comment.content %>', '<%= comment.rating %>', '<%= comment._id %>','<%= user.username%>',postID,'<%=isLoggedIn%>','<%=comment.userReaction %>', '<%=comment.createDate%>','<%=comment.editDate%>');
       $('.border').append(commentElement);
   </script>
   <% } else { %>
   <script>
-      var commentElement = postreply("deleted","deleted","The original comment was deleted, but you can still view the comments.", "N/A", '<%= comment._id %>',"visitor",postID,'<%=isLoggedIn%>',0);
+      var commentElement = postreply("deleted","deleted","The original comment was deleted, but you can still view the comments.", "N/A", '<%= comment._id %>',"visitor",postID,'<%=isLoggedIn%>',0,'','');
       $('.border').append(commentElement);
   </script>
   <% } %>
@@ -80,9 +80,9 @@
       
           <% if (!child.isDeleted) { %>
             console.log('<%=child.rating%>');
-          var replyResult = postreply(username, ppfp, content, rating, childId, user, postID,'<%=isLoggedIn%>','<%=child.userReaction %>');
+          var replyResult = postreply(username, ppfp, content, rating, childId, user, postID,'<%=isLoggedIn%>','<%=child.userReaction %>', '<%=child.createDate%>','<%=child.editDate%>');
           <% } else { %>
-          var replyResult = postreply("deleted", "deleted", "The original comment was deleted, but you can still view the comments.", "N/A", '<%= child._id %>', "visitor", postID, '<%=isLoggedIn%>');
+          var replyResult = postreply("deleted", "deleted", "The original comment was deleted, but you can still view the comments.", "N/A", '<%= child._id %>', "visitor", postID, '<%=isLoggedIn%>',0,'','');
           <% } %>
       
           <% if (child.parentCommentID === null) { %>
