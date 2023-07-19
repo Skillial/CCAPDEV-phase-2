@@ -1060,6 +1060,11 @@ padding-left:15px;
 	font-weight: bold;
 }
 
+.landing.subtext {
+	font-size: var(--small-title-font-size);
+	font-weight: bold;
+}
+
 .landing.button {
 	font-size: var(--content-font-size);
 	font-family: var(--font);
@@ -1070,8 +1075,16 @@ padding-left:15px;
 	min-height: 3em;
 	margin-top: 5em;
 	width: 40%;
-	border-width: 0px;;
+	border-width: 0px;
 	border-radius: calc(var(--corner-radius) / 2);
+}
+
+.landing.multibutton {
+	display: flex;
+	gap: 10px;
+	width: 100%;
+
+	justify-content: center;
 }
 
 .landing.button:hover {
