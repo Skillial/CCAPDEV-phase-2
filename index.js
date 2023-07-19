@@ -392,8 +392,9 @@ app.get("/profile", async (req, res) => {
       console.log("session id: ", req.sessionID);
       console.log("viewing profile of: ", userId, " with username: ", user.username);
       //console.log(posts !== null);
-      
       console.log(posts);
+      let sortOrder = 'desc'
+      posts.sort((a, b) => (sortOrder === "desc" ? b["createDate"] - a["createDate"] : a["createDate"] - b["createDate"]));
       if(posts.length === 0){
         user.posts = user.posts;
       }
@@ -442,13 +443,16 @@ app.get("/profile/:username", async (req, res) => {
       console.log("viewing profile of: ", userId, " with username: ", username);
       posts = await Post.find({ userID: userId, isDeleted:false })
       comments = await Comment.find({ userID: userId, isDeleted:false });
+      let sortOrder = 'desc'
+      posts.sort((a, b) => (sortOrder === "desc" ? b["createDate"] - a["createDate"] : a["createDate"] - b["createDate"]));
       console.log(posts);
       if(posts.length === 0){
         user.posts = user.posts;
       }
       else{
-        user.posts = posts;
+        user.posts = posts;        
       }
+
       if(comments.length === 0){
         user.comments = user.comments;
       }
