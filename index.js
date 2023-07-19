@@ -1,26 +1,25 @@
-//To DO
-//Overall: HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
-//        input sanitization and general checking
-
-//add landing pages for errors
-
-//SEMI-Done
-//patch profile -> need to fix profile pic
-//view profile -> maybe add displaying of comments. fix image link (to add)
-             //-> also add like datecreated maybe? and rating (?) though pahirapan pa yung rating so wag nalang (or maybe j number idk)
-             //-> pfp sa posts in the profile will break when viewing other users' posts
-//sort by date and by 'most popular' -> a little slow, and the sorting buttons can look better
-                                //   -> maybe make the mouse pointer like a loading circle... or just store the ratings in the post mismo..? 
-                                //   -> TOP is just the overall rating count currently.
-                                //   -> HOT is top posts within last 2 days. some decay factor math stuff
-//DONE FOR SURE
-// login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
-// post post, patch, delete post -> maybe paganda patching, make it more obvious that fields are editable
-// post, patch, delete comment -> maybe paganda patching, make it more obvious that fields are editable
-// reacting
-// remove a lot of the isLoggedIn checks 
-// search
-// /index -> maybe add the date posted? also limit the num of posts shown, maybe implement a paging function... (index/1, index/2...) that's pain.
+// # Appdev Todo [Updated 9:30PM July 18)
+//   ## Overall:
+//    - HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
+//    - input sanitization and general checking
+//    - add landing pages for errors
+  
+//   ## SEMI-Done
+//    * Patch profile -> need to fix profile pic
+//    * View profile -> Fix image link (to add)
+//     * -> pfp sa posts in the profile will break when viewing other users' posts
+  
+  
+//   ## DONE FOR SURE
+//    - login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
+//    - post post, patch, delete post -> maybe paganda patching, make it more obvious that fields are editable
+//    - post, patch, delete comment -> maybe paganda patching, make it more obvious that fields are editable
+//    -  in index -> maybe add the date posted? 
+//     - ->Also limit the num of posts shown, maybe implement a paging function... (index/1, index/2...) that's pain.
+//    - reacting
+//    - removed a lot of the isLoggedIn checks 
+//    - search
+//   * Sort by date and by 'most popular' -> a little slow, just store the ratings in the post mismo..? (future update)
 
 require('dotenv').config();
 const link = process.env.DB_URL;
