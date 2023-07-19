@@ -1,25 +1,23 @@
-// # Appdev Todo [Updated 9:30PM July 18)
-//   ## Overall:
+// # Appdev Todo [Updated 11:30PM July 19)
 //    - HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
-//    - input sanitization and general checking
-//    - add landing pages for errors
+//    - input sanitization and general checking (anti-hack stuff) -> idk if required
+//    - upload pfp's for all users
+//    - add password hashing
+//    - other frontend work:
+//     - add/fix landing pages or alerts for errors and successes
+//     - fix other pages (profile-edit.ejs, success.ejs, logout.ejs)
+//     - paganda editing ng comments and post (?)
+//    - limiting number of posts/comments shown in a page (maybe add page 1, 2...)
+//    - maybe add date posted in /index. also maybe limit num of posts shown for users, then add a paging thing?
+//    - double check session/cookie lifespan
   
-//   ## SEMI-Done
-//    * Patch profile -> need to fix profile pic
-//    * View profile -> Fix image link (to add)
-//     * -> pfp sa posts in the profile will break when viewing other users' posts
-  
-  
-//   ## DONE FOR SURE
-//    - login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
-//    - post post, patch, delete post -> maybe paganda patching, make it more obvious that fields are editable
-//    - post, patch, delete comment -> maybe paganda patching, make it more obvious that fields are editable
-//    -  in index -> maybe add the date posted? 
-//     - ->Also limit the num of posts shown, maybe implement a paging function... (index/1, index/2...) that's pain.
-//    - reacting
-//    - removed a lot of the isLoggedIn checks 
-//    - search
-//   * Sort by date and by 'most popular' -> a little slow, just store the ratings in the post mismo..? (future update)
+//   ## Functionalities DONE FOR SURE
+//    - User: login, signup, logout, profile (updating, showing of posts)  
+//    - Posts: new post, patch post, delete post -> maybe paganda patching, make it more obvious that fields are editable
+//    - Comment: new comment, patch comment, delete comment -> maybe paganda patching, make it more obvious that fields are editable
+//    - Reacting: new reacts, editing reacts, removing reacts
+//    - Search
+//    - Sort by date and by 'most popular' -> a little slow, just store the ratings in the post mismo..? (future update)
 
 require('dotenv').config();
 const link = process.env.DB_URL;
@@ -140,9 +138,9 @@ app.get("/index", async (req, res) => {
       }
     } else {
       console.log("Currently not logged in, showing a limited number of posts!")
-      const limit = 20; // Change the limit value as needed
-      posts = await Post.find({ isDeleted: false }).limit(limit);
-
+      //const limit = 20; // Change the limit value as needed
+      posts = await Post.find({ isDeleted: false });
+      //posts = await Post.find({ isDeleted: false }).limit(limit);
       // Get the number of positive and negative votes for each post
       for (let i = 0; i < posts.length; i++) {
         const post = posts[i];
@@ -170,7 +168,7 @@ app.get("/index", async (req, res) => {
     res.render("index", { posts });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while fetching posts." });
+    res.status(500).json({ error: "An error occurred while fetching posts." });render/register
   }
 });
 
@@ -328,30 +326,35 @@ app.get("/register", (req, res) => {
   const isLoggedIn = req.session.isLoggedIn || false;
   res.render("register", { isLoggedIn, successFlash: req.flash("success"), errorFlash: req.flash("error") });
 });
+
 app.post("/api/user", async (req, res) => {
   try {
     //ifLoggedIn = false;
     //console.log(isLoggedIn, successFlash, errorFlash );
     const { username, password, repassword } = req.body;
 
-    // Check if passwords match
     if (password !== repassword) {
       req.flash("error", "Passwords do not match.");
-      return res.redirect("/register"); // Redirect to the registration page with the flash message
+      return res.redirect("/register"); 
     }
 
-    // Check password length and complexity
-    const MIN_PASSWORD_LENGTH = 6; // Minimum password length
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/; // Password must contain at least one letter and one number
+    //checking inputs for other stuff
+    const MIN_PASSWORD_LENGTH = 6; 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/; 
     if (password.length < MIN_PASSWORD_LENGTH || !passwordRegex.test(password)) {
       req.flash("error", "Password must be at least 6 characters long and contain both letters and numbers.");
-      return res.redirect("/register"); // Redirect to the registration page with the flash message
+      return res.redirect("/register"); 
     }
+    let usernameRegex = /^[a-zA-Z0-9]*$/;
+      if (!usernameRegex.test(username)) {
+        req.flash("error", "Username can only contain letters and numbers!");
+        return res.redirect("/profile-edit"); 
+      }
 
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       req.flash("error", "Username already exists.");
-      return res.redirect("/register"); // Redirect to the registration page with the flash message
+      return res.redirect("/register"); 
     }
 
     const user = new User({ username, password });
@@ -370,10 +373,7 @@ app.post("/api/user", async (req, res) => {
 });
 
 
-
-
 app.get("/success", (req, res) => {
-  // Render the success page
   res.render("success");
 });
 
@@ -382,18 +382,17 @@ app.get("/success", (req, res) => {
 app.get("/profile", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
-      // Fetch user information from MongoDB based on the logged-in user's ID
       let user, posts, comments;
       const userId = req.session.userId;
       console.log(userId);
       user = await User.findById(userId);
       posts = await Post.find({ userID: userId, isDeleted:false });
       comments = await Comment.find({ userID: userId, isDeleted:false });
-      console.log("session id: ", req.sessionID);
-      console.log("viewing profile of: ", userId, " with username: ", user.username);
-      //console.log(posts !== null);
-      
-      console.log(posts);
+      // console.log("session id: ", req.sessionID);
+      // console.log("viewing profile of: ", userId, " with username: ", user.username);
+      // console.log(posts);
+      let sortOrder = 'desc'
+      posts.sort((a, b) => (sortOrder === "desc" ? b["createDate"] - a["createDate"] : a["createDate"] - b["createDate"]));
       if(posts.length === 0){
         user.posts = user.posts;
       }
@@ -410,10 +409,8 @@ app.get("/profile", async (req, res) => {
       console.log(userId);
       console.log(user);
       let IsCurrUserTheProfileOwner = true;
-      // Render the profile page with the user's information
       res.render("profile", { user, IsCurrUserTheProfileOwner});
     } else {
-      // Redirect to the login page if not logged in
       res.redirect("/login");
     }
   } catch (error) {
@@ -442,13 +439,16 @@ app.get("/profile/:username", async (req, res) => {
       console.log("viewing profile of: ", userId, " with username: ", username);
       posts = await Post.find({ userID: userId, isDeleted:false })
       comments = await Comment.find({ userID: userId, isDeleted:false });
+      let sortOrder = 'desc'
+      posts.sort((a, b) => (sortOrder === "desc" ? b["createDate"] - a["createDate"] : a["createDate"] - b["createDate"]));
       console.log(posts);
       if(posts.length === 0){
         user.posts = user.posts;
       }
       else{
-        user.posts = posts;
+        user.posts = posts;        
       }
+
       if(comments.length === 0){
         user.comments = user.comments;
       }
@@ -472,16 +472,43 @@ app.patch("/api/user/:username", async (req, res) => {
       const userID = req.session.userId;
       const username = req.params.username;
       const newUsername = req.body.username;
-      const newPassword = req.body.password;
+      let newPassword = req.body.password;
       const updateData = req.body;
-      if (newPassword !== "" && req.body.password === req.body.repassword) {
-        newPassword = newPassword.toString();
+      newPassword = newPassword.toString();
+      //const MIN_PASSWORD_LENGTH = 6; 
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}$/; 
+
+      //console.log(newPassword.length >= MIN_PASSWORD_LENGTH)
+      console.log(passwordRegex.test(newPassword))
+      if (newPassword !== "" && req.body.password === req.body.repassword && passwordRegex.test(newPassword)) {
+        console.log("hi")
+        //newPassword = newPassword.toString();
         // If the new password is provided, hash and update the password field
         //const hashedPassword = await hashPassword(newPassword);
         updateData.password = newPassword;
       }else{
         delete updateData.password;
       }
+      // if (newPassword !== "" && req.body.password === req.body.repassword) {
+      //   newPassword = newPassword.toString();
+      //   // If the new password is provided, hash and update the password field
+      //   //const hashedPassword = await hashPassword(newPassword);
+      //   updateData.password = newPassword;
+      // }else{
+      //   delete updateData.password;
+      // }
+      let usernameRegex = /^[a-zA-Z0-9]*$/;
+      if (!usernameRegex.test(newUsername)) {
+        req.flash("error", "Username can only contain letters and numbers!");
+        return res.redirect("/profile-edit"); 
+      }
+
+      let aboutmeRegex = /^[a-zA-Z0-9\t\n\r\s]*$/;
+      if (!aboutmeRegex.test(req.body.aboutme)) {
+        req.flash("error", "About Me can only contain letters, numbers, and spaces!");
+        return res.redirect("/profile-edit"); 
+      }
+
       console.log(username);
       // Assuming you want to find the user by the username
       //const user = await User.findById(userId);
@@ -629,7 +656,7 @@ app.get("/post/:title", async (req, res) => {
       // If user has already reacted or not
       const react = await React.findOne({ userID: user._id, parentPostID: post._id });
       const reactValue = react ? react.voteValue : 0;
-
+      console.log(author)
       res.render("post", { postID, user, post, author, isCurrUserTheAuthor, comments, reactValue });
     } else {
       const title = req.params.title;
