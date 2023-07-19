@@ -1,25 +1,22 @@
-// # Appdev Todo [Updated 9:30PM July 18)
-//   ## Overall:
+// # Appdev Todo [Updated 11:30PM July 19)
 //    - HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
-//    - input sanitization and general checking
-//    - add landing pages for errors
+//    - input sanitization and general checking (anti-hack stuff) -> idk if required
+//    - upload pfp's for all users
+//    - add password hashing
+//    - other of frontend work:
+//     - add/fix landing pages or alerts for errors and successes
+//     - fix other pages (profile-edit.ejs, success.ejs)
+//     - paganda editing ng comments and post (?)
+//    - limiting number of posts/comments shown in a page (maybe add page 1, 2...)
+//    - maybe add date posted in /index. also maybe limit num of posts shown for users, then add a paging thing?
   
-//   ## SEMI-Done
-//    * Patch profile -> need to fix profile pic
-//    * View profile -> Fix image link (to add)
-//     * -> pfp sa posts in the profile will break when viewing other users' posts
-  
-  
-//   ## DONE FOR SURE
-//    - login, signup, logout -> to add: hashing password (optional, code is there but doesnt fully work for logging in and editing password)
-//    - post post, patch, delete post -> maybe paganda patching, make it more obvious that fields are editable
-//    - post, patch, delete comment -> maybe paganda patching, make it more obvious that fields are editable
-//    -  in index -> maybe add the date posted? 
-//     - ->Also limit the num of posts shown, maybe implement a paging function... (index/1, index/2...) that's pain.
-//    - reacting
-//    - removed a lot of the isLoggedIn checks 
-//    - search
-//   * Sort by date and by 'most popular' -> a little slow, just store the ratings in the post mismo..? (future update)
+//   ## Functionalities DONE FOR SURE
+//    - User: login, signup, logout, profile (updating, showing of posts)  
+//    - Posts: new post, patch post, delete post -> maybe paganda patching, make it more obvious that fields are editable
+//    - Comment: new comment, patch comment, delete comment -> maybe paganda patching, make it more obvious that fields are editable
+//    - Reacting: new reacts, editing reacts, removing reacts
+//    - Search
+//    - Sort by date and by 'most popular' -> a little slow, just store the ratings in the post mismo..? (future update)
 
 require('dotenv').config();
 const link = process.env.DB_URL;
@@ -328,30 +325,34 @@ app.get("/register", (req, res) => {
   const isLoggedIn = req.session.isLoggedIn || false;
   res.render("register", { isLoggedIn, successFlash: req.flash("success"), errorFlash: req.flash("error") });
 });
+
 app.post("/api/user", async (req, res) => {
   try {
     //ifLoggedIn = false;
     //console.log(isLoggedIn, successFlash, errorFlash );
     const { username, password, repassword } = req.body;
 
-    // Check if passwords match
     if (password !== repassword) {
       req.flash("error", "Passwords do not match.");
-      return res.redirect("/register"); // Redirect to the registration page with the flash message
+      return res.redirect("/register"); 
     }
 
-    // Check password length and complexity
-    const MIN_PASSWORD_LENGTH = 6; // Minimum password length
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/; // Password must contain at least one letter and one number
+    //checking inputs for other stuff
+    const MIN_PASSWORD_LENGTH = 6; 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/; 
     if (password.length < MIN_PASSWORD_LENGTH || !passwordRegex.test(password)) {
       req.flash("error", "Password must be at least 6 characters long and contain both letters and numbers.");
-      return res.redirect("/register"); // Redirect to the registration page with the flash message
+      return res.redirect("/register"); 
+    }
+    if (!passwordRegex.test(username)) {
+      req.flash("error", "Username can only contain letters and numbers!");
+      return res.redirect("/register"); 
     }
 
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       req.flash("error", "Username already exists.");
-      return res.redirect("/register"); // Redirect to the registration page with the flash message
+      return res.redirect("/register"); 
     }
 
     const user = new User({ username, password });
@@ -370,10 +371,7 @@ app.post("/api/user", async (req, res) => {
 });
 
 
-
-
 app.get("/success", (req, res) => {
-  // Render the success page
   res.render("success");
 });
 
@@ -382,17 +380,15 @@ app.get("/success", (req, res) => {
 app.get("/profile", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
-      // Fetch user information from MongoDB based on the logged-in user's ID
       let user, posts, comments;
       const userId = req.session.userId;
       console.log(userId);
       user = await User.findById(userId);
       posts = await Post.find({ userID: userId, isDeleted:false });
       comments = await Comment.find({ userID: userId, isDeleted:false });
-      console.log("session id: ", req.sessionID);
-      console.log("viewing profile of: ", userId, " with username: ", user.username);
-      //console.log(posts !== null);
-      console.log(posts);
+      // console.log("session id: ", req.sessionID);
+      // console.log("viewing profile of: ", userId, " with username: ", user.username);
+      // console.log(posts);
       let sortOrder = 'desc'
       posts.sort((a, b) => (sortOrder === "desc" ? b["createDate"] - a["createDate"] : a["createDate"] - b["createDate"]));
       if(posts.length === 0){
@@ -411,10 +407,8 @@ app.get("/profile", async (req, res) => {
       console.log(userId);
       console.log(user);
       let IsCurrUserTheProfileOwner = true;
-      // Render the profile page with the user's information
       res.render("profile", { user, IsCurrUserTheProfileOwner});
     } else {
-      // Redirect to the login page if not logged in
       res.redirect("/login");
     }
   } catch (error) {
