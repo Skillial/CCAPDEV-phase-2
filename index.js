@@ -481,6 +481,7 @@ app.get("/profile", async (req, res) => {
       comments = await Comment.find({ userID: userId, isDeleted:false });
       let sortOrder = 'desc'
       posts.sort((a, b) => (sortOrder === "desc" ? b["createDate"] - a["createDate"] : a["createDate"] - b["createDate"]));
+      
       if(posts.length === 0){
         user.posts = user.posts;
       }
@@ -491,16 +492,28 @@ app.get("/profile", async (req, res) => {
         user.comments = user.comments;
       }
       else{
+        for (const comment of comments) {
+          const parentPost = await Post.findById(comment.parentPostID);
+          comment.parentPostTitle = parentPost ? parentPost.title : "Unknown Post Title";
+        }
         user.comments = comments;
       }
-
+      
+      posts.forEach(post =>{
+        post.content = he.decode(post.content);
+        post.title = he.decode(post.title);
+      })
+      comments.forEach(comment => {
+        let temp = he.decode(comment.content);
+        comment.content = temp;
+      })
       const decodedAboutMe = he.decode(user.aboutme);
       user.aboutme = decodedAboutMe;
 
       console.log(userId);
       console.log(user);
       let IsCurrUserTheProfileOwner = true;
-      res.render("profile", { user, IsCurrUserTheProfileOwner});
+      res.render("profile", { he, user, IsCurrUserTheProfileOwner});
     } else {
       res.redirect("/login");
     }
@@ -530,6 +543,7 @@ app.get("/profile/:username", async (req, res) => {
       console.log("viewing profile of: ", userId, " with username: ", username);
       posts = await Post.find({ userID: userId, isDeleted:false })
       comments = await Comment.find({ userID: userId, isDeleted:false });
+      
       let sortOrder = 'desc'
       posts.sort((a, b) => (sortOrder === "desc" ? b["createDate"] - a["createDate"] : a["createDate"] - b["createDate"]));
       console.log(posts);
@@ -539,13 +553,25 @@ app.get("/profile/:username", async (req, res) => {
       else{
         user.posts = posts;        
       }
-
       if(comments.length === 0){
         user.comments = user.comments;
       }
       else{
+        for (const comment of comments) {
+          const parentPost = await Post.findById(comment.parentPostID);
+          comment.parentPostTitle = parentPost ? parentPost.title : "Unknown Post Title";
+        }
         user.comments = comments;
       }
+
+      posts.forEach(post =>{
+        post.content = he.decode(post.content);
+        post.title = he.decode(post.title);
+      })
+      comments.forEach(comment => {
+        let temp = he.decode(comment.content);
+        comment.content = temp;
+      })
       
       const decodedAboutMe = he.decode(user.aboutme);
       user.aboutme = decodedAboutMe;
@@ -553,7 +579,7 @@ app.get("/profile/:username", async (req, res) => {
       console.log(userId);
       console.log(user);
       // Render the profile page with the user's information
-      res.render("profile", { user, IsCurrUserTheProfileOwner });
+      res.render("profile", { he, user, IsCurrUserTheProfileOwner });
 
   } catch (error) {
     console.error(error);
