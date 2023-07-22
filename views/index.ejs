@@ -37,7 +37,7 @@
         <table>
             <tr>
                 <p>Filter:</p>
-                <td>
+                  <td>
                     <a href="/index?sortBy=createDate&sortOrder=desc">Newest</a>
                   </td>
                   <td>
@@ -46,6 +46,15 @@
                   <td>
                     <a href="/index?sortBy=rating&sortOrder=desc">Highest-rated</a>
                   </td>
+                <!-- <td>      THIS sorts while staying on the same page. 
+                            This is good if we're only sorting the posts on a specific page.
+                  <a href="/index?page=<%= page %>&sortBy=createDate&sortOrder=desc">Newest - Same Page</a>
+                <td>
+                <a href="/index?page=<%= page %>&sortBy=hotness&sortOrder=desc">Trending</a>
+                </td>
+                <td>
+                <a href="/index?page=<%= page %>&sortBy=rating&sortOrder=desc">Highest-rated</a>
+                </td> -->
             </tr>
         </table>
     </div>
@@ -78,10 +87,10 @@
             document.getElementById("newPostWrite").addEventListener("click", showAlert);
         </script>
     <% } %>
+          
           <div id="forum">
-            <% let numPosts = 15; if(isLoggedIn){numPosts = posts.length;} %>
-            <% for (let i = 0; i < numPosts; i++) { %>
-              <% const post = posts[i]; %>
+            <% for (let i = 0; i < paginatedPosts.length; i++) { %>
+              <% const post = paginatedPosts[i]; %>
               <% let { _id, title, content, author, rating, media, profile, link, userReaction } = post; %>
               <% profile = "/profile/" + author %>
               <% link = "/post/" + encodeURIComponent(title) %>
@@ -90,8 +99,16 @@
                 console.log('<%= content %>');
               </script>
             <% } %>
-        
           </div>
+              <% if (totalPages > 1) { %>
+                <div id="pagination">
+                    Page:
+                  <% for (let i = 1; i <= totalPages; i++) { %>
+                    <% const sortUrl = `/index?page=${i}&sortBy=${sortBy}&sortOrder=${sortOrder}`; %>
+                    <button onclick="window.location.href='<%- sortUrl %>'"><%= i %></button>
+                  <% } %>
+                </div>
+              <% } %>
           
           <!-- <script>
             let title = 'Different salts',

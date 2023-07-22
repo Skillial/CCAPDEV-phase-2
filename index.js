@@ -1,7 +1,7 @@
 // # Appdev Todo [Updated 11:30PM July 19)
 //    - HTML encoding by EJS ( ' and " dont work, i know why but idk how to fix).
 //    - input sanitization and general checking (anti-hack stuff) -> idk if required
-//    
+   
 //    - other frontend work:
 //     - add/fix landing pages or alerts for errors and successes
 //     - fix other pages (profile-edit.ejs, success.ejs, logout.ejs)
@@ -33,12 +33,23 @@ const he = require("he");
 //const entities = require("html-entities").AllHtmlEntities;
 const MongoStore = require('connect-mongodb-session')(session);
 const app = express();
-
+const mongoOptions = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+};
 const store = new MongoStore({
   uri: link,
-  collection: 'sessions'
+  collection: 'sessions',
+  //expires: false,
 });
 
+//Set the TTL index on the sessions collection
+// store.on('connected', () => {
+//   store.client
+//     .db()
+//     .collection('sessions')
+//     .createIndex({ expires: 1000 }, { expireAfterSeconds: 0 });
+// });
 
 const bodyParser = require('body-parser')
 app.use(bodyParser.json())
@@ -53,12 +64,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
   name: process.env.SesNAME,
   secret: process.env.SesSECRET,
-  httpOnly: true,
-  secure: true,
   resave: false,
-  maxAge: 1000 * 60 * 60 * 24, //1d day
   saveUninitialized: true,
-  store: store
+  store: store,
+  //autoRemove: 'interval',
+  //autoRemoveInterval: 1, // In minutes. Default
+  //expires: false,
+  cookie: {
+    //expires: false,
+    maxAge: null, // 1 week (session will expire after this time)
+    httpOnly: true,
+    secure: false, // Set to true in production if using HTTPS
+  },
 }));
 const methodOverride = require('method-override');
 app.use(methodOverride('_method'));
@@ -85,12 +102,117 @@ app.use(userIDMiddleware);
 // app.use(hashPassword);
 
 
+// app.get("/index", async (req, res) => {
+//   try {
+//     const TWO_DAYS_IN_MS = 2 * 24 * 60 * 60 * 1000;
+//     const currentDate = new Date();
+//     let sortBy = req.query.sortBy || "createDate"; // Default sorting by creation date
+//     let sortOrder = req.query.sortOrder || "desc"; // Default sorting in descending order
+
+//     // Validate the sorting criteria to avoid potential security issues
+//     const allowedSortFields = ["createDate", "rating", "hotness"]; // Add more fields if needed
+//     const allowedSortOrders = ["asc", "desc"];
+//     if (!allowedSortFields.includes(sortBy)) {
+//       sortBy = "createDate"; // Set default sorting if an invalid field is provided
+//     }
+//     if (!allowedSortOrders.includes(sortOrder)) {
+//       sortOrder = "desc"; // Set default sorting order if an invalid order is provided
+//     }
+
+//     let posts = [];
+
+
+//     if (req.session?.isLoggedIn) {
+//       console.log(req.sessionID);
+//       console.log(req.session.isLoggedIn);
+//       const userId = req.session.userId;
+//       console.log(userId);
+
+//       posts = await Post.find({ isDeleted: false }).limit(0);
+
+//       // Get the number of positive and negative votes for each post
+//       for (let i = 0; i < posts.length; i++) {
+//         const post = posts[i];
+//         const userReaction = await React.findOne({
+//           userID: userId,
+//           parentPostID: post._id,
+//           isVoted: true,
+//         });
+//         post.userReaction = userReaction ? userReaction.voteValue : 0;
+
+//         const positiveCount = await React.countDocuments({
+//           parentPostID: post._id,
+//           voteValue: 1,
+//         });
+//         const negativeCount = await React.countDocuments({
+//           parentPostID: post._id,
+//           voteValue: -1,
+//         });
+//         const ratingCount = positiveCount - negativeCount;
+//         post.rating = ratingCount;
+
+//         //calculating hotness
+//         const timeDifferenceInMs = currentDate - post.createDate;
+//         const decayFactor = Math.exp(-timeDifferenceInMs / TWO_DAYS_IN_MS); // Adjust the decay rate as needed
+//         const ratingWithDecay = post.rating * decayFactor;
+//         post.hotnessScore = ratingWithDecay;
+//         const decodedTitle = he.decode(post.title);
+//         const decodedContent = he.decode(post.content);
+//         post.title = decodedTitle;
+//         post.content = decodedContent;
+//         console.log(post.content);
+//       }
+//     } else {
+//       console.log("Currently not logged in, showing a limited number of posts!")
+//       //const limit = 20; // Change the limit value as needed
+//       posts = await Post.find({ isDeleted: false });
+//       //posts = await Post.find({ isDeleted: false }).limit(limit);
+
+//       for (let i = 0; i < posts.length; i++) {
+//         const post = posts[i];
+//         const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
+//         const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
+//         const ratingCount = positiveCount - negativeCount;
+//         post.rating = ratingCount;
+
+//         //calculating hotness
+//         const timeDifferenceInMs = currentDate - post.createDate;
+//         const decayFactor = Math.exp(-timeDifferenceInMs / TWO_DAYS_IN_MS); // Adjust the decay rate as needed
+//         const ratingWithDecay = post.rating * decayFactor;
+//         post.hotnessScore = ratingWithDecay;
+
+//         const decodedTitle = he.decode(post.title);
+//         const decodedContent = he.decode(post.content);
+//         post.title = decodedTitle;
+//         post.content = decodedContent;
+//       }
+//     }
+
+//     if (sortBy === "rating") {
+//       posts.sort((a, b) => (sortOrder === "desc" ? b.rating - a.rating : a.rating - b.rating));
+//     } else if (sortBy === "hotness") {
+//       posts.sort((postA, postB) => postB.hotnessScore - postA.hotnessScore);
+//     } else {
+//       posts.sort((a, b) => (sortOrder === "desc" ? b[sortBy] - a[sortBy] : a[sortBy] - b[sortBy]));
+//     }
+
+//     res.render("index", {  he, posts });
+//     //res.render("index", { entities, posts });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "An error occurred while fetching posts." });
+//   }
+// });
+
+
+
 app.get("/index", async (req, res) => {
   try {
     const TWO_DAYS_IN_MS = 2 * 24 * 60 * 60 * 1000;
     const currentDate = new Date();
     let sortBy = req.query.sortBy || "createDate"; // Default sorting by creation date
     let sortOrder = req.query.sortOrder || "desc"; // Default sorting in descending order
+    const postsPerPage = 15;
 
     // Validate the sorting criteria to avoid potential security issues
     const allowedSortFields = ["createDate", "rating", "hotness"]; // Add more fields if needed
@@ -101,76 +223,45 @@ app.get("/index", async (req, res) => {
     if (!allowedSortOrders.includes(sortOrder)) {
       sortOrder = "desc"; // Set default sorting order if an invalid order is provided
     }
+    
+    const page = parseInt(req.query.page) || 1; // Current page number (default to 1 if not provided)
+    const skipPosts = (page - 1) * postsPerPage; // Number of posts to skip for pagination
 
     let posts = [];
+    const isUserLoggedIn = req.session?.isLoggedIn;
 
+    // Set the query conditions based on user login status
+    const queryConditions = isUserLoggedIn ? { isDeleted: false } : { isDeleted: false, /* Add any other conditions if needed for non-logged-in users */ };
 
-    if (req.session?.isLoggedIn) {
-      console.log(req.sessionID);
-      console.log(req.session.isLoggedIn);
-      const userId = req.session.userId;
-      console.log(userId);
+    // Retrieve posts based on query conditions
+    posts = await Post.find(queryConditions);
 
-      posts = await Post.find({ isDeleted: false }).limit(0);
+    // Get the number of positive and negative votes for each post and calculate hotness
+    for (let i = 0; i < posts.length; i++) {
+      const post = posts[i];
+      const userReaction = await React.findOne({
+        userID: req.session.userId,
+        parentPostID: post._id,
+        isVoted: true,
+      });
+      post.userReaction = userReaction ? userReaction.voteValue : 0;
 
-      // Get the number of positive and negative votes for each post
-      for (let i = 0; i < posts.length; i++) {
-        const post = posts[i];
-        const userReaction = await React.findOne({
-          userID: userId,
-          parentPostID: post._id,
-          isVoted: true,
-        });
-        post.userReaction = userReaction ? userReaction.voteValue : 0;
+      const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
+      const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
+      const ratingCount = positiveCount - negativeCount;
+      post.rating = ratingCount;
 
-        const positiveCount = await React.countDocuments({
-          parentPostID: post._id,
-          voteValue: 1,
-        });
-        const negativeCount = await React.countDocuments({
-          parentPostID: post._id,
-          voteValue: -1,
-        });
-        const ratingCount = positiveCount - negativeCount;
-        post.rating = ratingCount;
+      const timeDifferenceInMs = currentDate - post.createDate;
+      const decayFactor = Math.exp(-timeDifferenceInMs / TWO_DAYS_IN_MS); // Adjust the decay rate as needed
+      const ratingWithDecay = post.rating * decayFactor;
+      post.hotnessScore = ratingWithDecay;
 
-        //calculating hotness
-        const timeDifferenceInMs = currentDate - post.createDate;
-        const decayFactor = Math.exp(-timeDifferenceInMs / TWO_DAYS_IN_MS); // Adjust the decay rate as needed
-        const ratingWithDecay = post.rating * decayFactor;
-        post.hotnessScore = ratingWithDecay;
-        const decodedTitle = he.decode(post.title);
-        const decodedContent = he.decode(post.content);
-        post.title = decodedTitle;
-        post.content = decodedContent;
-        console.log(post.content);
-      }
-    } else {
-      console.log("Currently not logged in, showing a limited number of posts!")
-      //const limit = 20; // Change the limit value as needed
-      posts = await Post.find({ isDeleted: false });
-      //posts = await Post.find({ isDeleted: false }).limit(limit);
-
-      for (let i = 0; i < posts.length; i++) {
-        const post = posts[i];
-        const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
-        const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
-        const ratingCount = positiveCount - negativeCount;
-        post.rating = ratingCount;
-
-        //calculating hotness
-        const timeDifferenceInMs = currentDate - post.createDate;
-        const decayFactor = Math.exp(-timeDifferenceInMs / TWO_DAYS_IN_MS); // Adjust the decay rate as needed
-        const ratingWithDecay = post.rating * decayFactor;
-        post.hotnessScore = ratingWithDecay;
-
-        const decodedTitle = he.decode(post.title);
-        const decodedContent = he.decode(post.content);
-        post.title = decodedTitle;
-        post.content = decodedContent;
-      }
+      const decodedTitle = he.decode(post.title);
+      const decodedContent = he.decode(post.content);
+      post.title = decodedTitle;
+      post.content = decodedContent;
     }
-
+    // Sort the posts based on the selected sorting criteria
     if (sortBy === "rating") {
       posts.sort((a, b) => (sortOrder === "desc" ? b.rating - a.rating : a.rating - b.rating));
     } else if (sortBy === "hotness") {
@@ -179,13 +270,17 @@ app.get("/index", async (req, res) => {
       posts.sort((a, b) => (sortOrder === "desc" ? b[sortBy] - a[sortBy] : a[sortBy] - b[sortBy]));
     }
 
-    res.render("index", {  he, posts });
-    //res.render("index", { entities, posts });
+    const paginatedPosts = posts.slice(skipPosts, skipPosts + postsPerPage);
+    let totalPosts = posts.length;
+    let totalPages = Math.ceil(posts.length/postsPerPage);
+
+    res.render("index", { page, he, paginatedPosts, totalPosts, totalPages, sortBy, sortOrder });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while fetching posts." });render/register
+    res.status(500).json({ error: "An error occurred while fetching posts." });
   }
 });
+
 
 
 
@@ -206,8 +301,8 @@ app.get("/login", (req, res)=>{
   res.render("login")
   }
 })
-app.get("/logout", (req, res)=>{
-  req.session.destroy();
+app.get("/logout", async(req, res)=>{
+  await req.session.destroy();
   console.log("not logged in");
   res.render("logout")
 })
@@ -248,7 +343,7 @@ app.post("/login", async (req, res) => {
           //Use the comparePassword method to check if the provided password matches the hashed password in the database
           const isPasswordMatch = await user.comparePassword(password);
 
-          if (!isPasswordMatch || !user ) {
+          if (!isPasswordMatch ) {
             
             return res.status(400).json({ error: "Invalid username or password." });
           }
@@ -268,8 +363,10 @@ app.post("/login", async (req, res) => {
         console.log(remember)
         req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 21; // 21 days
       }else{
-        //eeq.session.cookie.expires = null; //supposed to delete the session info after the user closes the tab, doesnt work.
-        req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 1; // 1 day lifespan (temporrary)
+        console.log(remember)
+        //req.session.cookie.expires = null; //supposed to delete the session info after the user closes the tab, doesnt work.
+        //req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 1; // 1 day lifespan (temporrary)
+        //req.session.cookie.expires = null;
       }
       //res.redirect("/index");
       res.redirect("/profile");
@@ -295,34 +392,6 @@ app.post("/logout", async (req, res) => {
   
   res.status(200).send();
 })
-
-//registering
-// app.post("/api/user", async (req, res) => {
-//   try {
-//     const { username, password, repassword } = req.body;
-//     if (password !== repassword) {
-//       return res.status(400).json({ error: "Passwords do not match." });
-//     }
-
-//     const existingUser = await User.findOne({ username });
-//     if (existingUser) {
-//       return res.status(400).json({ error: "Username already exists." });
-//     }
-    
-//     const user = new User({ username, password });
-//     const savedUser = await user.save();
-
-//     savedUser.userId = savedUser._id;
-//     await savedUser.save();
-
-//     res.redirect("/success");
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "An error occurred while saving the user." });
-//   }
-// });
-
-
 
 const flash = require("connect-flash");
 
@@ -401,9 +470,6 @@ app.get("/profile", async (req, res) => {
       user = await User.findById(userId);
       posts = await Post.find({ userID: userId, isDeleted:false });
       comments = await Comment.find({ userID: userId, isDeleted:false });
-      // console.log("session id: ", req.sessionID);
-      // console.log("viewing profile of: ", userId, " with username: ", user.username);
-      // console.log(posts);
       let sortOrder = 'desc'
       posts.sort((a, b) => (sortOrder === "desc" ? b["createDate"] - a["createDate"] : a["createDate"] - b["createDate"]));
       if(posts.length === 0){
@@ -508,6 +574,7 @@ app.patch("/api/user/:username", async (req, res) => {
         updateData.password = newPassword;
       }else{
         delete updateData.password;
+        req.session.expires = null;
       }
       // if (newPassword !== "" && req.body.password === req.body.repassword) {
       //   newPassword = newPassword.toString();
@@ -927,6 +994,26 @@ app.post('/api/react', async (req, res) => {
         }
         await newReact.save();
       }
+
+      // if(reactParentType == 'post'){
+      //   const positiveCount = await React.countDocuments({ parentPostID: parentId, voteValue: 1 });
+      //   const negativeCount = await React.countDocuments({ parentPostID: parentId, voteValue: -1 });
+      //   const ratingCount = positiveCount - negativeCount;
+      //   await Post.findByIdAndUpdate(parentId, {
+      //     rating: ratingCount,
+      //     //hotnessScore: calculateHotnessScore(ratingCount, post.createDate),
+      //   });
+      //   }
+      // else{
+      //   const positiveCount = await React.countDocuments({ parentCommentID: parentId, voteValue: 1 });
+      //   const negativeCount = await React.countDocuments({ parentCommentID: parentId, voteValue: -1 });
+      //   const ratingCount = positiveCount - negativeCount;
+      //   await Comment.findByIdAndUpdate(parentId, {
+      //     rating: ratingCount,
+      //   });
+      // }
+      // await newReact.save();
+
       res.json({ message: 'Reaction updated successfully' });
     } else{
       res.redirect("/login");
