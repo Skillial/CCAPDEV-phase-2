@@ -2,7 +2,7 @@
 //    - HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
 //    - input sanitization and general checking (anti-hack stuff) -> idk if required
 //    - upload pfp's for all users
-//    - add password hashing
+//    
 //    - other frontend work:
 //     - add/fix landing pages or alerts for errors and successes
 //     - fix other pages (profile-edit.ejs, success.ejs, logout.ejs)
@@ -13,6 +13,7 @@
   
 //   ## Functionalities DONE FOR SURE
 //    - User: login, signup, logout, profile (updating, showing of posts)  
+//          - added password hashing
 //    - Posts: new post, patch post, delete post -> maybe paganda patching, make it more obvious that fields are editable
 //    - Comment: new comment, patch comment, delete comment -> maybe paganda patching, make it more obvious that fields are editable
 //    - Reacting: new reacts, editing reacts, removing reacts
@@ -197,10 +198,6 @@ app.get("/logout", (req, res)=>{
   res.render("logout")
 })
 
-// app.get("/profile", async(req, res) =>{
-//   res.render("profile")
-// })
-
 app.get("/profile/edit/", async (req, res) => {
   try {
     const userId = req.session.userId;
@@ -234,16 +231,16 @@ app.post("/login", async (req, res) => {
     if(!req.session.isLoggedIn){
       const { username, password, remember } = req.body;
       const user = await User.findOne({ username });
-          // Use the comparePassword method to check if the provided password matches the hashed password in the database
-          // const isPasswordMatch = await user.comparePassword(password);
+          //Use the comparePassword method to check if the provided password matches the hashed password in the database
+          const isPasswordMatch = await user.comparePassword(password);
 
-          // if (!isPasswordMatch) {
-          //   return res.status(400).json({ error: "Invalid username or password." });
-          // }
-      // Check if the user exists and the password matches
-      if (!user || user.password !== password) {
-        return res.status(400).json({ error: "Invalid username or password." });
-      }
+          if (!isPasswordMatch) {
+            return res.status(400).json({ error: "Invalid username or password." });
+          }
+      // Check if the user exists and the password matches (non hashing)
+      // if (!user || user.password !== password) {
+      //   return res.status(400).json({ error: "Invalid username or password." });
+      // }
       if (!user._id) {
         return res.status(500).json({ error: "An error occurred while retrieving user ID." });
       }
@@ -342,7 +339,7 @@ app.post("/api/user", async (req, res) => {
     const MIN_PASSWORD_LENGTH = 6; 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/; 
     if (password.length < MIN_PASSWORD_LENGTH || !passwordRegex.test(password)) {
-      req.flash("error", "Password must be at least 6 characters long and contain both letters and numbers.");
+      req.flash("error", "Password must be at least 6 characters long and must contain upper and lowercase lettes, and numbers.");
       return res.redirect("/register"); 
     }
     let usernameRegex = /^[a-zA-Z0-9]*$/;
