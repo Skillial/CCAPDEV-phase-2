@@ -1,7 +1,6 @@
 // # Appdev Todo [Updated 11:30PM July 19)
 //    - HTML encoding by EJS ( ' and " dont work, i know why but idk how to fix).
 //    - input sanitization and general checking (anti-hack stuff) -> idk if required
-//    - upload pfp's for all users
 //    
 //    - other frontend work:
 //     - add/fix landing pages or alerts for errors and successes
@@ -31,7 +30,7 @@ const session = require('express-session');
 const ejs = require('ejs-async');
 
 const he = require("he");
-const entities = require("html-entities").AllHtmlEntities;
+//const entities = require("html-entities").AllHtmlEntities;
 const MongoStore = require('connect-mongodb-session')(session);
 const app = express();
 
@@ -249,7 +248,7 @@ app.post("/login", async (req, res) => {
           //Use the comparePassword method to check if the provided password matches the hashed password in the database
           const isPasswordMatch = await user.comparePassword(password);
 
-          if (!isPasswordMatch) {
+          if (!isPasswordMatch || !user ) {
             
             return res.status(400).json({ error: "Invalid username or password." });
           }
@@ -419,7 +418,10 @@ app.get("/profile", async (req, res) => {
       else{
         user.comments = comments;
       }
-      
+
+      const decodedAboutMe = he.decode(user.aboutme);
+      user.aboutme = decodedAboutMe;
+
       console.log(userId);
       console.log(user);
       let IsCurrUserTheProfileOwner = true;
@@ -469,6 +471,10 @@ app.get("/profile/:username", async (req, res) => {
       else{
         user.comments = comments;
       }
+      
+      const decodedAboutMe = he.decode(user.aboutme);
+      user.aboutme = decodedAboutMe;
+
       console.log(userId);
       console.log(user);
       // Render the profile page with the user's information
@@ -517,9 +523,9 @@ app.patch("/api/user/:username", async (req, res) => {
         return res.redirect("/profile-edit"); 
       }
 
-      let aboutmeRegex = /^[a-zA-Z0-9\t\n\r\s]*$/;
+      let aboutmeRegex = /^[a-zA-Z0-9\t\n\r\s]*(?![\x22\x27])/;
       if (!aboutmeRegex.test(req.body.aboutme)) {
-        req.flash("error", "About Me can only contain letters, numbers, and spaces!");
+        req.flash("error", "About me cannot contain quotation marks");
         return res.redirect("/profile-edit"); 
       }
 
