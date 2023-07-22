@@ -1089,6 +1089,7 @@ padding-left:15px;
 .landing.subtext {
 	font-size: var(--small-title-font-size);
 	font-weight: bold;
+	text-align: center;
 }
 
 .landing.button {
