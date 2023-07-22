@@ -232,10 +232,11 @@ app.get("/index", async (req, res) => {
 
     let cachedPosts = req.session.cachedPosts;
     let noUpdate = req.session.cachedNoUpdate;
+    //noUpdate = false;
     let temp = await Post.find({isDeleted: false});
     console.log(cachedPosts)
     if (noUpdate) {
-        posts = temp;
+        posts = cachedPosts;
     } else {
       req.session.cachedNoUpdate = true;
       const queryConditions = isUserLoggedIn ? { isDeleted: false } : { isDeleted: false, /* Add any other conditions if needed for non-logged-in users */ };
