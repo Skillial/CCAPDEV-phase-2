@@ -279,10 +279,18 @@ button.newPost{
 	top: 0;
 	right: 0;
 	width: auto;
-	border-radius: 10px;
+	border-radius: calc(var(--corner-radius)/2);
+	border-style: hidden;
 	cursor: pointer;
 	font: var(--font);
-	font-size: 50%;
+	font-size: var(--content-font-size);
+	color: var(--text-color);
+	background-color: var(--secondary-color);
+	margin: 5px;
+}
+
+button.newPost:hover{
+	background-color: var(--highlight-2);
 }
 
 #newPostFormContainer {
