@@ -1,5 +1,5 @@
 // # Appdev Todo [Updated 11:30PM July 19)
-//    - HTML encoding by EJS ( special symbols are shown as `&lt;` and so on)
+//    - HTML encoding by EJS ( ' and " dont work, i know why but idk how to fix).
 //    - input sanitization and general checking (anti-hack stuff) -> idk if required
 //    - upload pfp's for all users
 //    
