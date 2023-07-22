@@ -405,6 +405,7 @@ button.cancel{
 	justify-content: center;
 	align-items: center;
 } 
+
 .like{
 	background-image: url("./../images/reacts/no_up.png");
 	height: 37px;
@@ -413,9 +414,29 @@ button.cancel{
 	background-size:contain; 
 	margin:auto;
 	cursor: pointer;
+	transform: scale(1);
+	transition: all 100ms linear;
 }
-.like-hover:hover{
+.like:hover{
 	background-image: url("./../images/reacts/up.png");
+	opacity: 0.8;
+	transform: scale(1);
+	transition: all 100ms linear;
+}
+
+.like_colored{
+	background-image: url("./../images/reacts/up.png");
+	height: 37px;
+	width: 15px;
+	background-repeat: no-repeat;
+	background-size:contain; 
+	margin:auto;
+	transform: scale(1);
+	transition: all 100ms linear;
+}
+.like_colored:hover{
+	background-image: url("./../images/reacts/up.png");
+	opacity: 1;
 }
 
 .dislike{
@@ -426,21 +447,13 @@ button.cancel{
 	background-size:contain; 
 	margin:auto;
 	cursor: pointer;
+	transform: scale(1);
+	transition: all 100ms linear;
 }
 .dislike-hover:hover{
 	background-image: url("./../images/reacts/down.png");
-}
-
-.like_colored{
-	background-image: url("./../images/reacts/up.png");
-	height: 37px;
-	width: 15px;
-	background-repeat: no-repeat;
-	background-size:contain; 
-	margin:auto;
-}
-.like_colored:hover{
-	background-image: url("./../images/reacts/no_up.png");
+	opacity: 0.6;
+	transition: all 100ms linear;
 }
 .dislike_colored{
 	background-image: url("./../images/reacts/down.png");
@@ -448,10 +461,13 @@ button.cancel{
 	width: 20px;
 	background-repeat: no-repeat;
 	background-size:contain; 
-	margin:auto;
+	margin: auto;
+	transform: scale(1);
+	transition: all 100ms linear;
 }
 .dislike_colored:hover{
-	background-image: url("./../images/reacts/no_down.png");
+	background-image: url("./../images/reacts/down.png");
+	opacity: 1;
 }
 .count{
 	color:var(--text-color); 
