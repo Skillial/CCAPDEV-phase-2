@@ -86,9 +86,11 @@
               <% profile = "/profile/" + author %>
               <% link = "/post/" + encodeURIComponent(title) %>
               <script>
-                $('#forum').append(createPost('<%= title %>', '<%= content %>', '<%= author %>', '<%= rating %>', '<%= media %>', '<%= profile %>', '<%= link %>','<%= _id %>', '<%= userReaction%>' ));
+                $('#forum').append(createPost('<%- title %>', '<%- he.decode(content) %>', '<%= author %>', '<%= rating %>', '<%= media %>', '<%= profile %>', '<%= link %>','<%= _id %>', '<%= userReaction%>' ));
+                console.log('<%= content %>');
               </script>
             <% } %>
+        
           </div>
           
           <!-- <script>

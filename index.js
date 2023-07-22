@@ -29,6 +29,9 @@ const { hashPassword } = require('./lib/hashing');
 const express = require('express');
 const session = require('express-session');
 const ejs = require('ejs-async');
+
+const he = require("he");
+const entities = require("html-entities").AllHtmlEntities;
 const MongoStore = require('connect-mongodb-session')(session);
 const app = express();
 
@@ -102,6 +105,7 @@ app.get("/index", async (req, res) => {
 
     let posts = [];
 
+
     if (req.session?.isLoggedIn) {
       console.log(req.sessionID);
       console.log(req.session.isLoggedIn);
@@ -136,13 +140,18 @@ app.get("/index", async (req, res) => {
         const decayFactor = Math.exp(-timeDifferenceInMs / TWO_DAYS_IN_MS); // Adjust the decay rate as needed
         const ratingWithDecay = post.rating * decayFactor;
         post.hotnessScore = ratingWithDecay;
+        const decodedTitle = he.decode(post.title);
+        const decodedContent = he.decode(post.content);
+        post.title = decodedTitle;
+        post.content = decodedContent;
+        console.log(post.content);
       }
     } else {
       console.log("Currently not logged in, showing a limited number of posts!")
       //const limit = 20; // Change the limit value as needed
       posts = await Post.find({ isDeleted: false });
       //posts = await Post.find({ isDeleted: false }).limit(limit);
-      // Get the number of positive and negative votes for each post
+
       for (let i = 0; i < posts.length; i++) {
         const post = posts[i];
         const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
@@ -155,6 +164,11 @@ app.get("/index", async (req, res) => {
         const decayFactor = Math.exp(-timeDifferenceInMs / TWO_DAYS_IN_MS); // Adjust the decay rate as needed
         const ratingWithDecay = post.rating * decayFactor;
         post.hotnessScore = ratingWithDecay;
+
+        const decodedTitle = he.decode(post.title);
+        const decodedContent = he.decode(post.content);
+        post.title = decodedTitle;
+        post.content = decodedContent;
       }
     }
 
@@ -166,7 +180,8 @@ app.get("/index", async (req, res) => {
       posts.sort((a, b) => (sortOrder === "desc" ? b[sortBy] - a[sortBy] : a[sortBy] - b[sortBy]));
     }
 
-    res.render("index", { posts });
+    res.render("index", {  he, posts });
+    //res.render("index", { entities, posts });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred while fetching posts." });render/register
@@ -235,9 +250,10 @@ app.post("/login", async (req, res) => {
           const isPasswordMatch = await user.comparePassword(password);
 
           if (!isPasswordMatch) {
+            
             return res.status(400).json({ error: "Invalid username or password." });
           }
-      // Check if the user exists and the password matches (non hashing)
+      //Check if the user exists and the password matches (non hashing)
       // if (!user || user.password !== password) {
       //   return res.status(400).json({ error: "Invalid username or password." });
       // }
@@ -253,7 +269,8 @@ app.post("/login", async (req, res) => {
         console.log(remember)
         req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 21; // 21 days
       }else{
-        req.session.cookie.expires = null; //idk why it doesnt work lol
+        //eeq.session.cookie.expires = null; //supposed to delete the session info after the user closes the tab, doesnt work.
+        req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 1; // 1 day lifespan (temporrary)
       }
       //res.redirect("/index");
       res.redirect("/profile");
@@ -585,6 +602,10 @@ app.get("/post/:title", async (req, res) => {
       if (!post) {
         return res.status(404).json({ error: "Post not found." });
       }
+      const decodedTitle = he.decode(post.title);
+      const decodedContent = he.decode(post.content);
+      post.title = decodedTitle;
+      post.content = decodedContent;
 
       // Fetch all top-level comments for the post
       const topLevelComments = await Comment.find({ parentPostID: post._id, parentCommentID: null })
@@ -615,6 +636,9 @@ app.get("/post/:title", async (req, res) => {
             const negativeCount = await React.countDocuments({ parentCommentID: childComment._id, voteValue: -1 });
             const ratingCount = positiveCount - negativeCount;
             childComment.rating = ratingCount;
+
+            const decodedContent = he.decode(childComment.content);
+            childComment.content = decodedContent;
             return childComment;
           })
         );
@@ -637,6 +661,8 @@ app.get("/post/:title", async (req, res) => {
           const negativeCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: -1 });
           const ratingCount = positiveCount - negativeCount;
           comment.rating = ratingCount;
+          const decodedContent = he.decode(comment.content);
+          comment.content = decodedContent;
           return comment;
         })
       );
@@ -686,6 +712,8 @@ app.get("/post/:title", async (req, res) => {
             const negativeCount = await React.countDocuments({ parentCommentID: childComment._id, voteValue: -1 });
             const ratingCount = positiveCount - negativeCount;
             childComment.rating = ratingCount;
+            const decodedContent = he.decode(childComment.content);
+            childComment.content = decodedContent;
             return childComment;
           })
         );
@@ -701,6 +729,8 @@ app.get("/post/:title", async (req, res) => {
           const negativeCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: -1 });
           const ratingCount = positiveCount - negativeCount;
           comment.rating = ratingCount;
+          const decodedContent = he.decode(comment.content);
+          comment.content = decodedContent;
           return comment;
         })
       );
