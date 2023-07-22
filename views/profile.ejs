@@ -54,10 +54,10 @@
 												var createDate = '<%= post.dateCreated %>';
 												pauthor = '<%= user.username %>';
 												ppfp = '<%= user.photo %>'; //temp
-												pdesc = '<%= post.title %>';
+												pdesc = '<%- post.title %>';
 												pcount = '<%= post.rating %>';
 												pid = '<%= post._id %>';
-												phtml = '/post/' + encodeURIComponent(title);
+												phtml ='/post/' + encodeURIComponent(pid)
 												$('#profile-details').append(profilePost(pauthor, ppfp, pdesc, pcount, pid, phtml));
 												<% ctr++; %>
 												<% if (ctr === 5)	 { %>
@@ -68,15 +68,15 @@
 												$('#profile-details').append(hiddenPosts);
 											<% } %>
 											<% } else{ %>
-												var title = '<%= post.title %>';
-												var content = '<%= post.content %>';
+												var title = '<%- post.title %>';
+												var content = '<%- post.content %>';
 												var createDate = '<%= post.dateCreated %>';
 												pauthor = '<%= user.username %>';
 												ppfp = '<%= user.photo %>'; //temp
-												pdesc = '<%= post.title %>';
+												pdesc = '<%- post.title %>';
 												pcount = '<%= post.rating %>';
 												pid = '<%= post._id %>';
-												phtml = '/post/' + encodeURIComponent(title);
+												phtml ='/post/' + encodeURIComponent(pid)
 												$('#hidden-posts').append(profilePost(pauthor, ppfp, pdesc, pcount, pid, phtml));
 												<% ctr++; %>
 											<% } %>
@@ -111,10 +111,10 @@
 				
 												pauthor = '<%= user.username %>';
 												ppfp = '<%= user.photo %>'; //temp
-												pdesc = '<%= comments.content %>';
+												pdesc = '<%- he.decode(comments.content) %>';
 												pcount = '<%= comments.rating %>';
 												pid = '<%= comments._id %>';
-												phtml = '/post/' + encodeURIComponent('<%= comments.parentPostTitle %>');
+												phtml = '/post/' + encodeURIComponent('<%= comments.parentPostID %>');
 												$('#profile-details').append(profilePost(pauthor, ppfp, pdesc, pcount, pid, phtml));
 												<% ctr++; %>
 												<% if (ctr === 5)	 { %>
@@ -129,10 +129,10 @@
 								
 												pauthor = '<%= user.username %>';
 												ppfp = '<%= user.photo %>'; //temp
-												pdesc = '<%= comments.content %>';
+												pdesc = '<%- comments.content %>';
 												pcount = '<%= comments.rating %>';
 												pid = '<%= comments._id %>';
-												phtml = '/post/' + encodeURIComponent('<%= comments.parentPostTitle %>');
+												phtml = '/post/' + encodeURIComponent('<%= comments.parentPostID %>');
 												$('#hidden-comments').append(profilePost(pauthor, ppfp, pdesc, pcount, pid, phtml));
 												<% ctr++; %>
 											<% } %>

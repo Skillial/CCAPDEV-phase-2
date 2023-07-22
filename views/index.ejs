@@ -93,7 +93,8 @@
               <% const post = paginatedPosts[i]; %>
               <% let { _id, title, content, author, rating, media, profile, link, userReaction } = post; %>
               <% profile = "/profile/" + author %>
-              <% link = "/post/" + encodeURIComponent(title) %>
+              <!-- <% link = "/post/" + encodeURIComponent(title) %> -->
+              <% link = "/post/" + encodeURIComponent(_id) %>
               <script>
                 $('#forum').append(createPost('<%- title %>', '<%- he.decode(content) %>', '<%= author %>', '<%= rating %>', '<%= media %>', '<%= profile %>', '<%= link %>','<%= _id %>', '<%= userReaction%>' ));
                 console.log('<%= content %>');

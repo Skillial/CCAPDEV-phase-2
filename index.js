@@ -231,15 +231,19 @@ app.get("/index", async (req, res) => {
     const isUserLoggedIn = req.session?.isLoggedIn;
 
     let cachedPosts = req.session.cachedPosts;
+    let noUpdate = req.session.cachedNoUpdate;
+    //noUpdate = false;
     let temp = await Post.find({isDeleted: false});
-    if (cachedPosts.length == temp.length) {
-      posts = cachedPosts;
+    console.log(cachedPosts)
+    if (noUpdate) {
+        posts = cachedPosts;
     } else {
+      req.session.cachedNoUpdate = true;
       const queryConditions = isUserLoggedIn ? { isDeleted: false } : { isDeleted: false, /* Add any other conditions if needed for non-logged-in users */ };
 
       // Retrieve posts based on query conditions
       posts = await Post.find(queryConditions);
-
+      console.log(posts);
       // Get the number of positive and negative votes for each post and calculate hotness
       for (let i = 0; i < posts.length; i++) {
         const post = posts[i];
@@ -289,8 +293,6 @@ app.get("/index", async (req, res) => {
 });
 
 
-
-
 app.get("/index", (req, res)=>{
     res.render("index")
 })
@@ -303,6 +305,7 @@ app.get("/success", (req, res)=>{
 })
 app.get("/login", (req, res)=>{
   if(req.session.isLoggedIn){
+    req.session.cachedNoUpdate = false;
     res.redirect("/profile");
   }else{
   res.render("login")
@@ -479,6 +482,7 @@ app.get("/profile", async (req, res) => {
       comments = await Comment.find({ userID: userId, isDeleted:false });
       let sortOrder = 'desc'
       posts.sort((a, b) => (sortOrder === "desc" ? b["createDate"] - a["createDate"] : a["createDate"] - b["createDate"]));
+      
       if(posts.length === 0){
         user.posts = user.posts;
       }
@@ -495,14 +499,22 @@ app.get("/profile", async (req, res) => {
         }
         user.comments = comments;
       }
-
+      
+      posts.forEach(post =>{
+        post.content = he.decode(post.content);
+        post.title = he.decode(post.title);
+      })
+      comments.forEach(comment => {
+        let temp = he.decode(comment.content);
+        comment.content = temp;
+      })
       const decodedAboutMe = he.decode(user.aboutme);
       user.aboutme = decodedAboutMe;
 
       console.log(userId);
       console.log(user);
       let IsCurrUserTheProfileOwner = true;
-      res.render("profile", { user, IsCurrUserTheProfileOwner});
+      res.render("profile", { he, user, IsCurrUserTheProfileOwner});
     } else {
       res.redirect("/login");
     }
@@ -532,6 +544,7 @@ app.get("/profile/:username", async (req, res) => {
       console.log("viewing profile of: ", userId, " with username: ", username);
       posts = await Post.find({ userID: userId, isDeleted:false })
       comments = await Comment.find({ userID: userId, isDeleted:false });
+      
       let sortOrder = 'desc'
       posts.sort((a, b) => (sortOrder === "desc" ? b["createDate"] - a["createDate"] : a["createDate"] - b["createDate"]));
       console.log(posts);
@@ -541,13 +554,25 @@ app.get("/profile/:username", async (req, res) => {
       else{
         user.posts = posts;        
       }
-
       if(comments.length === 0){
         user.comments = user.comments;
       }
       else{
+        for (const comment of comments) {
+          const parentPost = await Post.findById(comment.parentPostID);
+          comment.parentPostTitle = parentPost ? parentPost.title : "Unknown Post Title";
+        }
         user.comments = comments;
       }
+
+      posts.forEach(post =>{
+        post.content = he.decode(post.content);
+        post.title = he.decode(post.title);
+      })
+      comments.forEach(comment => {
+        let temp = he.decode(comment.content);
+        comment.content = temp;
+      })
       
       const decodedAboutMe = he.decode(user.aboutme);
       user.aboutme = decodedAboutMe;
@@ -555,7 +580,7 @@ app.get("/profile/:username", async (req, res) => {
       console.log(userId);
       console.log(user);
       // Render the profile page with the user's information
-      res.render("profile", { user, IsCurrUserTheProfileOwner });
+      res.render("profile", { he, user, IsCurrUserTheProfileOwner });
 
   } catch (error) {
     console.error(error);
@@ -673,12 +698,14 @@ app.post("/api/post", async (req, res) => {
 });
 
 
-app.get("/post/:title", async (req, res) => {
+app.get("/post/:id", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
       // Retrieve the post from the database based on the title
-      const title = req.params.title;
-      const post = await Post.findOne({ title });
+      //const title = req.params.title;
+      let postID = new mongoose.Types.ObjectId(req.params.id);
+      
+      const post = await Post.findOne({ _id:postID });
       // Currently logged in user
       const userId = req.session.userId;
       const user = await User.findById(userId);
@@ -753,11 +780,11 @@ app.get("/post/:title", async (req, res) => {
 
       // Author of the post
       const author = await User.findOne({ username: post.author });
-      const postID = post._id;
-      const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
-      const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
-      const ratingCount = positiveCount - negativeCount;
-      post.rating = ratingCount;
+      //const postID = post._id;
+      // const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
+      // const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
+      // const ratingCount = positiveCount - negativeCount;
+      // post.rating = ratingCount;
       const isCurrUserTheAuthor = author.username === user.username;
 
       // If user has already reacted or not
@@ -865,7 +892,8 @@ app.patch("/api/post/:id", async (req, res) => {
 
     // Save the updated post in the database
     await post.save();
-
+    req.session.cachedPosts = []; 
+    req.session.cachedNoUpdate = false;
     res.json({ message: "Post updated successfully", post });
   } catch (error) {
     console.error(error);
@@ -902,7 +930,7 @@ app.post("/api/comment", async (req, res) => {
 
       // Save the new comment object to the database
       await newComment.save();
-      res.redirect(`/post/${encodeURIComponent(masterPost.title)}`);
+      res.redirect(`/post/${encodeURIComponent(masterPost._id)}`);
     } else {
       // Redirect to the login page if not logged in
       // Also, display a message "you need to login first!"
@@ -1026,7 +1054,8 @@ app.post('/api/react', async (req, res) => {
         });
       }
       //await newReact.save();
-
+      req.session.cachedPosts = []; 
+      req.session.cachedNoUpdate = false;
       res.json({ message: 'Reaction updated successfully' });
     } else{
       res.redirect("/login");
