@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 <head>
     <title>Edit My Profile - SnaccOverflow</title>
@@ -7,6 +6,9 @@
     <script src="/javascript/react.js"></script>
     <script src="../javascript/profile.js"></script>
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/2.3.3/cropper.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropper/2.3.3/cropper.js"></script>
+    
 </head>
 <body>
     <script src="/javascript/navbar.js" type="text/javascript"></script>
@@ -19,11 +21,18 @@
             <input type="text" name="username" value="<%= user.username %>" placeholder="Enter new username">
             <input type="text" name="aboutme" value="<%= user.aboutme %>" placeholder="Enter new aboutme">
             <!-- Add the image input field here -->
-            <input type="file" accept="image/*" name="photo">
+            <input type="file" accept="image/*" name="photo" id="fileInput">
             <input type="text" name="password" placeholder="Enter new password">
             <input type="password" name="repassword" placeholder="Re-enter new password">
             <button type="submit">Save Changes</button>
+            
         </form>
+
+        <div id="canvas-container" style="display: none;">
+            <canvas id="canvas">
+              Your browser does not support the HTML5 canvas element.
+            </canvas>
+        </div>	
     </div>
 
     <script>
@@ -37,26 +46,33 @@
             const fileInput = document.querySelector("input[name='photo']");
             if (fileInput.files.length === 0) {
                 // If no file is selected, proceed with form submission without uploading an image
-                submitForm(formData);
+                submitForm(formData, null); // Pass null as the canvas data
             } else {
-                // If a file is selected, upload the image first and then submit the form
-                uploadImage(formData);
+                // If a file is selected, get the canvas data and upload the image first
+                const canvasData = canvas.cropper('getCroppedCanvas').toDataURL("image/png"); // Get the canvas data as data URL
+                uploadImage(formData, canvasData);
             }
         });
 
         // Function to handle image upload
-        function uploadImage(formData) {
-    let url = "https://script.google.com/macros/s/AKfycbzHrW44F8-PC41XVJyvuyf9dcVVWDjUcSQPpUdCPfZIh6meEEINS7WAAG5vV2PoShvi/exec";
-    let file = document.querySelector("input[name='photo']");
+        function uploadImage(formData, canvasData) {
+            console.log(canvasData);
+    if (!canvasData || typeof canvasData !== 'string' || !canvasData.startsWith('data:image/')) {
+        // If canvasData is not a valid data URI, there's no image to upload, so proceed with form submission without uploading an image
+        submitForm(formData, null); // Pass null as the image link
+        return;
+    }
 
+    let url = "https://script.google.com/macros/s/AKfycbzHrW44F8-PC41XVJyvuyf9dcVVWDjUcSQPpUdCPfZIh6meEEINS7WAAG5vV2PoShvi/exec";
+    let file = dataURItoBlob(canvasData);
     let fr = new FileReader();
     fr.addEventListener('loadend', () => {
         let res = fr.result;
         let spt = res.split("base64,")[1];
         let obj = {
             base64: spt,
-            type: file.files[0].type,
-            name: file.files[0].name
+            type: file.type,
+            name: file.name
         }
         fetch(url, {
             method: "POST",
@@ -70,34 +86,94 @@
         })
         .catch(error => console.error("Error:", error));
     });
-    fr.readAsDataURL(file.files[0]);
+    fr.readAsDataURL(file);
+}
+        
+
+function dataURItoBlob(dataURI) {
+    // Convert base64 to raw binary data held in a string
+    const byteString = atob(dataURI.split(',')[1]);
+    // Separate the mime component
+    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    // Write the bytes of the string to an ArrayBuffer
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const uint8Array = new Uint8Array(arrayBuffer);
+    for (let i = 0; i < byteString.length; i++) {
+        uint8Array[i] = byteString.charCodeAt(i);
+    }
+    // Create a Blob with the data and set the name property
+    const blob = new Blob([arrayBuffer], { type: mimeString });
+    blob.name = "profile_image.png"; // Set the name of the blob (you can change "profile_image.png" to a desired name)
+    return blob;
 }
 
         // Function to handle form submission
         function submitForm(formData, imageLink) {
-    // Add the image link to the formData
-    formData.append("photo", imageLink);
+            // If imageLink is null, the user didn't select a new image, so keep the old one
+            if (!imageLink) {
+                imageLink = "<%= user.photo %>";
+            }
 
-    // Send the PATCH request using fetch
-    fetch(`/api/user/${encodeURIComponent('<%= user.username %>')}`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(Object.fromEntries(formData))
-    })
-    .then(response => {
-        if (response.ok) {
-            window.location.href = '/profile';
-        } else {
-            console.error('Failed to update profile. Please try again later.');
+            // Add the image link to the formData
+            formData.append("photo", imageLink);
+
+            // Send the PATCH request using fetch
+            fetch(`/api/user/${encodeURIComponent('<%= user.username %>')}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Object.fromEntries(formData))
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/profile';
+                } else {
+                    console.error('Failed to update profile. Please try again later.');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                // Handle error (if needed)
+            });
         }
-    })
-    .catch(error => {
-        console.error(error);
-        // Handle error (if needed)
-    });
-}
+
+        var canvas  = $("#canvas"),
+            context = canvas.get(0).getContext("2d"),
+            $result = $('#result');
+
+        $('#fileInput').on('change', function () {
+            if (this.files && this.files[0]) {
+                if (this.files[0].type.match(/^image\//)) {
+                    var reader = new FileReader();
+                    reader.onload = function (evt) {
+                        var img = new Image();
+                        img.onload = function () {
+                            context.canvas.height = img.height;
+                            context.canvas.width = img.width;
+                            context.drawImage(img, 0, 0);
+                            var cropper = canvas.cropper({
+                                aspectRatio: 1 / 1,
+                                background: false // Set background to false to prevent cropping transparent parts
+                            });
+                            $('#canvas-container').show(); // Show the canvas container
+                        };
+                        img.src = evt.target.result;
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                } else {
+                    alert("Invalid file type! Please select an image file.");
+                }
+            } else {
+                $('#canvas-container').hide(); // Hide the canvas container
+                alert('No file(s) selected.');
+            }
+        });
     </script>
+    <style>
+        img {
+            max-width: 100%;
+        }
+    </style>
 </body>
 </html>

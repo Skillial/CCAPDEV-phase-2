@@ -1105,3 +1105,11 @@ padding-left:15px;
 /* img{
 	object-fit: contain;
 } */
+
+#canvas {
+	width: 600px;
+	height: 600px;
+	background-color: #ffffff;
+	cursor: default;
+	border: 1px solid black;
+}
