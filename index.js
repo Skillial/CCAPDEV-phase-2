@@ -230,36 +230,43 @@ app.get("/index", async (req, res) => {
     let posts = [];
     const isUserLoggedIn = req.session?.isLoggedIn;
 
-    // Set the query conditions based on user login status
-    const queryConditions = isUserLoggedIn ? { isDeleted: false } : { isDeleted: false, /* Add any other conditions if needed for non-logged-in users */ };
+    let cachedPosts = req.session.cachedPosts;
+    let temp = await Post.find({isDeleted: false});
+    if (cachedPosts.length == temp.length) {
+      posts = cachedPosts;
+    } else {
+      const queryConditions = isUserLoggedIn ? { isDeleted: false } : { isDeleted: false, /* Add any other conditions if needed for non-logged-in users */ };
 
-    // Retrieve posts based on query conditions
-    posts = await Post.find(queryConditions);
+      // Retrieve posts based on query conditions
+      posts = await Post.find(queryConditions);
 
-    // Get the number of positive and negative votes for each post and calculate hotness
-    for (let i = 0; i < posts.length; i++) {
-      const post = posts[i];
-      const userReaction = await React.findOne({
-        userID: req.session.userId,
-        parentPostID: post._id,
-        isVoted: true,
-      });
-      post.userReaction = userReaction ? userReaction.voteValue : 0;
+      // Get the number of positive and negative votes for each post and calculate hotness
+      for (let i = 0; i < posts.length; i++) {
+        const post = posts[i];
+        const userReaction = await React.findOne({
+          userID: req.session.userId,
+          parentPostID: post._id,
+          isVoted: true,
+        });
+        post.userReaction = userReaction ? userReaction.voteValue : 0;
 
-      const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
-      const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
-      const ratingCount = positiveCount - negativeCount;
-      post.rating = ratingCount;
+        // const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
+        // const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
+        // const ratingCount = positiveCount - negativeCount;
+        // post.rating = ratingCount;
 
-      const timeDifferenceInMs = currentDate - post.createDate;
-      const decayFactor = Math.exp(-timeDifferenceInMs / TWO_DAYS_IN_MS); // Adjust the decay rate as needed
-      const ratingWithDecay = post.rating * decayFactor;
-      post.hotnessScore = ratingWithDecay;
+        const timeDifferenceInMs = currentDate - post.createDate;
+        const decayFactor = Math.exp(-timeDifferenceInMs / TWO_DAYS_IN_MS); // Adjust the decay rate as needed
+        const ratingWithDecay = post.rating * decayFactor;
+        post.hotnessScore = ratingWithDecay;
 
-      const decodedTitle = he.decode(post.title);
-      const decodedContent = he.decode(post.content);
-      post.title = decodedTitle;
-      post.content = decodedContent;
+        const decodedTitle = he.decode(post.title);
+        const decodedContent = he.decode(post.content);
+        post.title = decodedTitle;
+        post.content = decodedContent;
+        
+      }
+      req.session.cachedPosts = posts;
     }
     // Sort the posts based on the selected sorting criteria
     if (sortBy === "rating") {
@@ -995,24 +1002,24 @@ app.post('/api/react', async (req, res) => {
         await newReact.save();
       }
 
-      // if(reactParentType == 'post'){
-      //   const positiveCount = await React.countDocuments({ parentPostID: parentId, voteValue: 1 });
-      //   const negativeCount = await React.countDocuments({ parentPostID: parentId, voteValue: -1 });
-      //   const ratingCount = positiveCount - negativeCount;
-      //   await Post.findByIdAndUpdate(parentId, {
-      //     rating: ratingCount,
-      //     //hotnessScore: calculateHotnessScore(ratingCount, post.createDate),
-      //   });
-      //   }
-      // else{
-      //   const positiveCount = await React.countDocuments({ parentCommentID: parentId, voteValue: 1 });
-      //   const negativeCount = await React.countDocuments({ parentCommentID: parentId, voteValue: -1 });
-      //   const ratingCount = positiveCount - negativeCount;
-      //   await Comment.findByIdAndUpdate(parentId, {
-      //     rating: ratingCount,
-      //   });
-      // }
-      // await newReact.save();
+      if(reactParentType == 'post'){
+        const positiveCount = await React.countDocuments({ parentPostID: parentId, voteValue: 1 });
+        const negativeCount = await React.countDocuments({ parentPostID: parentId, voteValue: -1 });
+        const ratingCount = positiveCount - negativeCount;
+        await Post.findByIdAndUpdate(parentId, {
+          rating: ratingCount,
+          //hotnessScore: calculateHotnessScore(ratingCount, post.createDate),
+        });
+        }
+      else{
+        const positiveCount = await React.countDocuments({ parentCommentID: parentId, voteValue: 1 });
+        const negativeCount = await React.countDocuments({ parentCommentID: parentId, voteValue: -1 });
+        const ratingCount = positiveCount - negativeCount;
+        await Comment.findByIdAndUpdate(parentId, {
+          rating: ratingCount,
+        });
+      }
+      //await newReact.save();
 
       res.json({ message: 'Reaction updated successfully' });
     } else{
