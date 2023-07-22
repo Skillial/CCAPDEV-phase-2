@@ -416,6 +416,10 @@ app.get("/profile", async (req, res) => {
         user.comments = user.comments;
       }
       else{
+        for (const comment of comments) {
+          const parentPost = await Post.findById(comment.parentPostID);
+          comment.parentPostTitle = parentPost ? parentPost.title : "Unknown Post Title";
+        }
         user.comments = comments;
       }
 

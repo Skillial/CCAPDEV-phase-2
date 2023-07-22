@@ -1,109 +1,160 @@
-
-<html>
-	<head>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-		<script src="/javascript/react.js"></script>
-        <title>
-            <%= user.username %>'s' Profile - SnaccOverflow
-        </title>
-        <link rel="icon" href="../images/icon.png" sizes="32x32" type="image/png">
-        <script src="/javascript/profile.js"></script>
-		<script src="/javascript/postView.js"></script>
-        <link rel="stylesheet" type="text/css" href="/css/styles.css">
-	</head>
-	<body>
-		<script src="/javascript/navbar.js" type="text/javascript"></script>
-		<script>
-			createNavbar(<%= isLoggedIn %>);
-		</script>
-		<div class="border">
-			<div class="profile">
-				<aside>
-					<div>
-						<img src="<%= user.photo %>">
-						<br/>
-					</div>
-					<main>
-						<%= user.username %> <!-- Display the user's display name -->
-					</main>
+	<html>
+		<head>
+			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+			<script src="/javascript/react.js"></script>
+			<title>
+				<%= user.username %>'s Profile - SnaccOverflow
+			</title>
+			<link rel="icon" href="../images/icon.png" sizes="32x32" type="image/png">
+			<script src="/javascript/profile.js"></script>
+			<script src="/javascript/postView.js"></script>
+			<link rel="stylesheet" type="text/css" href="/css/styles.css">
+		</head>
+		<body>
+			<script src="/javascript/navbar.js" type="text/javascript"></script>
+			<script>
+				createNavbar(<%= isLoggedIn %>);
+			</script>
+			<div class="border">
+				<div class="profile">
+					<aside>
+						<div>
+							<img src="<%= user.photo %>">
+							<br/>
+						</div>
+						<main>
+							<%= user.username %> <!-- Display the user's display name -->
+						</main>
 						<% if (IsCurrUserTheProfileOwner) { %>
 							<button onclick="window.location.href = '/profile/edit';">Edit Profile</button>
 						<% } %>
-				</aside>
-				<div id="profile-details">
-					<main>
-					  About Me
-					</main>
-					<article align="justify">
-					  <%- user.aboutme %>
-					</article>
-								
-					</script>
-					<br><br><h2>Recent User Posts</h2>
-					<main>
-						<script>
-							//console.log("length: ")
-							<% if (user.posts.length > 0) { %>
-								
-								<% user.posts.forEach((post) => { %>
-									console.log("Post Title:", '<%= post.title %>');
-									console.log("Post Content:", '<%= post.content %>');
-									console.log("Create Date:", '<%= post.dateCreated %>');
-									var title = '<%= post.title %>';
-									var content = '<%= post.content %>';
-									var createDate = '<%= post.dateCreated %>';
-									// var postElement = createPost(title, content, createDate);
-									// $("#profile-details").append(postElement.spacer);
-									// $("#profile-details").append(postElement.title);
-									// $("#profile-details").append(postElement.content);
-									// $("#profile-details").append(postElement.createDate);
+					</aside>
+					<div id="profile-details">
+						<main>
+							About Me
+						</main>
+						<article align="justify">
+							<%- user.aboutme %>
+						</article>
 
-									pauthor = '<%= user.username %>',    
-									ppfp = '<%= user.photo %>', //temp
-									pdesc = '<%= post.title %>',
-									pcount = '<%= post.rating %>',
-									pid='<%= post._id %>',
-									phtml='/post/' + encodeURIComponent(title)
-									$('#profile-details').append(profilePost(pauthor,ppfp,pdesc,pcount,pid,phtml) );
-								<% }) %>
-							<% } else { %>
-								var titlePost = 'No Posts';
-								var contentPost = 'This user currently has no posts.';
-								var postElement = createPost(titlePost, contentPost, '');
-								$("#profile-details").append(postElement.spacer);
-								$("#profile-details").append(postElement.titlePost);
-								$("#profile-details").append(postElement.contentPost);
-							<% } %>
-							
-							
-						</script>
-					</main>
+						<br><br>
+						<h2>Recent User Posts</h2>
+						<main>
+							<script>
+								function showPost() {
+									<% var ctr = 0; %>
+									<% if (user.posts.length > 0) { %>
+										<% user.posts.forEach((post) => { %>
+											<% if (ctr < 5) { %>
+												console.log("Post Title:", '<%= post.title %>');
+												console.log("Post Content:", '<%= post.content %>');
+												console.log("Create Date:", '<%= post.dateCreated %>');
+												var title = '<%= post.title %>';
+												var content = '<%= post.content %>';
+												var createDate = '<%= post.dateCreated %>';
+												pauthor = '<%= user.username %>';
+												ppfp = '<%= user.photo %>'; //temp
+												pdesc = '<%= post.title %>';
+												pcount = '<%= post.rating %>';
+												pid = '<%= post._id %>';
+												phtml = '/post/' + encodeURIComponent(title);
+												$('#profile-details').append(profilePost(pauthor, ppfp, pdesc, pcount, pid, phtml));
+												<% ctr++; %>
+												<% if (ctr === 5)	 { %>
+												$('#profile-details').append('<button id="hidden-button" onclick="showAllPosts()">Show All Posts</button>');
+												var hiddenPosts = document.createElement('div');
+												hiddenPosts.id = 'hidden-posts';
+												hiddenPosts.style.display = 'none';
+												$('#profile-details').append(hiddenPosts);
+											<% } %>
+											<% } else{ %>
+												var title = '<%= post.title %>';
+												var content = '<%= post.content %>';
+												var createDate = '<%= post.dateCreated %>';
+												pauthor = '<%= user.username %>';
+												ppfp = '<%= user.photo %>'; //temp
+												pdesc = '<%= post.title %>';
+												pcount = '<%= post.rating %>';
+												pid = '<%= post._id %>';
+												phtml = '/post/' + encodeURIComponent(title);
+												$('#hidden-posts').append(profilePost(pauthor, ppfp, pdesc, pcount, pid, phtml));
+												<% ctr++; %>
+											<% } %>
+										<% }) %>
+									<% } else { %>
+										var titlePost = 'No Posts';
+										var contentPost = 'This user currently has no posts.';
+										var postElement = createPost(titlePost, contentPost, '');
+										$("#profile-details").append(postElement.spacer);
+										$("#profile-details").append(postElement.titlePost);
+										$("#profile-details").append(postElement.contentPost);
+									<% } %>
+								}
+								showPost();
+								function showAllPosts() {
+									$('#hidden-posts').show();
+									$('#hidden-button').hide();
+								}
+
+
+
+
+								</script>
+								
+								<script>
+								function showComments() {
+									$("#profile-details").append("<h2>Recent User Comments</h2>");
+									<% var ctr = 0; %>
+									<% if (user.comments.length > 0) { %>
+										<% user.comments.forEach((comments) => { %>
+											<% if (ctr < 5) { %>
+				
+												pauthor = '<%= user.username %>';
+												ppfp = '<%= user.photo %>'; //temp
+												pdesc = '<%= comments.content %>';
+												pcount = '<%= comments.rating %>';
+												pid = '<%= comments._id %>';
+												phtml = '/post/' + encodeURIComponent('<%= comments.parentPostTitle %>');
+												$('#profile-details').append(profilePost(pauthor, ppfp, pdesc, pcount, pid, phtml));
+												<% ctr++; %>
+												<% if (ctr === 5)	 { %>
+												$('#profile-details').append('<button id="comment-button" onclick="showAllComments()">Show All Comments</button>');
+												// $('#profile-details').append('<div id="hidden-comments" style="display: none;">');
+												var hiddenComments = document.createElement('div');
+												hiddenComments.id = 'hidden-comments';
+												hiddenComments.style.display = 'none';
+												$('#profile-details').append(hiddenComments);
+											<% } %>
+											<% } else{ %>
+								
+												pauthor = '<%= user.username %>';
+												ppfp = '<%= user.photo %>'; //temp
+												pdesc = '<%= comments.content %>';
+												pcount = '<%= comments.rating %>';
+												pid = '<%= comments._id %>';
+												phtml = '/post/' + encodeURIComponent('<%= comments.parentPostTitle %>');
+												$('#hidden-comments').append(profilePost(pauthor, ppfp, pdesc, pcount, pid, phtml));
+												<% ctr++; %>
+											<% } %>
+										<% }) %>
+									<% } else { %>
+										var titlePost = 'No Comments';
+										var contentPost = 'This user currently has no comments.';
+										var postElement = createPost(titlePost, contentPost, '');
+										$("#profile-details").append(postElement.spacer);
+										$("#profile-details").append(postElement.titlePost);
+										$("#profile-details").append(postElement.contentPost);
+									<% } %>
+								}
+								showComments();
+								function showAllComments() {
+									$('#hidden-comments').show();
+									$('#comment-button').hide();
+								}
+							</script>
+						</main>
+					</div>
 				</div>
 			</div>
-		</div>
-	</body>
-	<!-- <div>   temporary basurahan for the comment shit.
-		for some reason, it causes a bug sa /profile/:username.
-		but the post shit works normally in /profile  so idk what's wrong lol
-		//might just remove since it'll be annoying to get the parentPost links for the comments :D
-							// <% if (user.comments.length > 0) { %>
-							// 	<% user.comments.forEach((comment) => { %>
-							// 		var commentContent = '<%= comment.content %>';
-							// 		var createDate = '<%= comment.dateCreated %>'
-							// 		var commentElement = createComment(commentContent, createDate);
-
-							// 		$("#profile-details").append(commentElement.spacer);
-							// 		$("#profile-details").append(commentElement.content);
-							// 		$("#profile-details").append(commentElement.createDate);
-							// 		<% }) %>
-							// <% } else { %>
-							// 	let titleComment = 'No Comments';
-							// 	let contentComment = 'This user currently has no commented posts.';
-							// 	let commentElement = createPost(titleComment, contentComment);
-							// 	$("#profile-details").append(postElement.spacer);
-							// 	$("#profile-details").append(postElement.title);
-							// 	$("#profile-details").append(postElement.content);
-							// 	<% } %>
-	</div> -->
-</html>
-	
+		</body>
+	</html>
