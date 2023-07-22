@@ -883,6 +883,7 @@ app.post("/api/comment", async (req, res) => {
       console.log("parent post id as string:", parentPostID);
       let parentPostIdObject = new mongoose.Types.ObjectId(parentPostID); //converts the string representation parentPostID to mongoose id
       let parentCommentIdObject = null;
+      const currentDate = new Date();
       if(parentCommentID){
         parentCommentIdObject = new mongoose.Types.ObjectId(parentCommentID);
       }
@@ -894,6 +895,7 @@ app.post("/api/comment", async (req, res) => {
         userID: user._id,
         author: user.username,
         content,
+        createDate:currentDate,
         parentPostID: parentPostIdObject, // Add the parent post if available
         parentCommentID: parentCommentIdObject, // Add the parent comment if available
       });
