@@ -552,7 +552,8 @@ function handleReply(postID,replyContent,parentID,checker) {
           if (response.ok) {
             // Handle successful reply creation
             // Reload or update the comments section if needed
-            window.location.href = "/post/" + encodeURIComponent(ptitle);
+            //window.location.href = "/post/" + encodeURIComponent(pid);
+            window.location.reload();
           } else {
             throw new Error('Failed to create reply');
           }
@@ -578,7 +579,8 @@ function handleReply(postID,replyContent,parentID,checker) {
       })
         .then(response => {
           if (response.ok) {
-            window.location.href = "/post/" + encodeURIComponent(ptitle);
+            //window.location.href = "/post/" + encodeURIComponent(pid);
+            window.location.reload();
           } else {
             throw new Error('Failed to delete the post');
           }
@@ -610,8 +612,9 @@ function handleReply(postID,replyContent,parentID,checker) {
           if (response.ok) {
             // Handle successful post update
             // Reload the page to see the updated post details
-            const encodedTitle = encodeURIComponent(newTitle); // Assuming newTitle is the updated title
-            window.location.replace(`/post/${encodedTitle}`);
+            //const encodedTitle = encodeURIComponent(newTitle); // Assuming newTitle is the updated title
+            //window.location.replace(`/post/${encodedTitle}`);
+            window.location.reload();
           } else {
             throw new Error('Failed to update post');
           }

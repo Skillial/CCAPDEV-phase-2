@@ -63,7 +63,7 @@
 									pdesc = '<%= post.title %>',
 									pcount = '<%= post.rating %>',
 									pid='<%= post._id %>',
-									phtml='/post/' + encodeURIComponent(title)
+									phtml='/post/' + encodeURIComponent(pid)
 									$('#profile-details').append(profilePost(pauthor,ppfp,pdesc,pcount,pid,phtml) );
 								<% }) %>
 							<% } else { %>
@@ -73,6 +73,7 @@
 								$("#profile-details").append(postElement.spacer);
 								$("#profile-details").append(postElement.titlePost);
 								$("#profile-details").append(postElement.contentPost);
+								
 							<% } %>
 							
 							
