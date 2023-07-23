@@ -117,12 +117,12 @@
       
           <% if (child.parentCommentID === null) { %>
           $('#' + '<%= child._id %>').append(replyResult);
-          <% if (count==5 & child.childComments.length > 0) {%>
+          <% if (count==15 & child.childComments.length > 0) {%>
             $('#' + '<%= child._id %>').append(showMoreButton('<%= child._id %>'));
             <%}%>
           <% } else { %>
           $('#' + parentCommentId).append(replyResult);
-          <% if (count==5 & child.childComments.length > 0) {%>
+          <% if (count==15 & child.childComments.length > 0) {%>
             
             $('#' + '<%= child._id %>').append(showMoreButton('<%= child._id %>'));
             <%}%>
@@ -155,7 +155,7 @@
       
         
       
-      <% if (child.childComments.length > 0 & count < 5) {
+      <% if (child.childComments.length > 0 & count < 15) {
         processChildComments(child.childComments);
       }
      
