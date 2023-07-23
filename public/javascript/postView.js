@@ -131,6 +131,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
 
 
     comment_edit.onclick = function() {
+      comment_edit.style.display='none';
         comment_save.style.display = 'inline';
         post_img.contentEditable = true;
         post_img.style.border = '1px solid red';
@@ -139,6 +140,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
         buttons.appendChild(comment_save);
       
         comment_save.onclick = function() {
+          comment_edit.style.display='inline';
           comment_save.style.display = 'none';
           post_img.contentEditable = false;
           post_img.style.border = 'none';
