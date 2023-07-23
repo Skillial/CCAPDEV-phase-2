@@ -47,10 +47,10 @@
 										<% user.posts.forEach((post) => { %>
 											<% if (ctr < 5) { %>
 												console.log("Post Title:", '<%= post.title %>');
-												console.log("Post Content:", '<%= post.content %>');
+												
 												console.log("Create Date:", '<%= post.dateCreated %>');
 												var title = '<%= post.title %>';
-												var content = '<%= post.content %>';
+												
 												var createDate = '<%= post.dateCreated %>';
 												pauthor = '<%= user.username %>';
 												ppfp = '<%= user.photo %>'; //temp
@@ -69,7 +69,7 @@
 											<% } %>
 											<% } else{ %>
 												var title = '<%- post.title %>';
-												var content = '<%- post.content %>';
+												
 												var createDate = '<%= post.dateCreated %>';
 												pauthor = '<%= user.username %>';
 												ppfp = '<%= user.photo %>'; //temp
@@ -111,7 +111,7 @@
 				
 												pauthor = '<%= user.username %>';
 												ppfp = '<%= user.photo %>'; //temp
-												pdesc = '<%- he.decode(comments.content) %>';
+												pdesc = '<%- he.decode(comments.content).replace(/\r\n|\r|\n/g, "") %>';
 												pcount = '<%= comments.rating %>';
 												pid = '<%= comments._id %>';
 												phtml = '/post/' + encodeURIComponent('<%= comments.parentPostID %>');
@@ -129,7 +129,7 @@
 								
 												pauthor = '<%= user.username %>';
 												ppfp = '<%= user.photo %>'; //temp
-												pdesc = '<%- comments.content %>';
+												pdesc = '<%- comments.content.replace(/\r\n|\r|\n/g, "") %>';
 												pcount = '<%= comments.rating %>';
 												pid = '<%= comments._id %>';
 												phtml = '/post/' + encodeURIComponent('<%= comments.parentPostID %>');

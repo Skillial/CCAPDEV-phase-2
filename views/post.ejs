@@ -30,7 +30,7 @@
         <% if (!post.isDeleted) { %>
           let pauthor = '<%= post.author %>',
               ptitle = '<%- post.title %>',
-              pdesc = "<%- post.content.replace(/\r\n|\r|\n/g, " <br> ") %>",
+              pdesc = "<%- post.content.replace(/\r\n|\r|\n/g, "") %>",
               ppostedDate = new Date('<%= post.createDate %>').toLocaleString();
           let peditedDate = '<%= post.editDate %>';
           if (peditedDate) {

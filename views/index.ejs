@@ -96,7 +96,7 @@
               <!-- <% link = "/post/" + encodeURIComponent(title) %> -->
               <% link = "/post/" + encodeURIComponent(_id) %>
               <script>
-                $('#forum').append(createPost('<%- title %>', "<%- content.replace(/\r\n|\r|\n/g, "<br>") %>", '<%= author %>', '<%= rating %>', '<%= media %>', '<%= profile %>', '<%= link %>','<%= _id %>', '<%= userReaction%>' ));
+                $('#forum').append(createPost('<%- title %>', "<%- content.replace(/\r\n|\r|\n/g, " ") %>", '<%= author %>', '<%= rating %>', '<%= media %>', '<%= profile %>', '<%= link %>','<%= _id %>', '<%= userReaction%>' ));
                 
               </script>
             <% } %>

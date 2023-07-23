@@ -55,7 +55,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
     headers.appendChild(span);
      topic.appendChild(headers);
     
-    post_img.textContent=pdesc;
+    post_img.innerHTML=pdesc;
     // post_img.contentEditable = true; 
     post.appendChild(post_img);
     post.appendChild( document.createElement('br'));
@@ -270,7 +270,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
     comment_profile.appendChild(comment_pfp);
     comment_profile.appendChild(author);
     comment_container.appendChild(comment_profile);
-    desc.textContent=pdesc;
+    desc.innerHTML=pdesc;
     comment_profile.style.cursor = 'pointer';
     if (pcount!=="N/A"){
     comment_profile.onclick = function(){
@@ -462,7 +462,7 @@ function profilePost(pauthor,ppfp,pdesc,pcount,pid,phtml){
     comment_profile.appendChild(comment_pfp);
     comment_profile.appendChild(author);
     comment_container.appendChild(comment_profile);
-    desc.textContent=pdesc;
+    desc.innerHTML=pdesc;
     desc.onclick = function() {
         window.location.href = phtml;
     };

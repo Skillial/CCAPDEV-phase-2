@@ -654,7 +654,7 @@ app.post("/api/post", async (req, res) => {
       const user = await User.findById(userId);
       let { title, content } = req.body;
       title = title.replace(/'/g, "\\'").replace(/"/g, '\\"');
-      content = content.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n');
+      content = content.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n(?=.)/g, "<br>");
 
       // Create a new post object
       const newPost = new Post({
@@ -798,7 +798,7 @@ app.patch("/api/post/:id", async (req, res) => {
 
     if (req.body.content) {
       content = req.body.content;
-      content = content.replace(/'/g, "\\'").replace(/"/g, '\\"');
+      content = content.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n(?=.)/g, "<br>");
       post.content = content;
     }
     
@@ -839,7 +839,7 @@ app.post("/api/comment", async (req, res) => {
       const masterPost = await Post.findById(parentPostIdObject); //gets master post of the comment, no matter the depth
       console.log("Master post object: ", masterPost);
       // Create a new comment object
-      content = content.replace(/'/g, "\\'").replace(/"/g, '\\"');
+      content = content.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n(?=.)/g, "<br>");
       const newComment = new Comment({
         userID: user._id,
         author: user.username,
@@ -880,7 +880,7 @@ app.patch("/api/comment/:id", async (req, res) => {
     //Updating comment fields
     if (req.body.content) {
       content = req.body.content;
-      content = content.replace(/'/g, "\\'").replace(/"/g, '\\"');
+      content = content.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n(?=.)/g, "<br>");
       comment.content = content;
     }
 
