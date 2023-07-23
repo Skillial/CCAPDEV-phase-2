@@ -1,8 +1,11 @@
-
+<!DOCTYPE html>
 <html>
     <head>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script>
+        <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+        <script>tinymce.init({selector:"#postContent",
+        menubar: 'edit   format',
+        statusbar: false});    
             </script>
             <% if (isLoggedIn) {%>
                 <script src="/javascript/react.js" type="text/javascript"></script>
@@ -58,13 +61,41 @@
             </tr>
         </table>
     </div>
+    <script>
+      tinymce.init({
+    selector: "#postContent",
+    // Additional configuration options if needed
+  });
+
+  // Function to validate the TinyMCE content before form submission
+  function validateForm() {
+    // Get the TinyMCE editor instance
+    const editor = tinymce.get("postContent");
+    
+    // Get the content of the editor
+    const content = editor.getContent();
+
+    // Check if the content is empty or null
+    if (!content || content.trim() === "") {
+      // Display an error message or handle the validation as per your requirements
+      alert("Please enter some content.");
+      return false; // Prevent form submission
+    }
+
+    // If the content is valid, you can proceed with form submission
+    return true;
+  }
+</script>
     <div id="newPostFormContainer">
         <h2>New Snacc</h2>
-        <form id="postForm" method="POST" action="<%= '/api/post' %>">
+        <form id="postForm" method="POST" action="<%= '/api/post' %>" onsubmit="return validateForm();">
             <label for="title">Title:</label>
             <input type="text" id="postTitle" name="title" required>
             <label for="content">Content:</label>
-            <textarea id="postContent" name="content" required></textarea>
+            <textarea id="postContent" name="content"></textarea>
+            <script>
+
+            </script>
             <!-- <label for="content">Media:</label>
             <input type="file" id="postMedia" name="media"> -->
             <div class="flex">
