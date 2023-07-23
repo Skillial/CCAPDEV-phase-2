@@ -791,6 +791,7 @@ app.get("/post/:id", async (req, res) => {
       const react = await React.findOne({ userID: user._id, parentPostID: post._id });
       const reactValue = react ? react.voteValue : 0;
       console.log(author)
+      // console.log("here"+comments);
       res.render("post", { postID, user, post, author, isCurrUserTheAuthor, comments, reactValue });
     } else {
       const title = req.params.title;
@@ -1131,3 +1132,169 @@ app.get('/searchcomment/:key', async (req, res) => {
 });
 
 
+app.get("/comment/:id", async (req, res) => {
+  try {
+    if (req.session.isLoggedIn) {
+      try {
+        // Retrieve the comment from the database based on the ID
+        const commentID = new mongoose.Types.ObjectId(req.params.id);
+        const comment = await Comment.findOne({ _id: commentID });
+        const commentAuthor = await User.findOne({username: comment.author});
+        console.log(commentAuthor.photo);
+        comment.userID= commentAuthor;
+        if (!comment) {
+          return res.status(404).json({ error: "Comment not found." });
+        }
+    
+        // Retrieve the post associated with the comment
+        const post = await Post.findOne({ _id: comment.parentPostID });
+        
+        if (!post) {
+          return res.status(404).json({ error: "Post not found." });
+        }
+    
+        // Currently logged in user
+        const userId = req.session.userId;
+        const user = await User.findById(userId);
+        const postID = post._id;
+        const decodedTitle = he.decode(post.title);
+        const decodedContent = he.decode(post.content);
+        post.title = decodedTitle;
+        post.content = decodedContent;
+    
+        // A recursive function to fetch comments of comments and so on
+        async function fetchChildComments(comment) {
+          const childComments = await Comment.find({ parentCommentID: comment._id })
+            .populate("userID")
+            .exec();
+    
+          if (childComments.length === 0) {
+            return [];
+          }
+    
+          const recursiveChildComments = await Promise.all(
+            childComments.map(async (childComment) => {
+              childComment.childComments = await fetchChildComments(childComment);
+              const userReaction = await React.findOne({
+                userID: userId,
+                parentCommentID: childComment._id,
+                isVoted: true,
+              });
+              childComment.userReaction = userReaction ? userReaction.voteValue : 0;
+    
+              const positiveCount = await React.countDocuments({ parentCommentID: childComment._id, voteValue: 1 });
+              const negativeCount = await React.countDocuments({ parentCommentID: childComment._id, voteValue: -1 });
+              const ratingCount = positiveCount - negativeCount;
+              childComment.rating = ratingCount;
+    
+              const decodedContent = he.decode(childComment.content);
+              childComment.content = decodedContent;
+              return childComment;
+            })
+          );
+    
+          return recursiveChildComments;
+        }
+        
+        // Fetch comments recursively for the main comment
+        comment.childComments = await fetchChildComments(comment);
+    
+        const userReaction = await React.findOne({
+          userID: userId,
+          parentCommentID: comment._id,
+          isVoted: true,
+        });
+        comment.userReaction = userReaction ? userReaction.voteValue : 0;
+    
+        const positiveCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: 1 });
+        const negativeCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: -1 });
+        const ratingCount = positiveCount - negativeCount;
+        comment.rating = ratingCount;
+    
+        comment.content = he.decode(comment.content);
+    
+        // Store the modified comment object in the comments constant as an array with a single element
+        const comments = [comment];
+    
+        // Author of the post
+        const author = await User.findOne({ username: post.author });
+        const isCurrUserTheAuthor = author.username === user.username;
+    
+        // If user has already reacted or not
+        const react = await React.findOne({ userID: user._id, parentPostID: post._id });
+        const reactValue = react ? react.voteValue : 0;
+    
+        console.log(author);
+        console.log("comments:", comments);
+    
+        res.render("comment", { postID, user, post, author, isCurrUserTheAuthor, comments, reactValue });
+      } catch (error) {
+        console.error("Error:", error);
+        // Handle any potential errors and send an appropriate response
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+    } else {
+      const title = req.params.title;
+      const post = await Post.findOne({ title });
+
+      if (!post) {
+        return res.status(404).json({ error: "Post not found." });
+      }
+ 
+      // Fetch all top-level comments for the post
+      const topLevelComments = await Comment.find({ parentPostID: post._id, parentCommentID: null })
+        .populate("userID") // Populate the user details for each comment
+        .exec();
+
+      // A recursive function to fetch comments of comments and so on
+      async function fetchChildComments(comment) {
+        console.log("poster name: ", comment.userID.username);
+        const childComments = await Comment.find({ parentCommentID: comment._id })
+          .populate("userID")
+          .exec();
+
+        if (childComments.length === 0) {
+          return [];
+        }
+
+        const recursiveChildComments = await Promise.all(
+          childComments.map(async (childComment) => {
+            childComment.childComments = await fetchChildComments(childComment);
+            const positiveCount = await React.countDocuments({ parentCommentID: childComment._id, voteValue: 1 });
+            const negativeCount = await React.countDocuments({ parentCommentID: childComment._id, voteValue: -1 });
+            const ratingCount = positiveCount - negativeCount;
+            childComment.rating = ratingCount;
+            const decodedContent = he.decode(childComment.content);
+            childComment.content = decodedContent;
+            return childComment;
+          })
+        );
+
+        return recursiveChildComments;
+      }
+
+      // Fetch comments recursively for each top-level comment
+      const comments = await Promise.all(
+        topLevelComments.map(async (comment) => {
+          comment.childComments = await fetchChildComments(comment);
+          const positiveCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: 1 });
+          const negativeCount = await React.countDocuments({ parentCommentID: comment._id, voteValue: -1 });
+          const ratingCount = positiveCount - negativeCount;
+          comment.rating = ratingCount;
+          const decodedContent = he.decode(comment.content);
+          comment.content = decodedContent;
+          return comment;
+        })
+      );
+      const author = await User.findOne({ username: post.author });
+      const reactValue = 0;
+      const isCurrUserTheAuthor = false;
+      const user = User.schema;
+      user.username='visitor';
+      res.render("post", { post, comments, author, reactValue,isCurrUserTheAuthor,user });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error." });
+  }
+});

@@ -65,6 +65,7 @@
 
     let url = "https://script.google.com/macros/s/AKfycbzHrW44F8-PC41XVJyvuyf9dcVVWDjUcSQPpUdCPfZIh6meEEINS7WAAG5vV2PoShvi/exec";
     let file = dataURItoBlob(canvasData);
+    // let file = document.getElementById("fileInput");
     let fr = new FileReader();
     fr.addEventListener('loadend', () => {
         let res = fr.result;

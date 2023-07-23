@@ -51,7 +51,33 @@
           $('.content_list').append('<div>The original post was deleted, but you can still view the comments.</div>');
         <% } %>
       </script>
-
+   <script>
+    $('.border').append(goBackButton('<%= post._id %>'));
+    function goBackButton(id){
+          let comment_forum = document.createElement('div'),
+            comment_wrapping = document.createElement('div'),
+            comment_align = document.createElement('div'),
+            comment_container = document.createElement('div'),
+            ShowMore = document.createElement('p');
+            ShowMore.textContent = "Go Back to Original Post";
+            ShowMore.style.fontWeight = 'bolder';
+            ShowMore.style.fontSize='20px';
+            comment_align.className = 'comment_align';
+            comment_forum.className = 'comment_forum';
+            comment_container.className = 'comment_container';
+            comment_wrapping.className = 'comment_wrapping';
+            comment_container.appendChild(ShowMore);
+            comment_container.style.justifyContent = 'center';
+            comment_container.style.cursor='pointer';
+            comment_container.onclick = function(){
+              window.location.href = "/post/"+encodeURIComponent(id);
+            }
+            comment_forum.appendChild(comment_container);
+            comment_wrapping.appendChild(comment_forum);
+            comment_align.appendChild(comment_wrapping);
+            return comment_align;
+        }
+</script>
 <% comments.forEach(comment => { %>
   <% var count=1;%>
   <% console.log(count);%>
@@ -91,14 +117,14 @@
       
           <% if (child.parentCommentID === null) { %>
           $('#' + '<%= child._id %>').append(replyResult);
-          <% if (count==5) {%>
+          <% if (count==5 & child.childComments.length > 0) {%>
             $('#' + '<%= child._id %>').append(showMoreButton('<%= child._id %>'));
             <%}%>
           <% } else { %>
           $('#' + parentCommentId).append(replyResult);
-          <% if (count==5) {%>
+          <% if (count==5 & child.childComments.length > 0) {%>
             
-            $('#' + parentCommentId).append(showMoreButton('<%= child._id %>'));
+            $('#' + '<%= child._id %>').append(showMoreButton('<%= child._id %>'));
             <%}%>
           <% } %>
         });
@@ -141,6 +167,7 @@
 %>
 
 <% }); %>
+
     </div>
   </body>
 </html>
