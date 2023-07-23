@@ -6,8 +6,7 @@
 //     - add/fix landing pages or alerts for errors and successes
 //     - fix other pages (profile-edit.ejs, success.ejs, logout.ejs)
 //     - paganda editing ng comments and post (?)
-//    - limiting number of posts/comments shown in a page (maybe add page 1, 2...)
-//    - maybe add date posted in /index. also maybe limit num of posts shown for users, then add a paging thing?
+//    - limiting number of posts/comments shown in a page (maybe add page 1, 2...)  
 //    - double check session/cookie lifespan
   
 //   ## Functionalities DONE FOR SURE
@@ -17,7 +16,7 @@
 //    - Comment: new comment, patch comment, delete comment -> maybe paganda patching, make it more obvious that fields are editable
 //    - Reacting: new reacts, editing reacts, removing reacts
 //    - Search
-//    - Sort by date and by 'most popular' -> a little slow, just store the ratings in the post mismo..? (future update)
+//    - Sort by date and by 'most popular' -> a bit faster, also added caching
 
 require('dotenv').config();
 const link = process.env.DB_URL;
