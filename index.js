@@ -225,7 +225,7 @@ app.get("/index", async (req, res) => {
 
     let cachedPosts = req.session.cachedPosts;
     let noUpdate = req.session.cachedNoUpdate;
-    const cacheExpirationTime = 5;
+    const cacheExpirationTime = 2;
     //noUpdate = false;
     //let temp = await Post.find({isDeleted: false});
     const cacheTimestamp = req.session.cacheTimestamp;
