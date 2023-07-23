@@ -2,6 +2,7 @@
 		<head>
 			<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 			<script src="/javascript/react.js"></script>
+			<script src="/javascript/live.js"></script>
 			<title>
 				<%= user.username %>'s Profile - SnaccOverflow
 			</title>
@@ -36,8 +37,7 @@
 						<article align="justify">
 							<%- user.aboutme %>
 						</article>
-
-						<br><br>
+						<div class="space"></div>
 						<h2>Recent User Posts</h2>
 						<main>
 							<script>
@@ -103,7 +103,7 @@
 								
 								<script>
 								function showComments() {
-									$("#profile-details").append("<h2>Recent User Comments</h2>");
+									$("#profile-details").append("<div class=\"space\"></div><h2>Recent User Comments</h2>");
 									<% var ctr = 0; %>
 									<% if (user.comments.length > 0) { %>
 										<% user.comments.forEach((comments) => { %>
