@@ -30,7 +30,7 @@
         <% if (!post.isDeleted) { %>
           let pauthor = '<%= post.author %>',
               ptitle = '<%- post.title %>',
-              pdesc = '<%- post.content %>',
+              pdesc = "<%- post.content.replace(/\r\n|\r|\n/g, " <br> ") %>",
               ppostedDate = new Date('<%= post.createDate %>').toLocaleString();
           let peditedDate = '<%= post.editDate %>';
           if (peditedDate) {
@@ -57,7 +57,7 @@
   <% console.log(count);%>
   <% if (!comment.isDeleted){ %>
   <script>
-      var commentElement = postreply('<%= comment.author %>','<%= comment.userID.photo %>','<%- comment.content %>', '<%= comment.rating %>', '<%= comment._id %>','<%= user.username%>',postID,'<%=isLoggedIn%>','<%=comment.userReaction %>', '<%=comment.createDate%>','<%=comment.editDate%>');
+      var commentElement = postreply('<%= comment.author %>','<%= comment.userID.photo %>',"<%- comment.content.replace(/\r\n|\r|\n/g, "<br>") %>", '<%= comment.rating %>', '<%= comment._id %>','<%= user.username%>',postID,'<%=isLoggedIn%>','<%=comment.userReaction %>', '<%=comment.createDate%>','<%=comment.editDate%>');
       $('.border').append(commentElement);
   </script>
   <% } else { %>
@@ -77,7 +77,7 @@
           console.log("hi " + parentCommentId);
           var username = '<%= child.userID.username %>';
           var ppfp = '<%= child.userID.photo %>';
-          var content = '<%- child.content %>';
+          var content = "<%- child.content.replace(/\r\n|\r|\n/g, "<br>") %>";
           var rating = '<%= child.rating %>';
           var childId = '<%= child._id %>';
           var user = '<%= user.username %>';

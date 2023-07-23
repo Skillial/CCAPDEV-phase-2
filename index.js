@@ -654,7 +654,8 @@ app.post("/api/post", async (req, res) => {
       const user = await User.findById(userId);
       let { title, content } = req.body;
       title = title.replace(/'/g, "\\'").replace(/"/g, '\\"');
-      content = content.replace(/'/g, "\\'").replace(/"/g, '\\"');
+      content = content.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n');
+
       // Create a new post object
       const newPost = new Post({
         userID: user._id,
@@ -665,6 +666,7 @@ app.post("/api/post", async (req, res) => {
       });
 
       // Save the new post object to the database
+      req.session.cachedNoUpdate = false;
       await newPost.save();
       res.redirect("/index");
     } else {
@@ -693,12 +695,14 @@ app.get("/post/:id", async (req, res) => {
     const isUserLoggedIn = req.session?.isLoggedIn;
     let user, reactValue, isCurrUserTheAuthor;
     const userId = req.session.userId;
+    const author = await User.findOne({ username: post.author });
     if (isUserLoggedIn) {
-      
       user = await User.findById(userId);
       const react = await React.findOne({ userID: userId, parentPostID: post._id });
       reactValue = react ? react.voteValue : 0;
-      isCurrUserTheAuthor = post.userID.toString() === userId;
+      isCurrUserTheAuthor = post.userID._id.toString() === userId.toString();
+      //console.log(post);
+      console.log("are you author?", isCurrUserTheAuthor);
     } else {
       user = { username: "visitor" }; // If user is not logged in, set a default user
       reactValue = 0;
@@ -760,8 +764,8 @@ app.get("/post/:id", async (req, res) => {
         return comment;
       })
     );
-
-    const author = await User.findOne({ username: post.author });
+    console.log("are you author?", isCurrUserTheAuthor);
+    
     res.render("post", { post, user, author, isCurrUserTheAuthor, comments, reactValue });
   } catch (error) {
     console.error(error);
