@@ -231,18 +231,25 @@ app.get("/index", async (req, res) => {
 
     let cachedPosts = req.session.cachedPosts;
     let noUpdate = req.session.cachedNoUpdate;
+    const cacheExpirationTime = 5;
     //noUpdate = false;
-    let temp = await Post.find({isDeleted: false});
-    console.log(cachedPosts)
-    if (noUpdate) {
-        posts = cachedPosts;
+    //let temp = await Post.find({isDeleted: false});
+    const cacheTimestamp = req.session.cacheTimestamp;
+    const currentTime = new Date().getTime();
+    const cacheAgeInMinutes = (currentTime - cacheTimestamp) / (1000 * 60);
+    //console.log(cachedPosts)
+    console.log(noUpdate && (cacheAgeInMinutes <= cacheExpirationTime));
+    //if (noUpdate || !(cacheAgeInMinutes <= cacheExpirationTime)) {
+    if(noUpdate && (cacheAgeInMinutes <= cacheExpirationTime)){
+      posts = cachedPosts;
     } else {
+      req.session.cacheTimestamp = new Date().getTime();
       req.session.cachedNoUpdate = true;
       const queryConditions = isUserLoggedIn ? { isDeleted: false } : { isDeleted: false, /* Add any other conditions if needed for non-logged-in users */ };
 
       // Retrieve posts based on query conditions
       posts = await Post.find(queryConditions);
-      console.log(posts);
+      //console.log(posts);
       // Get the number of positive and negative votes for each post and calculate hotness
       for (let i = 0; i < posts.length; i++) {
         const post = posts[i];
@@ -669,7 +676,8 @@ app.post("/api/post", async (req, res) => {
       const userId = req.session.userId;
       const user = await User.findById(userId);
       const { title, content } = req.body;
-
+      title = title.replace(/'/g, "\\'").replace(/"/g, '\\"');
+      content = content.replace(/'/g, "\\'").replace(/"/g, '\\"');
       // Create a new post object
       const newPost = new Post({
         userID: user._id,
@@ -874,13 +882,17 @@ app.patch("/api/post/:id", async (req, res) => {
     console.log("is user the author2? ", post.userID.toString() != req.session.userId.toString(), " ", post.userID.toString(), " ", req.session.userId.toString());
     // Update the post fields based on the data in the request body
     if (req.body.title) {
-      post.title = req.body.title;
+      title = req.body.title;
+      title = title.replace(/'/g, "\\'").replace(/"/g, '\\"');
+      post.title = title;
     }
 
     if (req.body.content) {
-      post.content = req.body.content;
+      content = req.body.content;
+      content = content.replace(/'/g, "\\'").replace(/"/g, '\\"');
+      post.content = content;
     }
-
+    
     // Check if the 'isDeleted' field exists in the request body
     // If it does, update the 'isDeleted' field in the post
     if (req.body.isDeleted !== undefined) {
@@ -918,6 +930,7 @@ app.post("/api/comment", async (req, res) => {
       const masterPost = await Post.findById(parentPostIdObject); //gets master post of the comment, no matter the depth
       console.log("Master post object: ", masterPost);
       // Create a new comment object
+      content = content.replace(/'/g, "\\'").replace(/"/g, '\\"');
       const newComment = new Comment({
         userID: user._id,
         author: user.username,
@@ -957,7 +970,9 @@ app.patch("/api/comment/:id", async (req, res) => {
     console.log(comment)
     //Updating comment fields
     if (req.body.content) {
-      comment.content = req.body.content;
+      content = req.body.content;
+      content = content.replace(/'/g, "\\'").replace(/"/g, '\\"');
+      comment.content = content;
     }
 
     // Check if the 'isDeleted' field exists in the request body

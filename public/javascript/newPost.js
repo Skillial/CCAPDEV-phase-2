@@ -57,7 +57,8 @@ function createPost(title, desc, author, rating, media, profile, link, pid, user
     window.location.href = profile;
   };
 	post_title.appendChild(post_author);
-	post_description.textContent = desc;
+	post_description.innerHTML = desc;
+  console.log(desc);
 	post_description.setAttribute('align', 'justify');
 	// if (media.localeCompare(' ') !== 0) {
 	// 	post_description.appendChild(document.createElement('br'));
