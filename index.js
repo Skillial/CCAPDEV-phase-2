@@ -1045,7 +1045,7 @@ app.get('/searchcomment/:key', async (req, res) => {
     const post = await Post.findOne({ _id: parentPostID });
     if (post) {
       const postTitle = post.title;
-      res.json({ postTitle });
+      res.json({ post });
     } else {
       res.status(404).json({ error: 'Post not found.' });
     }

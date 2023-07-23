@@ -243,22 +243,34 @@ async function updatePostChoices(choices) {
     let textContent = '';
 
     if (title) {
-      textContent = title;
+      textContent = choice;
+      if (textContent && !existingTextContent.has(textContent)) {
+        const li = document.createElement('li');
+        li.textContent = choice.title;
+        li.onclick = () => {
+          window.location.href = `/post/${encodeURIComponent(choice._id)}`;
+        };
+        searchChoices.appendChild(li);
+        existingTextContent.add(textContent);
+      }
     } else if (parentPostID) {
       const response = await fetch(`/searchcomment/${parentPostID}`);
       const data = await response.json();
-      textContent = data.postTitle || '';
+      textContent = data.post || '';
+      // console.log(textContent);
+      if (textContent.title && !existingTextContent.has(textContent.title)) {
+        const li = document.createElement('li');
+        // console.log(data);
+        li.textContent = textContent.title  ;
+        li.onclick = () => {
+          window.location.href = `/post/${encodeURIComponent(textContent._id)}`;
+        };
+        searchChoices.appendChild(li);
+        existingTextContent.add(textContent.title);
+      }
     }
 
-    if (textContent && !existingTextContent.has(textContent)) {
-      const li = document.createElement('li');
-      li.textContent = textContent;
-      li.onclick = () => {
-        window.location.href = `/post/${encodeURIComponent(li.textContent)}`;
-      };
-      searchChoices.appendChild(li);
-      existingTextContent.add(textContent);
-    }
+    
   }
 }
   
