@@ -222,6 +222,7 @@ app.get("/profile/edit/", async (req, res) => {
   try {
     const userId = req.session.userId;
     const user = await User.findById(userId);
+    console.log(user);
     res.render("profile-edit", { user, error: null });
   } catch (error) {
     console.error(error);
@@ -334,10 +335,10 @@ app.post("/api/user", async (req, res) => {
       //return res.redirect("/register"); 
     }
 
-    let usernameRegex = /^(?=.*[a-zA-Z0-9])[a-zA-Z0-9_-]*$/;
+    let usernameRegex = /^(?=.{3,15}$)(?=.*[a-zA-Z0-9])[a-zA-Z0-9_-]*$/;
     if (!usernameRegex.test(username) || username.toLowerCase() === "visitor") {
       //req.flash("error", "Username must contain at least one letter or number and cannot be 'visitor'!");
-      return res.status(400).render("register", { error: "Username must contain at least one letter or number and cannot be 'visitor'!" });
+      return res.status(400).render("register", { error: "Username must contain at least one letter or number, and be between 3-15 characters long, and cannot be 'visitor'!" });
       //return res.redirect("/profile-edit"); 
     }
     
@@ -481,7 +482,6 @@ app.get("/profile/:username", async (req, res) => {
       console.log(user);
       // Render the profile page with the user's information
       res.render("profile", { he, user, IsCurrUserTheProfileOwner });
-
   } catch (error) {
     console.error(error);
     //res.status(500).json({ error: "An error occurred while fetching user information." });
@@ -493,6 +493,7 @@ app.patch("/api/user/:username", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
       const userID = req.session.userId;
+      let user = await User.findById(userID)
       const username = req.params.username;
       const newUsername = req.body.username;
       let newPassword = req.body.password;
@@ -502,35 +503,30 @@ app.patch("/api/user/:username", async (req, res) => {
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}$/; 
 
       //console.log(newPassword.length >= MIN_PASSWORD_LENGTH)
-      console.log(passwordRegex.test(newPassword))
-      if (newPassword !== "" && req.body.password === req.body.repassword && passwordRegex.test(newPassword)) {
+      //console.log(passwordRegex.test(newPassword));
+      if(newPassword !== "" && !passwordRegex.test(newPassword)){
+        console.log("asdad");
+        return res.status(400).render("profile-edit", { user, error: "Invalid Password!"});
+      }
+      if (((newPassword !== "") && (req.body.password === req.body.repassword))) {
         console.log("hi")
         updateData.password = newPassword;
       }else{
         delete updateData.password;
         req.session.expires = null;
       }
-      // let usernameCheck = User.findOne({username: newUsername});
-      // if(usernameCheck){
-      //   req.flash("error", "Username already taken!")
-      //   return res.redirect("/profile-edit");
-      // }
 
-      let usernameRegex = /^(?=.*[a-zA-Z0-9])[a-zA-Z0-9_-]*$/;
-      if (!usernameRegex.test(newUsername)) {
-        //req.flash("error", "Username must contain at least one letter or number!");
-        //return res.redirect("/profile-edit"); 
-        return res.status(400).render("profile-edit", { error: "Username must contain at least one letter or number!"});
+      let usernameRegex = /^(?=.{3,15}$)(?=.*[a-zA-Z0-9])[a-zA-Z0-9_-]*$/;
+      if (!usernameRegex.test(newUsername) || newUsername.toLowerCase() === "visitor") {
+        return res.status(400).render("profile-edit", { user, error: "Username must contain at least one letter or number, and be between 3-15 characters long, and cannot be 'visitor!"});
       }
 
       let aboutmeRegex = /^[a-zA-Z0-9\t\n\r\s]*(?![\x22\x27])/;
       if (!aboutmeRegex.test(req.body.aboutme)) {
-        // req.flash("error", "About me cannot contain quotation marks");
-        // return res.redirect("/profile-edit"); 
-        return res.status(400).render("profile-edit", { error: "About me cannot contain quotation marks!"});
+        return res.status(400).render("profile-edit", { user, error: "About me cannot contain quotation marks!"});
       }
 
-      const user = await User.findOneAndUpdate({ username }, updateData, { new: true });
+      user = await User.findOneAndUpdate({ username }, updateData, { new: true });
       await Post.updateMany({ author: username }, { author: newUsername });
       await Comment.updateMany({ author: username }, { author: newUsername });
 
@@ -541,7 +537,7 @@ app.patch("/api/user/:username", async (req, res) => {
       } else {
         // User not found, return appropriate response
         //return res.status(404).json({ error: 'User not found' });
-        return res.status(404).render("profile-edit", { error: "User not found"});
+        return res.status(404).render("profile-edit", { user, error: "User not found"});
       }
     }else{
       res.redirect("/login");
@@ -549,7 +545,8 @@ app.patch("/api/user/:username", async (req, res) => {
   } catch (error) {
     console.error(error);
     //return res.status(500).json({ error: 'An error occurred while updating the profile' });
-    return res.status(500).render("profile-edit", { error: "An error occurred while updating the profile"});
+    let user = User.schema;
+    return res.status(500).render("profile-edit", { user, error: "An error occurred while updating the profile"});
   }
 });
 

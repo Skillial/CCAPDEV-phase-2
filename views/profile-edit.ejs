@@ -48,6 +48,10 @@
 				<input type="submit" value="Save Changes"></button>
 			</div>
         </form>
+        <% if (error) { %>
+            <script>console.log("googabooga");</script>
+            <div class="error-message"><%= error %></div>
+        <% } %>
     </div>
 
     <script>
@@ -139,7 +143,8 @@ function dataURItoBlob(dataURI) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(Object.fromEntries(formData))
+                body: JSON.stringify(Object.fromEntries(formData)),
+                credentials: 'include'
             })
             .then(response => {
                 if (response.ok) {
