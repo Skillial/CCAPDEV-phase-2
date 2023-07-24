@@ -222,7 +222,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
           header_remove.style.border = 'none';
           let edit_add = document.querySelectorAll('#comment_edit_id');
           edit_add.forEach(edit =>{
-            edit.style.display='inline';
+            edit.style.display='';
           });
           let share_remove = document.querySelectorAll('#comment_save_id');
           share_remove.forEach(share =>{

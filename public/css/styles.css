@@ -820,7 +820,7 @@ cursor: pointer;
 	display: flex;
 }
 
-.cancel_save_wrap > div, .comment_react > div, .comment_edit{
+.cancel_save_wrap > div, .comment_react > div, .post_button > div{
 	background-color: var(--highlight-1);
 	border-radius: var(--half-corner-radius);
 	width: 5em;
@@ -834,7 +834,7 @@ cursor: pointer;
 	margin-left: 1em;
 }
 
-.cancel_save_wrap > div:hover, .comment_react > div:hover, .comment_edit{
+.cancel_save_wrap > div:hover, .comment_react > div:hover, .post_button > div:hover{
 	background-color: var(--highlight-2);
 	transform: scale(1);
 	transition: 100ms all linear;
