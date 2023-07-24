@@ -18,18 +18,6 @@
 		<div class="credential-card">
 		<div class="register title">Register</div>
 
-            <% if (typeof successFlash !== 'undefined' && successFlash.length > 0) { %>
-                <div class="alert alert-success">
-                    <%= successFlash %>
-                </div>
-            <% } %>
-
-            <% if (typeof errorFlash !== 'undefined' && errorFlash.length > 0) { %>
-                <div class="alert alert-danger">
-                    <%= errorFlash %>
-                </div>
-            <% } %>
-
 
 
         <form class="form" method="POST" action="/api/user">

@@ -1,29 +1,28 @@
-# MCO1 Specs 2 (Forum)
-Main/Home page: index.html
+# MCO2 Specs 2 (Forum)
 Grp Members:
 Cabrera, Jean
 Dy, Sealtiel
 Lu, Bentley
 Ong, Camron
 
-### Hardcoded Usernames and Passwords Info:
-Usernames:
-1. denial
-1. Ecola
-2. Kinkey
-4. Matrix
-5. poop bandit
+Please do run an `npm i` before running `node index.js` or `nodemon index.js` (if you have nodemon).
+> necessary to install all the node modules (since the folder was included in the .gitignore)
 
-Password: `password`         (same password for all hardcoded users)
+Login information (though you can make your own account(s) as well)
+Format: <Username> - <Password>
+1. JingLiu  - Password1
+2. Paimon   - 1mpacT
+3. Serval   - L4ndau
+4. NotSeele - Password1
+5. Clara    - Sv4rog
+6. iMissHer - IReallyMissHer1
+Note that both usernames and passwords are case-sensitive.
+
+Note also that when creating an account (or editing account information):
+1. Usernames must only contain alphanumeric characters.
+2. Passwords should be 6 characters long, containing at least one uppercase, lowercase, and number in it.
 
 
-Note that both usernames and password(s) are case-sensitive!
-
-#### Things to note:
-1. Sometimes an error will occcur due to form interaction, wherein the url would have a `?` at the end. This is believed to be an issue with HTML forms and will "hopefully" be fixed via backend.
-2. New users can sign up and log in, but only the 5 hardcoded users may post/reply/edit/delete/edit their profile as of this MCO.
-3. Logins will also only work on the current webpage. For instance, user `denial` can log in on the index, but s/he would need to log in again if they were to move to a different html page of the project. This will also be properly implemented in the future when the backend can be implemented.
-Basically, problems that heavily require external data will be fully implemented in MCO2.
 
 ## --End of README--
 

@@ -11,10 +11,18 @@
     <body>
         <script src="/javascript/userView.js"></script>
 		<script src="/javascript/navbar.js" type="text/javascript"></script>
-		<div>
-            <h1>Task Failed. Please click back to return to the page.</h1>
-            <button onclick="window.location.href = '/login';">Go Login</button>
-            <button onclick="window.location.href = '/index';">Go Home</button>
+        <div class="space"></div>
+        <div class="space"></div>
+		<div class="landing card">
+            
+            <% if (error) { %>
+                <div class="landing text"><%= error %></div>
+              <% }else{%>
+                <div class="landing text">Task Failed.</div>
+                <% } %>
+                <div class="landing text">Please click "Go Back" to return to the home page.</div>
+            
+            <button class = "landing button" onclick="window.location.href = '/index';">Go Back</button>
         </div>
     </body>
 </html>

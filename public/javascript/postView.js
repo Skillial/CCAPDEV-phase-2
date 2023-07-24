@@ -4,9 +4,27 @@ function initializeTinyMCE() {
     menubar: 'edit   format',
     statusbar: false});  
     // Add your TinyMCE configuration options here if needed
-
+   
 }
 
+function initializeTinyMCEedit(){
+  tinymce.init({
+    selector: '#post_img_content',
+    menubar: 'edit format',
+    statusbar: false
+    // Add your TinyMCE configuration options here if needed
+  });
+}
+
+
+function initializeTinyMCEeditReply(pid){
+  tinymce.init({
+    selector: '#'+pid,
+    menubar: 'edit format',
+    statusbar: false
+    // Add your TinyMCE configuration options here if needed
+  });
+}
 function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prating,pmedia, preactValue, isCurrUserTheAuthor,isLoggedIn) {
     let 
     // content_list = document.createElement('div'),
@@ -41,12 +59,15 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
     headers.className = 'headers';
     post.className = 'post';
     post_img.className = 'post_img';
+    post_img.id = 'post_img_content';
     info.className = 'info';
     comment_reply.className='comment_reply';
     comment_share.className='comment_share';
     comment_edit.className='comment_edit';
     comment_edited.className='comment_edited';
     comment_save.className='comment_save';
+    comment_edit.id ="comment_edit_id";
+    comment_save.id = "comment_save_id";
     buttons.className='post_button';
     comment_text_area.className='comment_text_area';
     comment_text_area_save.className='comment_text_area_save';
@@ -59,6 +80,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
     span.style.cursor='pointer';
     span.appendChild(pfp);
     let header_title = document.createElement('p');
+    header_title.id="header_title";
     header_title.textContent=ptitle+" ";
     headers.appendChild(header_title);
     headers.appendChild(span);
@@ -98,6 +120,17 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
               parentElement.removeChild(textArea);
             }
           });
+
+          let header_remove = document.querySelector('#header_title');
+          header_remove.style.border = 'none';
+          let edit_add = document.querySelectorAll('#comment_edit_id');
+          edit_add.forEach(edit =>{
+            edit.style.display='inline';
+          });
+          let share_remove = document.querySelectorAll('#comment_save_id');
+          share_remove.forEach(share =>{
+            share.style.display='none';
+          });
           for (const editorId in tinymce.editors) {
             if (tinymce.editors.hasOwnProperty(editorId)) {
               const editor = tinymce.editors[editorId];
@@ -136,6 +169,16 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
         comment_cancel.onclick=function(){
             border.removeChild(cancel_save_wrap);
             border.removeChild(comment_text_area);
+            let header_remove = document.querySelector('#header_title');
+          header_remove.style.border = 'none';
+          let edit_add = document.querySelectorAll('#comment_edit_id');
+          edit_add.forEach(edit =>{
+            edit.style.display='inline';
+          });
+          let share_remove = document.querySelectorAll('#comment_save_id');
+          share_remove.forEach(share =>{
+            share.style.display='none';
+          });
             for (const editorId in tinymce.editors) {
               if (tinymce.editors.hasOwnProperty(editorId)) {
                 const editor = tinymce.editors[editorId];
@@ -165,27 +208,79 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
 
 
     comment_edit.onclick = function() {
-      comment_edit.style.display='none';
+      let textAreas = document.querySelectorAll('.comment_text_area');
+      textAreas.forEach(textArea => {
+          const parentElement = textArea.closest('.comment_wrapping');
+          if (parentElement) {
+            parentElement.removeChild(textArea);
+          }else{
+            const parentElement = textArea.closest('.border');
+            parentElement.removeChild(textArea);
+            }
+        });
+        let header_remove = document.querySelector('#header_title');
+          header_remove.style.border = 'none';
+          let edit_add = document.querySelectorAll('#comment_edit_id');
+          edit_add.forEach(edit =>{
+            edit.style.display='inline';
+          });
+          let share_remove = document.querySelectorAll('#comment_save_id');
+          share_remove.forEach(share =>{
+            share.style.display='none';
+          });
+        for (const editorId in tinymce.editors) {
+          if (tinymce.editors.hasOwnProperty(editorId)) {
+            const editor = tinymce.editors[editorId];
+            // Remove the editor instance
+            tinymce.remove(editor);
+          }
+        }
+      let commentSaves = document.querySelectorAll('.cancel_save_wrap');
+      // Remove each comment save element from its parent "comment_wrapping" div
+      commentSaves.forEach(commentSave => {
+          const parentElement = commentSave.closest('.comment_wrapping');
+          if (parentElement) {
+              parentElement.removeChild(commentSave);
+          } else{
+            const border = document.querySelector('.border');
+            border.removeChild(commentSave);
+          }
+      });
+      const scriptTag = document.createElement('script');
+        scriptTag.src = 'https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js';
+        scriptTag.setAttribute('referrerpolicy', 'origin');
+        scriptTag.onload = initializeTinyMCEedit; 
+        document.head.appendChild(scriptTag);
+
+        const styleTag = document.createElement('style');
+        styleTag.textContent = '.tox-notification { display: none !important; }';
+        document.head.appendChild(styleTag);
+        comment_edit.style.display='none';
         comment_save.style.display = 'inline';
-        post_img.contentEditable = true;
-        post_img.style.border = '1px solid red';
+        // post_img.contentEditable = true;
+        // post_img.style.border = '1px solid red';
         header_title.contentEditable = true;
         header_title.style.border = '1px solid red';      
         buttons.appendChild(comment_save);
       
         comment_save.onclick = function() {
+          var newDescription = tinymce.get('post_img_content').getContent();
+          if (newDescription==''){
+            alert('Edited post cannot be empty, Delete it instead!');
+          }else{
           comment_edit.style.display='inline';
           comment_save.style.display = 'none';
-          post_img.contentEditable = false;
+          // post_img.contentEditable = false;
           post_img.style.border = 'none';
           header_title.contentEditable = false;
           header_title.style.border = 'none';
           
           // Save the content of post_img and header_title to variables
-          var newDescription = post_img.innerHTML;
+
           var newTitle = header_title.innerHTML;
           handleEditPost(postID,newTitle,newDescription);
         };
+      }
       };
 
 
@@ -277,11 +372,13 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
     comment_text_area_save = document.createElement('div'),
     comment_text_area = document.createElement('textarea'),
     desc =document.createElement('p'),
+    
     comment_wrapping = document.createElement('div'),
     comment_cancel = document.createElement('div');
-
+    console.log("pid"+pid);
+    desc.id = pid+"here";
     comment_text_area.id = 'comment_text_area_id';
-
+    comment_forum.id=pid;
     comment_align.className = 'comment_align';
     comment_forum.className = 'comment_forum';
     comment_container.className = 'comment_container';
@@ -294,6 +391,8 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
     comment_edit.className='comment_edit';
     comment_edited.className='comment_edited';
     comment_save.className='comment_save';
+    comment_edit.id ="comment_edit_id";
+    comment_save.id = "comment_save_id";
     comment_text_area.className='comment_text_area';
     comment_text_area_save.className='comment_text_area_save';
     comment_wrapping.className='comment_wrapping';
@@ -333,6 +432,16 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
             parentElement.removeChild(textArea);
             }
         });
+        let header_remove = document.querySelector('#header_title');
+          header_remove.style.border = 'none';
+          let edit_add = document.querySelectorAll('#comment_edit_id');
+          edit_add.forEach(edit =>{
+            edit.style.display='inline';
+          });
+          let share_remove = document.querySelectorAll('#comment_save_id');
+          share_remove.forEach(share =>{
+            share.style.display='none';
+          });
         for (const editorId in tinymce.editors) {
           if (tinymce.editors.hasOwnProperty(editorId)) {
             const editor = tinymce.editors[editorId];
@@ -356,7 +465,8 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
         const scriptTag = document.createElement('script');
         scriptTag.src = 'https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js';
         scriptTag.setAttribute('referrerpolicy', 'origin');
-        scriptTag.onload = initializeTinyMCE; // Call the TinyMCE initialization after the script is loaded
+        scriptTag.onload = initializeTinyMCE; // Call the function inside the onload callback
+     // Call the TinyMCE initialization after the script is loaded
         document.head.appendChild(scriptTag);
 
         const styleTag = document.createElement('style');
@@ -373,6 +483,16 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
         comment_cancel.onclick=function(){
             comment_wrapping.removeChild(cancel_save_wrap);
             comment_wrapping.removeChild(comment_text_area);
+            let header_remove = document.querySelector('#header_title');
+          header_remove.style.border = 'none';
+          let edit_add = document.querySelectorAll('#comment_edit_id');
+          edit_add.forEach(edit =>{
+            edit.style.display='inline';
+          });
+          let share_remove = document.querySelectorAll('#comment_save_id');
+          share_remove.forEach(share =>{
+            share.style.display='none';
+          });
             for (const editorId in tinymce.editors) {
               if (tinymce.editors.hasOwnProperty(editorId)) {
                 const editor = tinymce.editors[editorId];
@@ -414,20 +534,82 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
         handleDeleteComment(pid);
     };
     comment_edit.onclick = function() {
-        comment_save.style.display = 'block';
+      let textAreas = document.querySelectorAll('.comment_text_area');
+      textAreas.forEach(textArea => {
+          const parentElement = textArea.closest('.comment_wrapping');
+          if (parentElement) {
+            parentElement.removeChild(textArea);
+          } else{
+            const parentElement = document.querySelector('.border');
+            parentElement.removeChild(textArea);
+            }
+        });
+        let header_remove = document.querySelector('#header_title');
+          header_remove.style.border = 'none';
+          let edit_add = document.querySelectorAll('#comment_edit_id');
+          edit_add.forEach(edit =>{
+            edit.style.display='inline';
+          });
+          let share_remove = document.querySelectorAll('#comment_save_id');
+          share_remove.forEach(share =>{
+            share.style.display='none';
+          });
+        for (const editorId in tinymce.editors) {
+          if (tinymce.editors.hasOwnProperty(editorId)) {
+            const editor = tinymce.editors[editorId];
+            // Remove the editor instance
+            tinymce.remove(editor);
+          }
+        }
+      let commentSaves = document.querySelectorAll('.cancel_save_wrap');
+      // Remove each comment save element from its parent "comment_wrapping" div
+      commentSaves.forEach(commentSave => {
+          let parentElement = commentSave.closest('.comment_wrapping');
+          if (parentElement) {
+              parentElement.removeChild(commentSave);
+          } else{
+            parentElement = document.querySelector('.border');
+            parentElement.removeChild(commentSave);
+          }
+      });
+      const scriptTag = document.createElement('script');
+        scriptTag.src = 'https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js';
+        scriptTag.setAttribute('referrerpolicy', 'origin');
+        scriptTag.onload = function() {
+          console.log(desc.id);
+          initializeTinyMCEeditReply(desc.id);
+        };
+        document.head.appendChild(scriptTag);
+
+        const styleTag = document.createElement('style');
+        styleTag.textContent = '.tox-notification { display: none !important; }';
+        document.head.appendChild(styleTag);
+        comment_save.style.display = 'inline';
         comment_edit.style.display='none';
         desc.contentEditable = true; 
-        desc.style.border = '1px solid red'; 
+        // desc.style.border = '1px solid red'; 
         comment_react.appendChild(comment_save);
         // comment_content_desc.appendChild(comment_edited);
         comment_save.onclick=function(){
+          var newCommentContent = tinymce.get(desc.id).getContent();
+          if (newCommentContent==''){
+              alert('Edited post cannot be empty, Delete it instead!');
+          } else{        
             comment_save.style.display = 'none';
-            comment_edit.style.display='block';
+            comment_edit.style.display='inline';
             desc.contentEditable = false;
-            var newCommentContent = desc.innerHTML;
-            desc.style.border = 'none'; 
-            handleEditComment(pid, newCommentContent );
+            console.log(newCommentContent);
+            for (const editorId in tinymce.editors) {
+              if (tinymce.editors.hasOwnProperty(editorId)) {
+                const editor = tinymce.editors[editorId];
+                // Remove the editor instance
+                tinymce.remove(editor);
+              }
+            }
+            // desc.style.border = 'none'; 
+            handleEditComment(pid, newCommentContent ); 
         }
+      }
 
     };
     if (user==pauthor){

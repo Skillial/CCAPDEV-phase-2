@@ -1,11 +1,8 @@
 // # Appdev Todo [Updated 11:30PM July 19)
 //    - input sanitization (sorta done?) and anti cross-site scripting (anti-hack stuff)
 //    - other frontend work:
-//     - add/fix landing pages or alerts for errors and successes
-//     - fix other pages (profile-edit.ejs, success.ejs, logout.ejs)
+//     - fix other pages (profile-edit.ejs)
 //     - paganda editing ng comments and post (?)
-//    - limiting number of posts/comments shown in a page (maybe add page 1, 2...)  
-
   
 //   ## Functionalities DONE FOR SURE
 //    - User: login, signup, logout, profile (updating, showing of posts)  
@@ -89,122 +86,16 @@ const Comment = require('./models/Comment')
 const Post = require('./models/Post')
 const React = require('./models/React')
 
-
-
 app.use(isLoggedInMiddleware);
 app.use(userIDMiddleware);
-
-
-// app.get("/index", async (req, res) => {
-//   try {
-//     const TWO_DAYS_IN_MS = 2 * 24 * 60 * 60 * 1000;
-//     const currentDate = new Date();
-//     let sortBy = req.query.sortBy || "createDate"; // Default sorting by creation date
-//     let sortOrder = req.query.sortOrder || "desc"; // Default sorting in descending order
-
-//     // Validate the sorting criteria to avoid potential security issues
-//     const allowedSortFields = ["createDate", "rating", "hotness"]; // Add more fields if needed
-//     const allowedSortOrders = ["asc", "desc"];
-//     if (!allowedSortFields.includes(sortBy)) {
-//       sortBy = "createDate"; // Set default sorting if an invalid field is provided
-//     }
-//     if (!allowedSortOrders.includes(sortOrder)) {
-//       sortOrder = "desc"; // Set default sorting order if an invalid order is provided
-//     }
-
-//     let posts = [];
-
-
-//     if (req.session?.isLoggedIn) {
-//       console.log(req.sessionID);
-//       console.log(req.session.isLoggedIn);
-//       const userId = req.session.userId;
-//       console.log(userId);
-
-//       posts = await Post.find({ isDeleted: false }).limit(0);
-
-//       // Get the number of positive and negative votes for each post
-//       for (let i = 0; i < posts.length; i++) {
-//         const post = posts[i];
-//         const userReaction = await React.findOne({
-//           userID: userId,
-//           parentPostID: post._id,
-//           isVoted: true,
-//         });
-//         post.userReaction = userReaction ? userReaction.voteValue : 0;
-
-//         const positiveCount = await React.countDocuments({
-//           parentPostID: post._id,
-//           voteValue: 1,
-//         });
-//         const negativeCount = await React.countDocuments({
-//           parentPostID: post._id,
-//           voteValue: -1,
-//         });
-//         const ratingCount = positiveCount - negativeCount;
-//         post.rating = ratingCount;
-
-//         //calculating hotness
-//         const timeDifferenceInMs = currentDate - post.createDate;
-//         const decayFactor = Math.exp(-timeDifferenceInMs / TWO_DAYS_IN_MS); // Adjust the decay rate as needed
-//         const ratingWithDecay = post.rating * decayFactor;
-//         post.hotnessScore = ratingWithDecay;
-//         const decodedTitle = he.decode(post.title);
-//         const decodedContent = he.decode(post.content);
-//         post.title = decodedTitle;
-//         post.content = decodedContent;
-//         console.log(post.content);
-//       }
-//     } else {
-//       console.log("Currently not logged in, showing a limited number of posts!")
-//       //const limit = 20; // Change the limit value as needed
-//       posts = await Post.find({ isDeleted: false });
-//       //posts = await Post.find({ isDeleted: false }).limit(limit);
-
-//       for (let i = 0; i < posts.length; i++) {
-//         const post = posts[i];
-//         const positiveCount = await React.countDocuments({ parentPostID: post._id, voteValue: 1 });
-//         const negativeCount = await React.countDocuments({ parentPostID: post._id, voteValue: -1 });
-//         const ratingCount = positiveCount - negativeCount;
-//         post.rating = ratingCount;
-
-//         //calculating hotness
-//         const timeDifferenceInMs = currentDate - post.createDate;
-//         const decayFactor = Math.exp(-timeDifferenceInMs / TWO_DAYS_IN_MS); // Adjust the decay rate as needed
-//         const ratingWithDecay = post.rating * decayFactor;
-//         post.hotnessScore = ratingWithDecay;
-
-//         const decodedTitle = he.decode(post.title);
-//         const decodedContent = he.decode(post.content);
-//         post.title = decodedTitle;
-//         post.content = decodedContent;
-//       }
-//     }
-
-//     if (sortBy === "rating") {
-//       posts.sort((a, b) => (sortOrder === "desc" ? b.rating - a.rating : a.rating - b.rating));
-//     } else if (sortBy === "hotness") {
-//       posts.sort((postA, postB) => postB.hotnessScore - postA.hotnessScore);
-//     } else {
-//       posts.sort((a, b) => (sortOrder === "desc" ? b[sortBy] - a[sortBy] : a[sortBy] - b[sortBy]));
-//     }
-
-//     res.render("index", {  he, posts });
-//     //res.render("index", { entities, posts });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "An error occurred while fetching posts." });
-//   }
-// });
-
 
 
 app.get("/index", async (req, res) => {
   try {
     const TWO_DAYS_IN_MS = 2 * 24 * 60 * 60 * 1000;
     const currentDate = new Date();
-    let sortBy = req.query.sortBy || "createDate"; // Default sorting by creation date
-    let sortOrder = req.query.sortOrder || "desc"; // Default sorting in descending order
+    let sortBy = req.query.sortBy || "createDate"; 
+    let sortOrder = req.query.sortOrder || "desc"; 
     const postsPerPage = 15;
 
     // Validate the sorting criteria to avoid potential security issues
@@ -217,8 +108,8 @@ app.get("/index", async (req, res) => {
       sortOrder = "desc";
     }
     
-    const page = parseInt(req.query.page) || 1; // Current page number (default to 1 if not provided)
-    const skipPosts = (page - 1) * postsPerPage; // Number of posts to skip for pagination
+    const page = parseInt(req.query.page) || 1; 
+    const skipPosts = (page - 1) * postsPerPage; 
 
     let posts = [];
     const isUserLoggedIn = req.session?.isLoggedIn;
@@ -299,7 +190,13 @@ app.get("/index", (req, res)=>{
 })
 
 app.get("/register", (req, res)=>{
-  res.render("register")
+  if(req.session.isLoggedIn){
+    req.session.cachedNoUpdate = false;
+    res.redirect("/profile");
+  }else{
+  return res.render("register", {error: null})
+  }
+  res.render("register", {error: null})
 })
 app.get("/success", (req, res)=>{
   res.render("success")
@@ -309,7 +206,7 @@ app.get("/login", (req, res)=>{
     req.session.cachedNoUpdate = false;
     res.redirect("/profile");
   }else{
-  res.render("login")
+  return res.render("login", {error: null})
   }
 })
 
@@ -323,10 +220,11 @@ app.get("/profile/edit/", async (req, res) => {
   try {
     const userId = req.session.userId;
     const user = await User.findById(userId);
-    res.render("profile-edit", { user });
+    res.render("profile-edit", { user, error: null });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while fetching user information." });
+    res.status(500).render("fail", { error: "An error ocurred while fetching user information" });
+    //res.status(500).json({ error: "An error occurred while fetching user information." });
   }
 });
 
@@ -341,8 +239,9 @@ app.get("/newComment", (req, res)=>{
 app.get("/editComment", (req, res)=>{
   res.render("editComment")
 })
-
-
+app.get("/fail", (req, res) =>{
+  res.render("fail", {error: null})
+})
 
 
 //logging in
@@ -355,12 +254,12 @@ app.post("/login", async (req, res) => {
           const isPasswordMatch = await user.comparePassword(password);
 
           if (!isPasswordMatch ) {
-            
-            return res.status(400).json({ error: "Invalid username or password." });
+            return res.status(400).render("login", { error: "Wrong Password." });
           }
 
       if (!user._id) {
-        return res.status(500).json({ error: "An error occurred while retrieving user ID." });
+        //return res.status(500).json({ error: "An error occurred while retrieving user ID." });
+        return res.status(500).render("login", { error: "An error occurred while retrieving user ID." });
       }
       req.session.isLoggedIn = true;
 
@@ -381,7 +280,8 @@ app.post("/login", async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while logging in." });
+    //res.status(500).json({ error: "An error occurred while logging in." });
+    return res.status(500).render("login", { error: "That user does not exist." });
   }
 });
 
@@ -409,10 +309,11 @@ app.use((req, res, next) => {
   res.locals.errorFlash = req.flash("error");
   next();
 });
-app.get("/register", (req, res) => {
-  const isLoggedIn = req.session.isLoggedIn || false;
-  res.render("register", { isLoggedIn, successFlash: req.flash("success"), errorFlash: req.flash("error") });
-});
+// app.get("/register", (req, res) => {
+//   const isLoggedIn = req.session.isLoggedIn || false;
+//   res.render("register", { isLoggedIn, successFlash: req.flash("success"), errorFlash: req.flash("error") });
+
+// });
 
 app.post("/api/user", async (req, res) => {
   try {
@@ -421,29 +322,33 @@ app.post("/api/user", async (req, res) => {
     const { username, password, repassword } = req.body;
 
     if (password !== repassword) {
-      req.flash("error", "Passwords do not match.");
-      return res.redirect("/register"); 
+      //req.flash("error", "Passwords do not match.");
+      return res.status(400).render("register", { error: "Passwords do not match." });
+      //return res.redirect("/register"); 
     }
 
     //checking inputs for other stuff
     const MIN_PASSWORD_LENGTH = 6; 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/; 
     if (password.length < MIN_PASSWORD_LENGTH || !passwordRegex.test(password)) {
-      req.flash("error", "Password must be at least 6 characters long and must contain upper and lowercase lettes, and numbers.");
-      return res.redirect("/register"); 
+      //req.flash("error", "Password must be at least 6 characters long and must contain upper and lowercase lettes, and numbers.");
+      return res.status(400).render("register", { error: "Password must be at least 6 characters long and must contain upper and lowercase lettes, and numbers." });
+      //return res.redirect("/register"); 
     }
 
     let usernameRegex = /^(?=.*[a-zA-Z0-9])[a-zA-Z0-9_-]*$/;
     if (!usernameRegex.test(username) || username.toLowerCase() === "visitor") {
-      req.flash("error", "Username must contain at least one letter or number and cannot be 'visitor'!");
-      return res.redirect("/profile-edit"); 
+      //req.flash("error", "Username must contain at least one letter or number and cannot be 'visitor'!");
+      return res.status(400).render("register", { error: "Username must contain at least one letter or number and cannot be 'visitor'!" });
+      //return res.redirect("/profile-edit"); 
     }
     
 
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-      req.flash("error", "Username already exists.");
-      return res.redirect("/register"); 
+      //req.flash("error", "Username already exists.");
+      //return res.redirect("/register"); 
+      return res.status(400).render("register", { error:"Username already exists"});
     }
 
     const user = new User({ username, password });
@@ -452,12 +357,13 @@ app.post("/api/user", async (req, res) => {
     savedUser.userId = savedUser._id;
     await savedUser.save();
 
-    req.flash("success", "Registration successful!"); // Flash success message
+    //req.flash("success", "Registration successful!"); // Flash success message
     res.redirect("/success"); // Redirect to the login page with the success message
   } catch (error) {
     console.error(error);
-    req.flash("error", "An error occurred while saving the user.");
-    res.redirect("/register"); // Redirect to the registration page with the flash message
+    //req.flash("error", "An error occurred while saving the user.");
+    //res.redirect("/register"); // Redirect to the registration page with the flash message
+    return res.status(400).render("register", { error: "An error occured, please try again" });
   }
 });
 
@@ -614,14 +520,16 @@ app.patch("/api/user/:username", async (req, res) => {
 
       let usernameRegex = /^(?=.*[a-zA-Z0-9])[a-zA-Z0-9_-]*$/;
       if (!usernameRegex.test(newUsername)) {
-        req.flash("error", "Username must contain at least one letter or number!");
-        return res.redirect("/profile-edit"); 
+        //req.flash("error", "Username must contain at least one letter or number!");
+        //return res.redirect("/profile-edit"); 
+        return res.status(400).render("profile-edit", { error: "Username must contain at least one letter or number!"});
       }
 
       let aboutmeRegex = /^[a-zA-Z0-9\t\n\r\s]*(?![\x22\x27])/;
       if (!aboutmeRegex.test(req.body.aboutme)) {
-        req.flash("error", "About me cannot contain quotation marks");
-        return res.redirect("/profile-edit"); 
+        // req.flash("error", "About me cannot contain quotation marks");
+        // return res.redirect("/profile-edit"); 
+        return res.status(400).render("profile-edit", { error: "About me cannot contain quotation marks!"});
       }
 
       const user = await User.findOneAndUpdate({ username }, updateData, { new: true });
@@ -634,14 +542,16 @@ app.patch("/api/user/:username", async (req, res) => {
         //return res.redirect("/profile");
       } else {
         // User not found, return appropriate response
-        return res.status(404).json({ error: 'User not found' });
+        //return res.status(404).json({ error: 'User not found' });
+        return res.status(404).render("profile-edit", { error: "User not found"});
       }
     }else{
       res.redirect("/login");
     }
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'An error occurred while updating the profile' });
+    //return res.status(500).json({ error: 'An error occurred while updating the profile' });
+    return res.status(500).render("profile-edit", { error: "An error occurred while updating the profile"});
   }
 });
 
@@ -1127,23 +1037,6 @@ app.get("/comment/:id", async (req, res) => {
       );
       return recursiveChildComments;
     }
-
-    // Fetch comments recursively for each top-level comment
-    // const comments = await Promise.all(
-    //   topLevelComments.map(async (comment) => {
-    //     comment.childComments = await fetchChildComments(comment);
-    //     const userReaction = await React.findOne({
-    //       userID: userId,
-    //       parentCommentID: comment._id,
-    //       isVoted: true,
-    //     });
-    //     comment.userReaction = userReaction ? userReaction.voteValue : 0;
-
-    //     const decodedContent = he.decode(comment.content);
-    //     comment.content = decodedContent;
-    //     return comment;
-    //   })
-    // );
     comment.childComments = await fetchChildComments(comment);
     const userReaction = await React.findOne({
       userID: userId,
