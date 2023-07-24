@@ -11,34 +11,48 @@ writePostButton.addEventListener("click", () => {
 
 
 cancelButton.addEventListener("click", () => { 
-  yCancelButton.style.display = "block";
-  nCancelButton.style.display = "block";
-  cancelButton.style.display = 'none';
-  if (!postForm.checkValidity()) {
-    // Prevent the form from submitting
-    event.preventDefault();
-
-    // Display the validation messages
-    form.reportValidity();
-  }
-});
-
-yCancelButton.addEventListener("click", () => {
-    postForm.reset();
+  postForm.reset();
     yCancelButton.style.display = "none";
     nCancelButton.style.display = "none";
     postFormContainer.style.display = "none";
 });
 
-nCancelButton.addEventListener("click", () => {
-  yCancelButton.style.display = "none";
-  nCancelButton.style.display = "none";
-  cancelButton.style.display = 'block';
-  if (!postForm.checkValidity()) {
-    // Prevent the form from submitting
-    event.preventDefault();
 
-    // Display the validation messages
-    form.reportValidity();
-  }
-});
+
+
+
+
+
+
+// cancelButton.addEventListener("click", () => { 
+//   yCancelButton.style.display = "block";
+//   nCancelButton.style.display = "block";
+//   cancelButton.style.display = 'none';
+//   if (!postForm.checkValidity()) {
+//     // Prevent the form from submitting
+//     event.preventDefault();
+
+//     // Display the validation messages
+//     form.reportValidity();
+//   }
+// });
+
+// yCancelButton.addEventListener("click", () => {
+//     postForm.reset();
+//     yCancelButton.style.display = "none";
+//     nCancelButton.style.display = "none";
+//     postFormContainer.style.display = "none";
+// });
+
+// nCancelButton.addEventListener("click", () => {
+//   yCancelButton.style.display = "none";
+//   nCancelButton.style.display = "none";
+//   cancelButton.style.display = 'block';
+//   if (!postForm.checkValidity()) {
+//     // Prevent the form from submitting
+//     preventDefault();
+
+//     // Display the validation messages
+//     form.reportValidity();
+//   }
+// });
