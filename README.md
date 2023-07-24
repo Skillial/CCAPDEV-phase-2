@@ -20,6 +20,8 @@ Format: <Username> - <Password>
 4. NotSeele - Password1
 5. Clara    - Sv4rog
 6. iMissHer - IReallyMissHer1
+7. seal     - Sealtie1
+
 Note that both usernames and passwords are case-sensitive.
 
 Note also that when creating an account (or editing account information):
