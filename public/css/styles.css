@@ -1168,10 +1168,18 @@ padding-left:15px;
 }
 
 button.current-page {
-	background-color: #e39227;
+	background-color: #EBCB8B;
 	color: #fff;
 	cursor: pointer;
+	border-radius: 25%;
+	font-size: 16px;
+	border-color: 1px solid #000000;
   }
 .pagination-button {
+	background-color: #5E81AC;
+	color: #fff;
 	cursor: pointer;
+	border-radius: 25%;
+	font-size: 16px;
+	border-color: 1px solid #000000;
   }
