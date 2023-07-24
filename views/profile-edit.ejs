@@ -20,10 +20,9 @@
 		<div class="title">Edit Profile</div>
         <form class="form" id="profile-form" action="/api/user/<%= user.username %>" method="PATCH">
             <input type="hidden" name="_method" value="PATCH">
-			<label>Profile Picture</label>
 			<div class="centered">
 				<label for="fileInput">
-					Upload
+					Upload new Profile Picture
 				</label>
 				<input type="file" accept="image/*" name="photo" id="fileInput">
 			</div>
@@ -170,7 +169,8 @@ function dataURItoBlob(dataURI) {
                             context.drawImage(img, 0, 0);
                             var cropper = canvas.cropper({
                                 aspectRatio: 1 / 1,
-                                background: false // Set background to false to prevent cropping transparent parts
+                                viewMode: 2,
+                                background: false 
                             });
                             $('#canvas-container').show(); // Show the canvas container
                         };
