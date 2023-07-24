@@ -434,9 +434,6 @@ button.cancel{
 	color: inherit;
 	text-decoration: none;
 }
-.filter table tr td:hover{
-	background-color: var(--card-color);
-}
 .forum{
 	background-color: var(--card-color);
 	border-radius: var(--corner-radius);
@@ -447,7 +444,15 @@ button.cancel{
 	/* width:100%; */
 }
 
-.forum:hover, .comment_wrapping:hover {
+.filter td{
+	border-radius: var(--half-corner-radius);
+	background-color: var(--card-color);
+	width: 8rem;
+	text-align: center;
+	justify-content: center;
+}
+
+.forum:hover, .comment_wrapping:hover, .filter td:hover{
 	background-color: var(--highlight-1);
 	transform: scale(1);
 	transition: 100ms linear all;	
