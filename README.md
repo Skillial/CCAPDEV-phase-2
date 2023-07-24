@@ -8,6 +8,8 @@ Ong, Camron
 Please do run an `npm i` before running `node index.js` or `nodemon index.js` (if you have nodemon).
 > necessary to install all the node modules (since the folder was included in the .gitignore)
 
+`http://localhost:3000` or `http://localhost:3000/index` will both lead to the homepage.
+
 Login information (though you can make your own account(s) as well)
 Format: <Username> - <Password>
 1. JingLiu  - Password1

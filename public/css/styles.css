@@ -1183,3 +1183,6 @@ button.current-page {
 	font-size: 16px;
 	border-color: 1px solid #000000;
   }
+button{
+	cursor:pointer;
+}

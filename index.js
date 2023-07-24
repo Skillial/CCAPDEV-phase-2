@@ -184,6 +184,9 @@ app.get("/index", async (req, res) => {
   }
 });
 
+app.get("/", (req, res)=>{
+  res.redirect("/index")
+})
 
 app.get("/index", (req, res)=>{
     res.render("index")
@@ -379,7 +382,7 @@ app.get("/profile", async (req, res) => {
     if (req.session.isLoggedIn) {
       let user, posts, comments;
       const userId = req.session.userId;
-      console.log(userId);
+      //console.log(userId);
       user = await User.findById(userId);
       posts = await Post.find({ userID: userId, isDeleted:false });
       comments = await Comment.find({ userID: userId, isDeleted:false });
@@ -414,8 +417,8 @@ app.get("/profile", async (req, res) => {
       const decodedAboutMe = he.decode(user.aboutme);
       user.aboutme = decodedAboutMe;
 
-      console.log(userId);
-      console.log(user);
+      //console.log(userId);
+      //console.log(user);
       let IsCurrUserTheProfileOwner = true;
       res.render("profile", { he, user, IsCurrUserTheProfileOwner});
     } else {
@@ -423,7 +426,7 @@ app.get("/profile", async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while fetching user information." });
+    return res.status(500).render("fail", { error: "That user does not exist." });
   }
 });
 
@@ -487,7 +490,8 @@ app.get("/profile/:username", async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while fetching user information." });
+    //res.status(500).json({ error: "An error occurred while fetching user information." });
+    return res.status(500).render("fail", { error: "That user does not exist." });
   }
 });
 
