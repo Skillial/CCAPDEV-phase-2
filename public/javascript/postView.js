@@ -264,6 +264,10 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
         buttons.appendChild(comment_save);
       
         comment_save.onclick = function() {
+          var newDescription = tinymce.get('post_img_content').getContent();
+          if (newDescription==''){
+            alert('Edited post cannot be empty, Delete it instead!');
+          }else{
           comment_edit.style.display='inline';
           comment_save.style.display = 'none';
           // post_img.contentEditable = false;
@@ -272,10 +276,11 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
           header_title.style.border = 'none';
           
           // Save the content of post_img and header_title to variables
-          var newDescription = tinymce.get('post_img_content').getContent();
+
           var newTitle = header_title.innerHTML;
           handleEditPost(postID,newTitle,newDescription);
         };
+      }
       };
 
 
@@ -586,11 +591,13 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
         comment_react.appendChild(comment_save);
         // comment_content_desc.appendChild(comment_edited);
         comment_save.onclick=function(){
-          
+          var newCommentContent = tinymce.get(desc.id).getContent();
+          if (newCommentContent==''){
+              alert('Edited post cannot be empty, Delete it instead!');
+          } else{        
             comment_save.style.display = 'none';
             comment_edit.style.display='inline';
             desc.contentEditable = false;
-            var newCommentContent = tinymce.get(desc.id).getContent();
             console.log(newCommentContent);
             for (const editorId in tinymce.editors) {
               if (tinymce.editors.hasOwnProperty(editorId)) {
@@ -602,6 +609,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
             // desc.style.border = 'none'; 
             handleEditComment(pid, newCommentContent ); 
         }
+      }
 
     };
     if (user==pauthor){
