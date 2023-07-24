@@ -10,6 +10,8 @@ Please do run an `npm i` before running `node index.js` or `nodemon index.js` (i
 
 `http://localhost:3000` or `http://localhost:3000/index` will both lead to the homepage.
 
+The link for the DB connection is in the .env file.
+
 Login information (though you can make your own account(s) as well)
 Format: <Username> - <Password>
 1. JingLiu  - Password1
