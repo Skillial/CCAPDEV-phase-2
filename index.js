@@ -1,8 +1,6 @@
 // # Appdev Todo [Updated 11:30PM July 19)
 //    - input sanitization (sorta done?) and anti cross-site scripting (anti-hack stuff)
-//    - other frontend work:
-//     - fix other pages (profile-edit.ejs)
-//     - paganda editing ng comments and post (?)
+//    - fix search
   
 //   ## Functionalities DONE FOR SURE
 //    - User: login, signup, logout, profile (updating, showing of posts)  
@@ -346,7 +344,6 @@ app.post("/api/user", async (req, res) => {
       //return res.redirect("/profile-edit"); 
     }
     
-
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       //req.flash("error", "Username already exists.");
