@@ -131,15 +131,42 @@
               </script>
             <% } %>
           </div>
-              <% if (totalPages > 1) { %>
-                <div id="pagination">
-                    Page:
-                  <% for (let i = 1; i <= totalPages; i++) { %>
-                    <% const sortUrl = `/index?page=${i}&sortBy=${sortBy}&sortOrder=${sortOrder}`; %>
-                    <button onclick="window.location.href='<%- sortUrl %>'"><%= i %></button>
-                  <% } %>
-                </div>
+          <% if (totalPages > 1) { %>
+            <div id="pagination">
+              Page:
+              <% const currentPage = parseInt(page); %>
+              <% const totalPagesToShow = 3; %>
+              <% const startPage = Math.max(currentPage - Math.floor(totalPagesToShow / 2), 1); %>
+              <% const endPage = Math.min(startPage + totalPagesToShow - 1, totalPages); %>
+          
+              <% if (startPage > 1) { %>
+                <% const firstPageUrl = `/index?page=1&sortBy=${sortBy}&sortOrder=${sortOrder}`; %>
+                <% const buttonClass = (1 === currentPage) ? 'current-page' : 'pagination-button'; %>
+                <button class="<%= buttonClass %>" onclick="window.location.href='<%- firstPageUrl %>'">1</button>
+                <% if (startPage > 2) { %>
+                  <span>...</span>
+                <% } %>
               <% } %>
+          
+              <% for (let i = startPage; i <= endPage; i++) { %>
+                <% const sortUrl = `/index?page=${i}&sortBy=${sortBy}&sortOrder=${sortOrder}`; %>
+                <% const buttonClass = (i === currentPage) ? 'current-page' : 'pagination-button'; %>
+                <button class="<%= buttonClass %>" onclick="window.location.href='<%- sortUrl %>'"><%= i %></button>
+              <% } %>
+          
+              <% if (endPage < totalPages) { %>
+                <% if (endPage < totalPages - 1) { %>
+                  <span>...</span>
+                <% } %>
+                <% const lastPageUrl = `/index?page=${totalPages}&sortBy=${sortBy}&sortOrder=${sortOrder}`; %>
+                <% const buttonClass = (totalPages === currentPage) ? 'current-page' : 'pagination-button'; %>
+                <button class="<%= buttonClass %>" onclick="window.location.href='<%- lastPageUrl %>'"><%= totalPages %></button>
+              <% } %>
+            </div>
+          <% } %>
+          
+          
+          
           
           <!-- <script>
             let title = 'Different salts',

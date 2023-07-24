@@ -1,11 +1,8 @@
 // # Appdev Todo [Updated 11:30PM July 19)
 //    - input sanitization (sorta done?) and anti cross-site scripting (anti-hack stuff)
 //    - other frontend work:
-//     - add/fix landing pages or alerts for errors and successes
-//     - fix other pages (profile-edit.ejs, success.ejs, logout.ejs)
+//     - fix other pages (profile-edit.ejs)
 //     - paganda editing ng comments and post (?)
-//    - limiting number of posts/comments shown in a page (maybe add page 1, 2...)  
-
   
 //   ## Functionalities DONE FOR SURE
 //    - User: login, signup, logout, profile (updating, showing of posts)  

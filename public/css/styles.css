@@ -1166,3 +1166,12 @@ padding-left:15px;
 	text-align: center;
 	padding-bottom: 1rem;
 }
+
+button.current-page {
+	background-color: #e39227;
+	color: #fff;
+	cursor: pointer;
+  }
+.pagination-button {
+	cursor: pointer;
+  }
