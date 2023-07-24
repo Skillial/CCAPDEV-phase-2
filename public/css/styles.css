@@ -54,24 +54,16 @@
 .profile > aside {
 	border-radius: var(--corner-radius);
 	background-color: var(--card-color);
-	max-width: 480px;
-	width: 60%;
+	width: 40%;
 	margin-right: 10px;
 	padding: 10px;
 }
 
-.profile > aside > div {
-	max-width: 480px;
-	border-radius: 15px;
-	display: flex;
-	background-color: var(--secondary-color);
-	padding: 10px;
-}
-
-.profile > aside > div > img {
+.profile > aside > img {
 	width: 100%;
 	height: auto;
-	border-radius: inherit;
+	border-radius: var(--corner-radius);
+	border: 5px solid var(--secondary-color);
 	display: block;
 }
 
@@ -270,7 +262,7 @@ html { box-sizing: border-box; height: 100%; font-size: 10px; } *, *::before, *:
 .searchbar{
 	margin: 1px auto;
 	width:40%;
-	height: 2rem;
+	height: 100%;
 }
 .title{
 	padding-right: 8px;
@@ -957,7 +949,7 @@ padding-left:15px;
 	top: 0;
 	z-index: 999;
 	/* overflow: hidden; */
-	height: 6.20%; 
+	height: 3em; 
 }
 
 .navbar-div {
