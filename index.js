@@ -90,7 +90,7 @@ app.use(userIDMiddleware);
 
 app.get("/index", async (req, res) => {
   try {
-    const TWO_DAYS_IN_MS = 2 * 24 * 60 * 60 * 1000;
+    const TWO_DAYS_IN_MS = 3 * 24 * 60 * 60 * 1000;
     const currentDate = new Date();
     let sortBy = req.query.sortBy || "createDate"; 
     let sortOrder = req.query.sortOrder || "desc"; 
@@ -114,7 +114,7 @@ app.get("/index", async (req, res) => {
 
     let cachedPosts = req.session.cachedPosts;
     let noUpdate = req.session.cachedNoUpdate;
-    const cacheExpirationTime = 2;
+    const cacheExpirationTime = 1;
     //noUpdate = false;
     //let temp = await Post.find({isDeleted: false});
     const cacheTimestamp = req.session.cacheTimestamp;
@@ -916,6 +916,7 @@ app.post('/api/react', async (req, res) => {
         );
         }
       else{
+        //slow way ;-;
         // const positiveCount = await React.countDocuments({ parentCommentID: parentId, voteValue: 1 });
         // const negativeCount = await React.countDocuments({ parentCommentID: parentId, voteValue: -1 });
         // const ratingCount = positiveCount - negativeCount;
@@ -946,10 +947,7 @@ app.post('/api/react', async (req, res) => {
           }
         }
 
-        //ratingCount = ratingCount + reactionValue;
-        // await Comment.findByIdAndUpdate(parentId, {
-        //  rating: ratingCount,
-        // });
+        
         await Comment.findOneAndUpdate(
           { _id: parentId, rating: ratingCount }, // Query: Find the post with the specific ratingCount
           { rating: updatedRatingCount }, // Update: Set the new rating count
