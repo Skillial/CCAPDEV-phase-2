@@ -118,8 +118,11 @@ function createNavbar(isLoggedIn) {
     search_button.setAttribute('type', 'submit');
     
     search_bar.appendChild(form);
-    search_bar.appendChild(search_choices_user);
-    search_bar.appendChild(search_choices_post);
+    let search_choices_div = document.createElement('div');
+    search_choices_div.className='search_choices_div'
+    search_choices_div.appendChild(search_choices_user);
+    search_choices_div.appendChild(search_choices_post);
+    search_bar.appendChild(search_choices_div);
     
 
     var login_button = document.createElement('div'),
@@ -243,6 +246,7 @@ async function updatePostChoices(choices) {
     let textContent = '';
 
     if (title) {
+      
       textContent = choice;
       if (textContent && !existingTextContent.has(textContent)) {
         const li = document.createElement('li');
@@ -254,20 +258,20 @@ async function updatePostChoices(choices) {
         existingTextContent.add(textContent);
       }
     } else if (parentPostID) {
-      const response = await fetch(`/searchcomment/${parentPostID}`);
-      const data = await response.json();
-      textContent = data.post || '';
-      // console.log(textContent);
-      if (textContent.title && !existingTextContent.has(textContent.title)) {
-        const li = document.createElement('li');
-        // console.log(data);
-        li.textContent = textContent.title  ;
-        li.onclick = () => {
-          window.location.href = `/post/${encodeURIComponent(textContent._id)}`;
-        };
-        searchChoices.appendChild(li);
-        existingTextContent.add(textContent.title);
-      }
+      // const response = await fetch(`/searchcomment/${parentPostID}`);
+      // const data = await response.json();
+      // textContent = data.post || '';
+      // // console.log(textContent);
+      // if (textContent.title && !existingTextContent.has(textContent.title)) {
+      //   const li = document.createElement('li');
+      //   // console.log(data);
+      //   li.textContent = textContent.title  ;
+      //   li.onclick = () => {
+      //     window.location.href = `/post/${encodeURIComponent(textContent._id)}`;
+      //   };
+      //   searchChoices.appendChild(li);
+      //   existingTextContent.add(textContent.title);
+      // }
     }
 
     
@@ -292,6 +296,7 @@ async function searchForPost(key) {
 
     if (data.length > 0) {
       // If there are search results, update the choices
+      searchChoices.innerHTML = ''; 
       updatePostChoices(data);
       isSearchResultDisplayed = true;
     } else {

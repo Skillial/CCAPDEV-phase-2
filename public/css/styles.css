@@ -216,7 +216,10 @@ body{
 	display: flex;
 	flex-direction: column;
   }
-
+.search_choices_div{
+	max-height: 500px;
+	overflow-y: auto;
+}
   .search_bar_label {
 	padding: 0;
 	padding-right: 5px;
@@ -250,8 +253,9 @@ html { box-sizing: border-box; height: 100%; font-size: 10px; } *, *::before, *:
 }
 
 .searchbar{
-	margin: 0 auto;
+	margin: 1px auto;
 	width:40%;
+	height: 2rem;
 }
 .title{
 	padding-right: 8px;
@@ -1050,7 +1054,7 @@ padding-left:15px;
 	top: 0;
 	z-index: 999;
 	/* overflow: hidden; */
-	height: 3rem; 
+	height: 6.20%; 
 }
 
 .navbar-div {

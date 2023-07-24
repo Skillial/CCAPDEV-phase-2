@@ -1025,14 +1025,8 @@ app.get("/searchpost/:key", async (req, res) => {
       ]
     });
     
-    const commentData = await Comment.find({
-      $and: [
-        { content: { $regex: regex } },
-        { isDeleted: false }
-      ]
-    });
 
-    const combinedData = [...postData, ...commentData];
+    const combinedData = [...postData];
     res.json(combinedData); // Sending the retrieved data as JSON response
   } catch (error) {
     console.error(error);
