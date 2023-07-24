@@ -125,7 +125,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
           header_remove.style.border = 'none';
           let edit_add = document.querySelectorAll('#comment_edit_id');
           edit_add.forEach(edit =>{
-            edit.style.display='inline';
+            edit.style.display='';
           });
           let share_remove = document.querySelectorAll('#comment_save_id');
           share_remove.forEach(share =>{
@@ -173,7 +173,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
           header_remove.style.border = 'none';
           let edit_add = document.querySelectorAll('#comment_edit_id');
           edit_add.forEach(edit =>{
-            edit.style.display='inline';
+            edit.style.display='';
           });
           let share_remove = document.querySelectorAll('#comment_save_id');
           share_remove.forEach(share =>{
@@ -256,7 +256,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
         styleTag.textContent = '.tox-notification { display: none !important; }';
         document.head.appendChild(styleTag);
         comment_edit.style.display='none';
-        comment_save.style.display = 'inline';
+        comment_save.style.display = '';
         // post_img.contentEditable = true;
         // post_img.style.border = '1px solid red';
         header_title.contentEditable = true;
@@ -268,7 +268,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
           if (newDescription==''){
             alert('Edited post cannot be empty, Delete it instead!');
           }else{
-          comment_edit.style.display='inline';
+          comment_edit.style.display='';
           comment_save.style.display = 'none';
           // post_img.contentEditable = false;
           post_img.style.border = 'none';
@@ -337,12 +337,12 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
     info_list.appendChild(topic);
     const buttonschildren = buttons.children;
     for (let i = 0; i < buttonschildren.length; i++) {
-        buttonschildren[i].style.display = 'inline';
+        buttonschildren[i].style.display = '';
     }
 
     const infoChildren = info.children;
     for (let i = 0; i < infoChildren.length; i++) {
-        infoChildren[i].style.display = 'inline';
+        infoChildren[i].style.display = '';
     }
     
     return info_list;
@@ -436,7 +436,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
           header_remove.style.border = 'none';
           let edit_add = document.querySelectorAll('#comment_edit_id');
           edit_add.forEach(edit =>{
-            edit.style.display='inline';
+            edit.style.display='';
           });
           let share_remove = document.querySelectorAll('#comment_save_id');
           share_remove.forEach(share =>{
@@ -487,7 +487,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
           header_remove.style.border = 'none';
           let edit_add = document.querySelectorAll('#comment_edit_id');
           edit_add.forEach(edit =>{
-            edit.style.display='inline';
+            edit.style.display='';
           });
           let share_remove = document.querySelectorAll('#comment_save_id');
           share_remove.forEach(share =>{
@@ -548,7 +548,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
           header_remove.style.border = 'none';
           let edit_add = document.querySelectorAll('#comment_edit_id');
           edit_add.forEach(edit =>{
-            edit.style.display='inline';
+            edit.style.display='';
           });
           let share_remove = document.querySelectorAll('#comment_save_id');
           share_remove.forEach(share =>{
@@ -584,7 +584,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
         const styleTag = document.createElement('style');
         styleTag.textContent = '.tox-notification { display: none !important; }';
         document.head.appendChild(styleTag);
-        comment_save.style.display = 'inline';
+        comment_save.style.display = '';
         comment_edit.style.display='none';
         desc.contentEditable = true; 
         // desc.style.border = '1px solid red'; 
@@ -596,7 +596,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
               alert('Edited post cannot be empty, Delete it instead!');
           } else{        
             comment_save.style.display = 'none';
-            comment_edit.style.display='inline';
+            comment_edit.style.display='';
             desc.contentEditable = false;
             console.log(newCommentContent);
             for (const editorId in tinymce.editors) {
@@ -746,7 +746,7 @@ function profilePost(pauthor,ppfp,pdesc,pcount,pid,phtml){
     comment_react.appendChild(comment_edit);
     comment_edit.onclick = function() {
      
-        comment_save.style.display = 'block';
+        comment_save.style.display = '';
         desc.contentEditable = true; 
         
         comment_react.appendChild(comment_save);

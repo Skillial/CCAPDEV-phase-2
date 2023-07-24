@@ -3,7 +3,7 @@
     <head>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
-        <style>
+		<style>
            .tox-notification { display: none !important }
         </style>
         <script>tinymce.init({selector:"#postContent",
@@ -90,13 +90,15 @@
         <form id="postForm" method="POST" action="<%= '/api/post' %>" onsubmit="return validateForm();">
             <label for="title">Title:</label>
             <input type="text" id="postTitle" name="title" required>
+			<div class="space"></div>
             <label for="content">Content:</label>
             <textarea id="postContent" name="content"></textarea>
             <script>
-
-            </script>
+				
+			</script>
             <!-- <label for="content">Media:</label>
-            <input type="file" id="postMedia" name="media"> -->
+				<input type="file" id="postMedia" name="media"> -->
+			<div class="space"></div>
             <div class="flex">
                 <button class="newPostButtons" type="submit">Post</button>
                 <button class="newPostButtons" type="reset">Clear</button>
