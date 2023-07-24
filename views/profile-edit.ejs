@@ -4,7 +4,7 @@
     <link rel="icon" href="../images/icon.png" sizes="32x32" type="image/png">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/javascript/react.js"></script>
-    <script src="../javascript/profile.js"></script>
+    <script src="/javascript/profile.js"></script>
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/2.3.3/cropper.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropper/2.3.3/cropper.js"></script>
@@ -15,24 +15,38 @@
     <script>
         createNavbar(<%= isLoggedIn %>);
     </script>
-    <div class="border">
-        <form id="profile-form" action="/api/user/<%= user.username %>" method="PATCH">
+	<div class="space"></div>
+    <div class="credential-card">
+		<div class="title">Edit Profile</div>
+        <form class="form" id="profile-form" action="/api/user/<%= user.username %>" method="PATCH">
             <input type="hidden" name="_method" value="PATCH">
+			<div class="centered">
+				<label for="fileInput">
+					Upload new Profile Picture
+				</label>
+				<input type="file" accept="image/*" name="photo" id="fileInput">
+			</div>
+			<div id="canvas-container" style="display: none;">
+				<canvas id="canvas">
+					Your browser does not support the HTML5 canvas element.
+				</canvas>
+			</div>	
+			<div class="space"></div>
+			<label for="username" >Username</label>
             <input type="text" name="username" value="<%= user.username %>" placeholder="Enter new username">
-            <input type="text" name="aboutme" value="<%= user.aboutme %>" placeholder="Enter new aboutme">
+			<label for="aboutme" >About Me</label>
+            <input class="long" type="text" name="aboutme" value="<%= user.aboutme %>" placeholder="Enter new aboutme">
             <!-- Add the image input field here -->
-            <input type="file" accept="image/*" name="photo" id="fileInput">
+			<div class="space double"></div>
+			<label for="password" >Password</label>
             <input type="text" name="password" placeholder="Enter new password">
+			<label for="repassword" >Retype Password</label>
             <input type="password" name="repassword" placeholder="Re-enter new password">
-            <button type="submit">Save Changes</button>
-            
+			<div class="space"></div>
+			<div class="centered">
+				<input type="submit" value="Save Changes"></button>
+			</div>
         </form>
-
-        <div id="canvas-container" style="display: none;">
-            <canvas id="canvas">
-              Your browser does not support the HTML5 canvas element.
-            </canvas>
-        </div>	
     </div>
 
     <script>
@@ -155,7 +169,8 @@ function dataURItoBlob(dataURI) {
                             context.drawImage(img, 0, 0);
                             var cropper = canvas.cropper({
                                 aspectRatio: 1 / 1,
-                                background: false // Set background to false to prevent cropping transparent parts
+                                viewMode: 2,
+                                background: false 
                             });
                             $('#canvas-container').show(); // Show the canvas container
                         };
