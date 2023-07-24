@@ -26,6 +26,8 @@ Note also that when creating an account (or editing account information):
 
 Note also, that caching is implemented in the /index route. It's set to expire every minute, and should be refreshing when new posts/reacts are made, and when reacts are changed (vote up to down, etc). Post edits by other users (ie, user A is logged in, user B edits a post) will not make user A's cache expire automatically.
 
+PROFILE PICTURES WILL ONLY 100% WORK IN GOOGLE CHROME. 
+
 ## --End of README--
 
 <br /><br /><br /><br /><br />
