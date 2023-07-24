@@ -57,8 +57,9 @@
 												phtml ='/post/' + encodeURIComponent(pid)
 												$('#profile-details').append(profilePost(pauthor, ppfp, pdesc, pcount, pid, phtml));
 												<% ctr++; %>
-												<% if (ctr === 5)	 { %>
+												<% if (ctr === 5 && user.posts.length > 5) { %>
 												$('#profile-details').append('<button id="hidden-button" onclick="showAllPosts()">Show All Posts</button>');
+												
 												var hiddenPosts = document.createElement('div');
 												hiddenPosts.id = 'hidden-posts';
 												hiddenPosts.style.display = 'none';
@@ -94,8 +95,6 @@
 								}
 
 
-
-
 								</script>
 								
 								<script>
@@ -114,7 +113,7 @@
 												phtml = '/post/' + encodeURIComponent('<%= comments.parentPostID %>');
 												$('#profile-details').append(profilePost(pauthor, ppfp, pdesc, pcount, pid, phtml));
 												<% ctr++; %>
-												<% if (ctr === 5)	 { %>
+												<% if (ctr === 5 && user.comments.length > 5)	 { %>
 												$('#profile-details').append('<button id="comment-button" onclick="showAllComments()">Show All Comments</button>');
 												// $('#profile-details').append('<div id="hidden-comments" style="display: none;">');
 												var hiddenComments = document.createElement('div');
