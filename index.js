@@ -302,20 +302,16 @@ app.post("/logout", async (req, res) => {
 
 const flash = require("connect-flash");
 
-// Assuming you have set up the flash middleware
+
 app.use(flash());
 
-// Custom middleware to expose flash messages to views
+
 app.use((req, res, next) => {
   res.locals.successFlash = req.flash("success");
   res.locals.errorFlash = req.flash("error");
   next();
 });
-// app.get("/register", (req, res) => {
-//   const isLoggedIn = req.session.isLoggedIn || false;
-//   res.render("register", { isLoggedIn, successFlash: req.flash("success"), errorFlash: req.flash("error") });
 
-// });
 
 app.post("/api/user", async (req, res) => {
   try {
@@ -386,7 +382,7 @@ app.get("/profile", async (req, res) => {
       comments = await Comment.find({ userID: userId, isDeleted:false });
       let sortOrder = 'desc'
       posts.sort((a, b) => (sortOrder === "desc" ? b["createDate"] - a["createDate"] : a["createDate"] - b["createDate"]));
-      
+      comments.sort((a, b) => (sortOrder === "desc" ? b["createDate"] - a["createDate"] : a["createDate"] - b["createDate"]));
       if(posts.length === 0){
         user.posts = user.posts;
       }
