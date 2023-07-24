@@ -20,16 +20,16 @@
 
 
 
-        <form class="register screen" method="POST" action="/api/user">
+        <form class="form" method="POST" action="/api/user">
             <label for="username">Username</label>
             <input type="text" name="username" id="username">
+			<div class="space"></div>
             <label for="password">Password</label>
             <input type="password" name="password" id="password" required>
+			<div class="space"></div>
             <label for="repassword">Retype Password</label>
             <input type="password" name="repassword" id="repassword" required>
-            <% if (error) { %>
-                <div class="error-message"><%= error %></div>
-              <% } %>
+			<div class="space"></div>
 			<div class="centered">
 				<input type="submit" value="Sign Up">
 			</div>
