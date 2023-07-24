@@ -66,7 +66,7 @@
   </script>
   <% } else { %>
   <script>
-      var commentElement = postreply("deleted","deleted","The original comment was deleted, but you can still view the comments.", "N/A", '<%= comment._id %>',"visitor",postID,'<%=isLoggedIn%>',0,'','');
+      var commentElement = postreply("deleted","https://drive.google.com/uc?id=1h0X17ZdHdB-Sfseocg4s0EI4tsZwX76I&export=download","The original comment was deleted, but you can still view the comments.", "N/A", '<%= comment._id %>',"visitor",postID,'<%=isLoggedIn%>',0,'','');
       $('.border').append(commentElement);
   </script>
   <% } %>
@@ -90,7 +90,7 @@
             console.log('<%=child.rating%>');
           var replyResult = postreply(username, ppfp, content, rating, childId, user, postID,'<%=isLoggedIn%>','<%=child.userReaction %>', '<%=child.createDate%>','<%=child.editDate%>');
           <% } else { %>
-          var replyResult = postreply("deleted", "deleted", "The original comment was deleted, but you can still view the comments.", "N/A", '<%= child._id %>', "visitor", postID, '<%=isLoggedIn%>',0,'','');
+          var replyResult = postreply("deleted", "https://drive.google.com/uc?id=1h0X17ZdHdB-Sfseocg4s0EI4tsZwX76I&export=download", "The original comment was deleted, but you can still view the comments.", "N/A", '<%= child._id %>', "visitor", postID, '<%=isLoggedIn%>',0,'','');
           <% } %>
       
           <% if (child.parentCommentID === null) { %>
