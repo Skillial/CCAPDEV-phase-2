@@ -26,6 +26,7 @@ const ejs = require('ejs-async');
 const cors = require('cors');
 const he = require("he");
 const MongoStore = require('connect-mongodb-session')(session);
+const cheerio = require('cheerio');
 
 const app = express();
 
@@ -980,23 +981,25 @@ app.get("/searchuser/:key", async (req, res) => {
   }
 });
 
+
 app.get("/searchpost/:key", async (req, res) => {
   try {
+    // Fetch all the data
+    const allData = await Post.find({ isDeleted: false });
+
+    // Sanitize the content to remove HTML tags
+    const sanitizedData = allData.map((post) => ({
+      ...post._doc,
+      content: cheerio.load(post.content).text()
+    }));
+
+    // Filter the sanitized data based on the regex
     const regex = new RegExp(req.params.key, 'i'); // 'i' flag for case-insensitive search
+    const postData = sanitizedData.filter((post) => (
+      regex.test(post.title) || regex.test(post.content)
+    ));
 
-    const postData = await Post.find({
-      $and: [
-        { $or: [
-          { title: { $regex: regex } },
-          { content: { $regex: regex } }
-        ] },
-        { isDeleted: false }
-      ]
-    });
-    
-
-    const combinedData = [...postData];
-    res.json(combinedData); // Sending the retrieved data as JSON response
+    res.json(postData); // Sending the retrieved data as JSON response
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred during the search." });
