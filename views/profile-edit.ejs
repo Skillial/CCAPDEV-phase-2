@@ -150,6 +150,15 @@ function dataURItoBlob(dataURI) {
                 if (response.ok) {
                     window.location.href = '/profile';
                 } else {
+                    if(response.status==400){
+                        alert("Invalid Password, must be at least 6 characters long and Alphanumeric!");
+                    }else if(response.status == 401){
+                        alert("Username must contain at least one letter or number, and be between 3-15 characters long, and cannot be 'visitor!");
+                    }else if(response.status == 402){
+                        alert("Sorry, about me cannot contain quotation marks!");
+                    } else if(response.status == 404){
+                        alert("User not found");
+                    }
                     console.error('Failed to update profile. Please try again later.');
                 }
             })

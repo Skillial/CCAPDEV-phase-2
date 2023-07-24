@@ -519,12 +519,12 @@ app.patch("/api/user/:username", async (req, res) => {
 
       let usernameRegex = /^(?=.{3,15}$)(?=.*[a-zA-Z0-9])[a-zA-Z0-9_-]*$/;
       if (!usernameRegex.test(newUsername) || newUsername.toLowerCase() === "visitor") {
-        return res.status(400).render("profile-edit", { user, error: "Username must contain at least one letter or number, and be between 3-15 characters long, and cannot be 'visitor!"});
+        return res.status(401).render("profile-edit", { user, error: "Username must contain at least one letter or number, and be between 3-15 characters long, and cannot be 'visitor!"});
       }
 
       let aboutmeRegex = /^[a-zA-Z0-9\t\n\r\s]*(?![\x22\x27])/;
       if (!aboutmeRegex.test(req.body.aboutme)) {
-        return res.status(400).render("profile-edit", { user, error: "About me cannot contain quotation marks!"});
+        return res.status(402).render("profile-edit", { user, error: "About me cannot contain quotation marks!"});
       }
 
       user = await User.findOneAndUpdate({ username }, updateData, { new: true });
