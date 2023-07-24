@@ -65,19 +65,21 @@
 	border-radius: var(--corner-radius);
 	border: 5px solid var(--secondary-color);
 	display: block;
+	background-color: var(--secondary-color);
 }
 
 .profile > aside > main {
 	width: 100%;
 	border-radius: var(--corner-radius);
 	display: block;
-	font-size: var(--title-font-size);
+	font-size: calc(var(--title-font-size)*2);
 	font-weight: bold;
 }
 
 .profile > div {
 	border-radius: var(--corner-radius);
 	background-color: var(--card-color);
+	max-width: 60%;
 	width: 100%;
 	padding: 10px;
 	display: flex;
@@ -93,15 +95,13 @@
 	font-size: var(--content-font-size);
 }
 
-.profile > div > div.space {
-	padding-top: 70px;
-}
-
 .profile button {
 	font-size: var(--content-font-size);
 	font-family: var(--font);
 	font-weight: bold;
 	text-align: center;
+	justify-content: center;
+	align-items: center;
 	max-width: 100%;
 	max-height: 100%;
 	min-height: 3em;
@@ -118,6 +118,7 @@
 	transition: all 100ms linear;	
 }
 
+
 .space{
 	padding-top: 35px;
 }
@@ -127,9 +128,8 @@
 }
 
 .border{
-	justify-content: center;
-	align-items: center;
-	margin: auto;
+	margin: 0px auto;
+	padding: 10px;
 	max-width: 1440px;
 	width: 100%;
 }
