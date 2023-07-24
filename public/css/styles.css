@@ -279,7 +279,9 @@ html { box-sizing: border-box; height: 100%; font-size: 10px; } *, *::before, *:
 	width: 100%;
 	max-width: 1440px;
 	margin: 15px auto;
-	
+}
+.content_list.main{
+	background-color: transparent;
 }
 .pfp_login{
 	height:50px;
