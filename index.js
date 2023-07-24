@@ -178,7 +178,8 @@ app.get("/index", async (req, res) => {
     res.render("index", { page, he, paginatedPosts, totalPosts, totalPages, sortBy, sortOrder });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while fetching posts." });
+    //res.status(500).json({ error: "An error occurred while fetching posts." });
+    res.status(500).render("fail", { error: "An error occurred while fetching posts." });
   }
 });
 
@@ -224,7 +225,7 @@ app.get("/profile/edit/", async (req, res) => {
     res.render("profile-edit", { user, error: null });
   } catch (error) {
     console.error(error);
-    res.status(500).render("fail", { error: "An error ocurred while fetching user information" });
+    res.status(500).render("fail", { error: "An error ocurred while fetching user information." });
     //res.status(500).json({ error: "An error occurred while fetching user information." });
   }
 });
@@ -259,7 +260,7 @@ app.post("/login", async (req, res) => {
           }
 
       if (!user._id) {
-        //return res.status(500).json({ error: "An error occurred while retrieving user ID." });
+        
         return res.status(500).render("login", { error: "An error occurred while retrieving user ID." });
       }
       req.session.isLoggedIn = true;
@@ -281,7 +282,7 @@ app.post("/login", async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    //res.status(500).json({ error: "An error occurred while logging in." });
+    
     return res.status(500).render("login", { error: "That user does not exist." });
   }
 });
@@ -363,7 +364,7 @@ app.post("/api/user", async (req, res) => {
     console.error(error);
     //req.flash("error", "An error occurred while saving the user.");
     //res.redirect("/register"); // Redirect to the registration page with the flash message
-    return res.status(400).render("register", { error: "An error occured, please try again" });
+    return res.status(505).render("register", { error: "An error occured, please try again" });
   }
 });
 
@@ -600,7 +601,8 @@ app.get("/post/:id", async (req, res) => {
     const postId = req.params.id;
     const post = await Post.findOne({ _id: postId }).populate("userID");
     if (!post) {
-      return res.status(404).json({ error: "Post not found." });
+      //return res.status(404).json({ error: "Post not found." });
+      res.status(500).render("fail", { error: "Post not found." });
     }
 
     const isUserLoggedIn = req.session?.isLoggedIn;
@@ -680,7 +682,7 @@ app.get("/post/:id", async (req, res) => {
     res.render("post", { post, user, author, isCurrUserTheAuthor, comments, reactValue });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error." });
+    res.status(500).render("fail", { error: "Post does not exist." });
   }
 });
 
@@ -728,7 +730,8 @@ app.patch("/api/post/:id", async (req, res) => {
     res.json({ message: "Post updated successfully", post });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    //res.status(500).json({ error: "Server error" });
+    res.status(500).render("fail", { error: "Post editing failed." });
   }
 });
 
@@ -770,7 +773,8 @@ app.post("/api/comment", async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred while creating the comment." });
+    //res.status(500).json({ error: "An error occurred while creating the comment." });
+    res.status(500).render("fail", { error: "An error occurred while creating the comment". });
   }
 });
 
@@ -809,7 +813,8 @@ app.patch("/api/comment/:id", async (req, res) => {
     res.json({ message: "Comment updated successfully", comment });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Server error" });
+    //res.status(500).json({ error: "Server error" });
+    res.status(500).render("fail", { error: "Comment not found." });
   }
 });
 
@@ -902,7 +907,8 @@ app.post('/api/react', async (req, res) => {
     }
   }catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Server error' });
+    //res.status(500).json({ error: 'Server error' });
+    res.status(500).render("fail", { error: "Server error." });
   }
 });
 
