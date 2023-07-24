@@ -189,10 +189,14 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
         }
         comment_text_area_save.onclick=function(){
           let newcomment = tinymce.get('comment_text_area_id').getContent();
+          if (newcomment==''){
+            alert("Please enter some content.");
+          }else{
             border.removeChild(comment_text_area);
             border.removeChild(cancel_save_wrap);
             // border.append(postreply(userID,"",newcomment,0,postID+1)); //change to currently logged in
             handleReply(postID,newcomment,'a',0);
+          }
         }
       } else{
         alert("Please log in")
@@ -504,11 +508,14 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
         comment_text_area_save.onclick=function(){
             let newcomment = tinymce.get('comment_text_area_id').getContent();
             console.log(newcomment);
+            if (newcomment==''){
+              alert("Please enter some content.");
+            }else{
             comment_wrapping.removeChild(comment_text_area);
             comment_wrapping.removeChild(cancel_save_wrap);
             // comment_align.append(postreply("poop bandit","../sample users/poop bandit.jpg",newcomment,0,pid+1));
             handleReply(pid,newcomment,parentID,1);
-            
+            }
         }
       }else{
         alert("Please log in")
