@@ -30,6 +30,9 @@
             <label for="repassword">Retype Password</label>
             <input type="password" name="repassword" id="repassword" required>
 			<div class="space"></div>
+			<% if (error) { %>
+				<div class="error-message"><%= error %></div>
+			<% } %>
 			<div class="centered">
 				<input type="submit" value="Sign Up">
 			</div>

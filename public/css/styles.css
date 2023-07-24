@@ -9,6 +9,7 @@
 	--text-color-2:#E5E9F0;
 	--highlight-2: #5E81AC;
 	--highlight-3: #EBCB8B;
+	--error-color: #BF616A;
 	--title-font-size: 2rem;
 	--small-title-font-size: 1.5rem;
 	--content-font-size: 1rem;
@@ -1232,4 +1233,12 @@ padding-left:15px;
 	border-radius: var(--corner-radius);
 	padding: 15px;
 	gap: 10px;
+}
+
+.error-message {
+	color: var(--error-color);
+	font-weight: bold;
+	max-width: 60%;
+	text-align: center;
+	margin: auto;
 }
