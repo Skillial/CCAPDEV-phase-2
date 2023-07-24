@@ -271,13 +271,15 @@ html { box-sizing: border-box; height: 100%; font-size: 10px; } *, *::before, *:
 .content_list{
 	width:90%;  
 	min-height: 50px;
-	border-radius: .7rem;
+	border-radius: var(--corner-radius);
+	background-color: var(--card-color);
 	vertical-align:center;
 	align-items: center;
 	padding:10px;
 	width: 100%;
 	max-width: 1440px;
 	margin: 15px auto;
+	
 }
 .pfp_login{
 	height:50px;
@@ -604,13 +606,15 @@ hr{
 	font-size:var(--content-font-size);
 	padding-left: 15px;
 	font-weight: bold;
-	position:absolute;
-	bottom: 0;
-	width:90%;
+	width:100%;
+	display: flex;
+}
+.info p {
+	margin-right: 0.5rem;
 }
 .info span{
 	font-weight: lighter;
-	margin-right: 15px;
+	margin-right: 1rem;
 }
 .react_post{
 	min-width:30px;
@@ -622,8 +626,6 @@ hr{
 .info_list{
 	display: flex;
 	position: relative;
-	padding-bottom: 30px;
-	margin-bottom: 25px;
 	width:100%;
 }
 .topic{
@@ -634,6 +636,9 @@ hr{
 	max-width: 100%;
 	width: 100%;
 	/* width: auto; */
+	display:flex;
+	flex-direction: column;
+	height: 100%;
 }
 
 .comment_react{
@@ -695,9 +700,8 @@ hr{
 	margin-right:18px;
 	text-align: left;
 	position: relative;
-	width:85%;
-	min-width:85%;
-	max-width:85%;
+	width: 100%;
+	max-width:100%;
 	padding-bottom: 30px;	
 	word-wrap: break-word;
 }
@@ -839,7 +843,9 @@ cursor: pointer;
 	transform: scale(1);
 	transition: 100ms all linear;
 }
-
+.post_button {
+	margin-left: auto;
+}
 .post_img img{
 height:60px;
 }
