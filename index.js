@@ -950,7 +950,7 @@ app.post('/api/react', async (req, res) => {
         // await Comment.findByIdAndUpdate(parentId, {
         //  rating: ratingCount,
         // });
-        await comment.findOneAndUpdate(
+        await Comment.findOneAndUpdate(
           { _id: parentId, rating: ratingCount }, // Query: Find the post with the specific ratingCount
           { rating: updatedRatingCount }, // Update: Set the new rating count
           { new: true } // Options: Return the updated document after the update
