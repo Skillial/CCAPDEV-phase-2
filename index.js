@@ -774,7 +774,7 @@ app.post("/api/comment", async (req, res) => {
   } catch (error) {
     console.error(error);
     //res.status(500).json({ error: "An error occurred while creating the comment." });
-    res.status(500).render("fail", { error: "An error occurred while creating the comment". });
+    res.status(500).render("fail", { error: "An error occurred while creating the comment." });
   }
 });
 
