@@ -235,7 +235,7 @@ async function updatePostChoices(choices) {
   const searchChoices = document.querySelector('#search_choices_post');
   searchChoices.innerHTML = '';
   const search_bar_label = document.createElement('div');
-  search_bar_label.textContent = "Search from comments/posts";
+  search_bar_label.textContent = "Search from posts";
   search_bar_label.className = "search_bar_label";
   searchChoices.appendChild(search_bar_label);
 

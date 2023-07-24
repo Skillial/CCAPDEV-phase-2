@@ -845,8 +845,10 @@ app.post('/api/react', async (req, res) => {
       }
       //console.log("parent id: ", parentId);
       //console.log("parent info: ", post," ", comment)
+      let oldReactValue;
       if (existingReact) {
         // User has already reacted, update the voteValue
+        oldReactValue = existingReact.voteValue;
         existingReact.voteValue = reactionValue;
         if(reactionValue == 0){
           existingReact.isVoted = false;
@@ -874,29 +876,85 @@ app.post('/api/react', async (req, res) => {
         }
         await newReact.save();
       }
-
+      
       if(reactParentType == 'post'){
         // const positiveCount = await React.countDocuments({ parentPostID: parentId, voteValue: 1 });
         // const negativeCount = await React.countDocuments({ parentPostID: parentId, voteValue: -1 });
         // const ratingCount = positiveCount - negativeCount;
+        
         const post = await Post.findById(parentId);
-        let ratingCount = post.ratingCount || 0;
-        ratingCount = ratingCount + parseInt(reactionValue);
-        await Post.findByIdAndUpdate(parentId, {
-          rating: ratingCount,
-          //hotnessScore: calculateHotnessScore(ratingCount, post.createDate),
-        });
+        let ratingCount = post.rating || 0;
+        let updatedRatingCount;
+
+        if(oldReactValue && oldReactValue == -1){
+          if(reactionValue == 0){
+            updatedRatingCount = ratingCount + 1;
+          }
+          else{
+            updatedRatingCount = ratingCount + 2;
+          }
+        } else if (oldReactValue && oldReactValue == 1){
+          if(reactionValue == 0){
+            updatedRatingCount = ratingCount - 1;
+          }
+          else{
+            updatedRatingCount = ratingCount - 2;
+          }
+        }else {
+          if(reactionValue == 1){
+            updatedRatingCount = ratingCount + 1;
+          }
+          else{
+            updatedRatingCount = ratingCount - 1;
+          }
+        }
+
+        await Post.findOneAndUpdate(
+          { _id: parentId, rating: ratingCount }, // Query: Find the post with the specific ratingCount
+          { rating: updatedRatingCount }, // Update: Set the new rating count
+          { new: true } // Options: Return the updated document after the update
+        );
         }
       else{
         // const positiveCount = await React.countDocuments({ parentCommentID: parentId, voteValue: 1 });
         // const negativeCount = await React.countDocuments({ parentCommentID: parentId, voteValue: -1 });
         // const ratingCount = positiveCount - negativeCount;
         const comment = await Comment.findById(parentId);
-        ratingCount = comment.ratingCount  || 0;
-        ratingCount = ratingCount + reactionValue;
-        await Comment.findByIdAndUpdate(parentId, {
-         rating: ratingCount,
-        });
+        let ratingCount = comment.rating || 0;
+        let updatedRatingCount;
+
+        if(oldReactValue && oldReactValue == -1){
+          if(reactionValue == 0){
+            updatedRatingCount = ratingCount + 1;
+          }
+          else{
+            updatedRatingCount = ratingCount + 2;
+          }
+        } else if (oldReactValue && oldReactValue == 1){
+          if(reactionValue == 0){
+            updatedRatingCount = ratingCount - 1;
+          }
+          else{
+            updatedRatingCount = ratingCount - 2;
+          }
+        }else {
+          if(reactionValue == 1){
+            updatedRatingCount = ratingCount + 1;
+          }
+          else{
+            updatedRatingCount = ratingCount - 1;
+          }
+        }
+
+        //ratingCount = ratingCount + reactionValue;
+        // await Comment.findByIdAndUpdate(parentId, {
+        //  rating: ratingCount,
+        // });
+        await Comment.findOneAndUpdate(
+          { _id: parentId, rating: ratingCount }, // Query: Find the post with the specific ratingCount
+          { rating: updatedRatingCount }, // Update: Set the new rating count
+          { new: true } // Options: Return the updated document after the update
+        );
       }
       //await newReact.save();
       req.session.cachedPosts = []; 
