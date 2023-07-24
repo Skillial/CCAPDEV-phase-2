@@ -920,7 +920,7 @@ padding-left:15px;
 	border-radius: calc(var(--corner-radius) / 1.5);
 	border-style: hidden;
 	height: 2rem;
-	margin-bottom: 2rem;
+	margin-bottom: 1.5rem;
 	padding: 1rem;
 	background-color: var(--text-color);
 }
@@ -1159,4 +1159,9 @@ padding-left:15px;
 	background-color: #ffffff;
 	cursor: default;
 	border: 1px solid black;
+}
+
+.error-message{
+	color:red;
+	text-align: center;
 }

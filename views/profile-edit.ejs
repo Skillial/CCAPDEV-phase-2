@@ -16,6 +16,9 @@
         createNavbar(<%= isLoggedIn %>);
     </script>
     <div class="border">
+        <% if (error) { %>
+            <div class="error-message"><%= error %></div>
+          <% } %>
         <form id="profile-form" action="/api/user/<%= user.username %>" method="PATCH">
             <input type="hidden" name="_method" value="PATCH">
             <input type="text" name="username" value="<%= user.username %>" placeholder="Enter new username">
