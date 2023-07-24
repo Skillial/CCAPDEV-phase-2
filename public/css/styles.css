@@ -447,6 +447,12 @@ button.cancel{
 	/* width:100%; */
 }
 
+.forum:hover, .comment_wrapping:hover {
+	background-color: var(--highlight-1);
+	transform: scale(1);
+	transition: 100ms linear all;	
+}
+
 .reactions {
 	max-width: 40px;
 	/* width: 100%; */
