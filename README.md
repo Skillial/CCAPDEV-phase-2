@@ -24,7 +24,7 @@ Note also that when creating an account (or editing account information):
 1. Usernames must only contain alphanumeric characters.
 2. Passwords should be 6 characters long, containing at least one uppercase, lowercase, and number in it.
 
-
+Note also, that caching is implemented in the /index route. It's set to expire every minute, and should be refreshing when new posts/reacts are made, and when reacts are changed (vote up to down, etc). Post edits by other users (ie, user A is logged in, user B edits a post) will not make user A's cache expire automatically.
 
 ## --End of README--
 

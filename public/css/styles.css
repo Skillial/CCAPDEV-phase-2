@@ -543,6 +543,10 @@ hr{
 	font-family: var(--font);
 	padding-bottom: 30px;
 	word-wrap: break-word;
+	max-height: 6em;
+	line-height: 1.2;
+	text-overflow:clip;
+	overflow: hidden;
 }
 
 .content_footer{
