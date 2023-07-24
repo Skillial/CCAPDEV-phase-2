@@ -250,7 +250,7 @@ async function updatePostChoices(choices) {
       textContent = choice;
       if (textContent && !existingTextContent.has(textContent)) {
         const li = document.createElement('li');
-        li.textContent = choice.title;
+        li.textContent = choice.title.replace(/\\'/g, "'").replace(/\\"/g, '"');
         li.onclick = () => {
           window.location.href = `/post/${encodeURIComponent(choice._id)}`;
         };
