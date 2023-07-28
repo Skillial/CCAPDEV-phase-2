@@ -1,87 +1,32 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit My Profile - SnaccOverflow</title>
-    <link rel="icon" href="../images/icon.png" sizes="32x32" type="image/png">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="/javascript/react.js"></script>
-    <script src="/javascript/profile.js"></script>
-    <link rel="stylesheet" type="text/css" href="/css/styles.css">
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/2.3.3/cropper.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropper/2.3.3/cropper.js"></script>
-    
-</head>
-<body>
-    <script src="/javascript/navbar.js" type="text/javascript"></script>
-    <script>
-        createNavbar(<%= isLoggedIn %>);
-    </script>
-	<div class="space"></div>
-    <div class="credential-card">
-		<div class="title">Edit Profile</div>
-        <% if (user) console.log(user.username); %>
-        <form class="form" id="profile-form">
-			<div class="centered">
-				<label for="fileInput">
-					Upload new Profile Picture
-				</label>
-				<input type="file" accept="image/*" name="photo" id="fileInput">
-			</div>
-			<div id="canvas-container" style="display: none;">
-				<canvas id="canvas">
-					Your browser does not support the HTML5 canvas element.
-				</canvas>
-			</div>	
+const editError = document.getElementById('profileEdit_error');
+const currentPfpLink = document.getElementById('currentPfpLink').value;
+document.getElementById('profile-form').addEventListener('submit', async function (event) {
+    event.preventDefault(); // Prevent the default form submission behavior
 
-            <input type="hidden" id="currentPfpLink" value="<%= user.photo %>">
+    // Get the form data
+    const formData = new FormData(event.target);
 
-			<div class="space"></div>
-			<label for="username" >Username</label>
-            <input type="text" name="username" value="<%= user.username %>" placeholder="Enter new username">
-			<label for="aboutme" >About Me</label>
-            <input class="long" type="text" name="aboutme" value="<%= user.aboutme %>" placeholder="Enter new aboutme">
-			<div class="space double"></div>
-			<label for="password" >Password</label>
-            <input type="text" name="password" placeholder="Enter new password">
-			<label for="repassword" >Retype Password</label>
-            <input type="password" name="repassword" placeholder="Re-enter new password">
-			<div class="space"></div>
-            <div class="error-message" id="profileEdit_error"></div>
-			<div class="centered">
-				<input type="submit" value="Save Changes"></button>
-			</div>
-        </form>
-        <script src="/javascript/profile-edit.js" type="text/javascript"></script> 
-    </div>
-
-    <!-- <script>
-        const editError = document.getElementById('profileEdit_error');
-        document.getElementById('profile-form').addEventListener('submit', function (event) {
-            event.preventDefault(); // Prevent the default form submission behavior
-
-            // Get the form data
-            const formData = new FormData(event.target);
-
-            // Check if a file has been selected
-            const fileInput = document.querySelector("input[name='photo']");
-            if (fileInput.files.length === 0) {
-                // If no file is selected, proceed with form submission without uploading an image
-                submitForm(formData, null); // Pass null as the canvas data
-            } else {
-                // If a file is selected, get the canvas data and upload the image first
-                const canvasData = canvas.cropper('getCroppedCanvas').toDataURL("image/png"); // Get the canvas data as data URL
-                uploadImage(formData, canvasData);
-            }
-        });
-
-        // Function to handle image upload
-        function uploadImage(formData, canvasData) {
-            console.log(canvasData);
+    // Check if a file has been selected
+    const fileInput = document.querySelector("input[name='photo']");
+    if (fileInput.files.length === 0) {
+        // If no file is selected, proceed with form submission without uploading an image
+        await submitForm(formData, null); // Pass null as the canvas data
+    } else {
+        // If a file is selected, get the canvas data and upload the image first
+        const canvasData = canvas.cropper('getCroppedCanvas').toDataURL("image/png"); // Get the canvas data as data URL
+        await uploadImage(formData, canvasData);
+    }
+});
+        
+async function uploadImage(formData, canvasData) {
+    editError.textContent = "Loading... this may take a little while.";
+    console.log(canvasData);
     if (!canvasData || typeof canvasData !== 'string' || !canvasData.startsWith('data:image/')) {
         // If canvasData is not a valid data URI, there's no image to upload, so proceed with form submission without uploading an image
-        submitForm(formData, null); // Pass null as the image link
+        submitForm(formData, null); // Pass defaultImageURL as the image link
         return;
     }
+    
 
     let url = "https://script.google.com/macros/s/AKfycbzHrW44F8-PC41XVJyvuyf9dcVVWDjUcSQPpUdCPfZIh6meEEINS7WAAG5vV2PoShvi/exec";
     let file = dataURItoBlob(canvasData);
@@ -102,7 +47,7 @@
         .then(r => r.text())
         .then(link => {
             console.log("Image link:", link);
-            editError.textContent = "Loading...";
+            editError.textContent = "Almost done... You will be redirected shortly!";
             // Pass the image link to the submitForm function
             submitForm(formData, link);
         })
@@ -129,21 +74,25 @@ function dataURItoBlob(dataURI) {
     return blob;
 }
 
-        // Function to handle form submission
 // Function to handle form submission
 async function submitForm(formData, imageLink) {
-    // If imageLink is null, the user didn't select a new image, so keep the old one
-    if (!imageLink) {
-        imageLink = "<%= user.photo %>";
-    }
+    // Get the default image URL (old image URL) from the formData
+    //const defaultImageURL = formData.get("photo");
 
+    // If imageLink is null, the user didn't select a new image, so keep the old one (defaultImageURL)
+    if (!imageLink) {
+        console.log(currentPfpLink);
+        imageLink = currentPfpLink;
+    }
+    
     // Add the image link to the formData
     formData.append("photo", imageLink);
 
     try {
         // Send the PATCH request using fetch
         //fetch(`/api/user/${encodeURIComponent('<%= user.username %>')}`, {
-        const response = await fetch(`/profile/edit`, {
+        console.log([...formData]);
+        const response = await fetch(`/editprofile`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -156,7 +105,7 @@ async function submitForm(formData, imageLink) {
             window.location.href = '/profile';
         } else {
             const errorMessage = await response.json();
-            loginError.textContent = errorMessage.error;
+            editError.textContent = errorMessage.error;
             console.error('Failed to update profile. Please try again later.');
         }
     } catch (error) {
@@ -198,11 +147,3 @@ async function submitForm(formData, imageLink) {
                 alert('No file(s) selected.');
             }
         });
-    </script> -->
-    <style>
-        img {
-            max-width: 100%;
-        }
-    </style>
-</body>
-</html>

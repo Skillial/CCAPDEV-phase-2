@@ -19,10 +19,9 @@
 		<div class="register title">Register</div>
 
 
-
-        <form class="form" method="POST" action="/api/user">
+        <form class="form" id="register-form">
             <label for="username">Username</label>
-            <input type="text" name="username" id="username">
+            <input type="text" name="username" id="username" required>
 			<div class="space"></div>
             <label for="password">Password</label>
             <input type="password" name="password" id="password" required>
@@ -30,12 +29,11 @@
             <label for="repassword">Retype Password</label>
             <input type="password" name="repassword" id="repassword" required>
 			<div class="space"></div>
-			<% if (error) { %>
-				<div class="error-message"><%= error %></div>
-			<% } %>
+            <div class="error-message" id="register_error"></div>
 			<div class="centered">
 				<input type="submit" value="Sign Up">
 			</div>
         </form>
+        <script src="/javascript/register.js" type="text/javascript"></script> 
     </body>
 </html>

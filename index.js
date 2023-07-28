@@ -209,8 +209,9 @@ app.get("/login", (req, res)=>{
     req.session.cachedNoUpdate = false;
     res.redirect("/profile");
   }else{
-  return res.render("login", {error: null})
+  return res.render("login")
   }
+  res.render("login");
 })
 
 app.get("/logout", async(req, res)=>{
@@ -219,18 +220,6 @@ app.get("/logout", async(req, res)=>{
   res.render("logout")
 })
 
-app.get("/profile/edit/", async (req, res) => {
-  try {
-    const userId = req.session.userId;
-    const user = await User.findById(userId);
-    console.log(user);
-    res.render("profile-edit", { user, error: null });
-  } catch (error) {
-    console.error(error);
-    res.status(500).render("fail", { error: "An error ocurred while fetching user information." });
-    //res.status(500).json({ error: "An error occurred while fetching user information." });
-  }
-});
 
 app.get("/editPost", (req, res)=>{
   res.render("editPost")
@@ -247,28 +236,26 @@ app.get("/fail", (req, res) =>{
   res.render("fail", {error: null})
 })
 
-
+app.use(express.urlencoded({ extended: true }));
 //logging in
 app.post("/login", async (req, res) => {
   try {
     console.log("does req.session not exist?", !req.session.isLoggedIn);
     if(!req.session.isLoggedIn){
-      const { username, password, remember } = req.body;
-      const user = await User.findOne({ username });
-          const isPasswordMatch = await user.comparePassword(password);
-
-          if (!isPasswordMatch ) {
-            return res.status(400).render("login", { error: "Wrong Password." });
-          }
-
-      if (!user._id) {
-        
-        return res.status(500).render("login", { error: "An error occurred while retrieving user ID." });
+      let { username, password, remember } = req.body;
+      console.log(username);
+      const user = await User.findOne({ username: username });
+      if (!user) {
+        console.log("asdasd");
+        return res.status(400).json({ error: "That user does not exist." });
       }
-      req.session.isLoggedIn = true;
+      const isPasswordMatch = await user.comparePassword(password);
+      if (!isPasswordMatch ) {
+        return res.status(400).json({ error: "Wrong Username or Password." });
+      }
 
+      req.session.isLoggedIn = true;
       req.session.userId = user._id;
-      console.log("user id of session: ", req.session.userId)
       if(remember) {
         console.log(remember);
         req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 21; // 21 days
@@ -285,7 +272,7 @@ app.post("/login", async (req, res) => {
   } catch (error) {
     console.error(error);
     
-    return res.status(500).render("login", { error: "That user does not exist." });
+    return res.status(500).json({ error: "DB error." });
   }
 });
 
@@ -302,52 +289,30 @@ app.post("/logout", async (req, res) => {
   res.status(200).send();
 })
 
-const flash = require("connect-flash");
 
-
-app.use(flash());
-
-
-app.use((req, res, next) => {
-  res.locals.successFlash = req.flash("success");
-  res.locals.errorFlash = req.flash("error");
-  next();
-});
-
-
-app.post("/api/user", async (req, res) => {
+app.post("/register", async (req, res) => {
   try {
-    //ifLoggedIn = false;
-    //console.log(isLoggedIn, successFlash, errorFlash );
     const { username, password, repassword } = req.body;
 
     if (password !== repassword) {
-      //req.flash("error", "Passwords do not match.");
-      return res.status(400).render("register", { error: "Passwords do not match." });
-      //return res.redirect("/register"); 
+      return res.status(400).json({ error: "Passwords do not match." });
     }
 
     //checking inputs for other stuff
     const MIN_PASSWORD_LENGTH = 6; 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/; 
     if (password.length < MIN_PASSWORD_LENGTH || !passwordRegex.test(password)) {
-      //req.flash("error", "Password must be at least 6 characters long and must contain upper and lowercase lettes, and numbers.");
-      return res.status(400).render("register", { error: "Password must be at least 6 characters long and must contain upper and lowercase lettes, and numbers." });
-      //return res.redirect("/register"); 
+      return res.status(400).json({ error: "Password must be at least 6 characters long and must contain upper and lowercase lettes, and numbers." });
     }
 
     let usernameRegex = /^(?=.{3,15}$)(?=.*[a-zA-Z0-9])[a-zA-Z0-9_-]*$/;
     if (!usernameRegex.test(username) || username.toLowerCase() === "visitor") {
-      //req.flash("error", "Username must contain at least one letter or number and cannot be 'visitor'!");
-      return res.status(400).render("register", { error: "Username must contain at least one letter or number, and be between 3-15 characters long, and cannot be 'visitor'!" });
-      //return res.redirect("/profile-edit"); 
+      return res.status(400).json( { error: "Username must contain at least one letter or number, and be between 3-15 characters long, and cannot be 'visitor'!" });
     }
     
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-      //req.flash("error", "Username already exists.");
-      //return res.redirect("/register"); 
-      return res.status(400).render("register", { error:"Username already exists"});
+      return res.status(400).json( { error:"Username already exists"});
     }
 
     const user = new User({ username, password });
@@ -356,13 +321,10 @@ app.post("/api/user", async (req, res) => {
     savedUser.userId = savedUser._id;
     await savedUser.save();
 
-    //req.flash("success", "Registration successful!"); // Flash success message
-    res.redirect("/success"); // Redirect to the login page with the success message
+    res.redirect("/success");
   } catch (error) {
     console.error(error);
-    //req.flash("error", "An error occurred while saving the user.");
-    //res.redirect("/register"); // Redirect to the registration page with the flash message
-    return res.status(505).render("register", { error: "An error occured, please try again" });
+    return res.status(505).json( { error: "An error occured, please try again" });
   }
 });
 
@@ -490,62 +452,79 @@ app.get("/profile/:username", async (req, res) => {
   }
 });
 
-app.patch("/api/user/:username", async (req, res) => {
+
+app.get("/editprofile", async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const user = await User.findById(userId);
+    console.log(user);
+    res.render("profile-edit", { user, error: null });
+  } catch (error) {
+    console.error(error);
+    res.status(500).render("fail", { error: "An error ocurred while fetching user information." });
+    //res.status(500).json({ error: "An error occurred while fetching user information." });
+  }
+});
+
+app.post("/editprofile", async (req, res) => {
   try {
     if (req.session.isLoggedIn) {
       const userID = req.session.userId;
-      let user = await User.findById(userID)
-      const username = req.params.username;
+      let user = await User.findById(userID);
+      //console.log("profile edit", user);
+      const username = user.username;
       const newUsername = req.body.username;
       let newPassword = req.body.password;
       const updateData = req.body;
       newPassword = newPassword.toString();
-      //const MIN_PASSWORD_LENGTH = 6; 
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}$/; 
-
-      //console.log(newPassword.length >= MIN_PASSWORD_LENGTH)
-      //console.log(passwordRegex.test(newPassword));
+      let testuser = await User.findOne({username: username});
+      if(user){
+        console.log("found user");
+      }
+      
+      
       if(newPassword !== "" && !passwordRegex.test(newPassword)){
-        console.log("asdad");
-        return res.status(400).render("profile-edit", { user, error: "Invalid Password!"});
+        console.log("invalid new password");
+        return res.status(400).json( {  error: "Passwod should be at least 6 characters long, and containing only alphanumeric characters"});
       }
       if (((newPassword !== "") && (req.body.password === req.body.repassword))) {
-        console.log("hi")
+        console.log("valid new password")
         updateData.password = newPassword;
       }else{
+        console.log("no new password")
         delete updateData.password;
+        delete updateData.repassword;
         req.session.expires = null;
       }
 
       let usernameRegex = /^(?=.{3,15}$)(?=.*[a-zA-Z0-9])[a-zA-Z0-9_-]*$/;
       if (!usernameRegex.test(newUsername) || newUsername.toLowerCase() === "visitor") {
-        return res.status(401).render("profile-edit", { user, error: "Username must contain at least one letter or number, and be between 3-15 characters long, and cannot be 'visitor!"});
+        return res.status(401).json( { error: "Username must contain at least one letter or number, and be between 3-15 characters long, and cannot be 'visitor!"});
       }
 
-      let aboutmeRegex = /^[a-zA-Z0-9\t\n\r\s]*(?![\x22\x27])/;
-      if (!aboutmeRegex.test(req.body.aboutme)) {
-        return res.status(402).render("profile-edit", { user, error: "About me cannot contain quotation marks!"});
-      }
-
-      user = await User.findOneAndUpdate({ username }, updateData, { new: true });
+      // let aboutmeRegex = /^[a-zA-Z0-9\t\n\r\s]*(?![\x22\x27])/;
+      // if (!aboutmeRegex.test(req.body.aboutme)) {
+      //   return res.status(402).json( { error: "About me cannot contain quotation marks!"});
+      // }
+      console.log(updateData);
+      user = await User.findOneAndUpdate({ username: username }, updateData, { new: true });
       await Post.updateMany({ author: username }, { author: newUsername });
       await Comment.updateMany({ author: username }, { author: newUsername });
 
       if (user) {
-        // User found and updated successfully
         return res.json(user);
         //return res.redirect("/profile");
       } else {
         // User not found, return appropriate response
-        //return res.status(404).json({ error: 'User not found' });
-        return res.status(404).render("profile-edit", { user, error: "User not found"});
+        return res.status(404).json( { error: "User not found"});
       }
     }else{
       res.redirect("/login");
     }
   } catch (error) {
     console.error(error);
-    //return res.status(500).json({ error: 'An error occurred while updating the profile' });
+    return res.status(500).json({ error: 'An error occurred while updating the profile' });
     let user = User.schema;
     return res.status(500).render("profile-edit", { user, error: "An error occurred while updating the profile"});
   }

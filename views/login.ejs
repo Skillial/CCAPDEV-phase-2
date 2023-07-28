@@ -20,7 +20,8 @@
 			<div class="login title">
 				Log In
 			</div>
-			<form class="form" method="POST" action="/login">
+		
+			<form class="form" id="login-form">
 				<label for="username">Username</label>
 				<input type="text" name="username" id="username" required>
 				<div class="space"></div>
@@ -31,13 +32,12 @@
 					<label for="remember">Remember Me</label>
 					<input type="checkbox" name="remember" id="remember">
 				</div>
-				<% if (error) { %>
-					<div class="error-message"><%= error %></div>
-				<% } %>
+				<div class="error-message" id="login_error"></div>
 				<div class="centered">
 					<input type="submit" value="Log In">	
 				</div>
 			</form>
+			<script src="/javascript/login.js" type="text/javascript"></script> 
 		</div>
     </body>
 </html>
