@@ -78,13 +78,12 @@ function dataURItoBlob(dataURI) {
 async function submitForm(formData, imageLink) {
     // Get the default image URL (old image URL) from the formData
     //const defaultImageURL = formData.get("photo");
-
     // If imageLink is null, the user didn't select a new image, so keep the old one (defaultImageURL)
     if (!imageLink) {
         console.log(currentPfpLink);
         imageLink = currentPfpLink;
     }
-    
+
     // Add the image link to the formData
     formData.append("photo", imageLink);
 
