@@ -514,9 +514,7 @@ app.post("/editprofile", async (req, res) => {
 
       if (user) {
         return res.json(user);
-        //return res.redirect("/profile");
       } else {
-        // User not found, return appropriate response
         return res.status(404).json( { error: "User not found"});
       }
     }else{
@@ -550,13 +548,10 @@ app.post("/api/post", async (req, res) => {
         createDate: new Date(), // Set createDate to the current date
       });
 
-      // Save the new post object to the database
       req.session.cachedNoUpdate = false;
       await newPost.save();
       res.redirect("/index");
     } else {
-      // Redirect to the login page if not logged in
-      // Also, display a message "you need to login first!"
       req.flash("error", "You need to login first!!");
       res.redirect("/login");
     }

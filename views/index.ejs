@@ -34,10 +34,8 @@
     <div class="content_list main" id="forum">
     <div class="headers">
         All Snaccs
-        <button class="newPost" id="newPostWrite">+ New Snacc</button>	
-        <!-- <a href="/newPost" class="newPost" id="newPostWrite">+New Snacc</a> -->
+        <button class="newPost" id="newPostWrite" data-is-loggedin="<%= isLoggedIn %>">+ New Snacc</button>
     </div>
-    
     <hr>
     <div class="filter">
         <table>
@@ -80,25 +78,22 @@
       alert("Please enter some content.");
       return false; // Prevent form submission
     }
-
-    // If the content is valid, you can proceed with form submission
     return true;
   }
 </script>
+    <% if (isLoggedIn) { %>
     <div id="newPostFormContainer">
         <h2>New Snacc</h2>
         <form id="postForm" method="POST" action="<%= '/api/post' %>" onsubmit="return validateForm();">
+          
             <label for="title">Title:</label>
             <input type="text" id="postTitle" name="title" required>
 			<div class="space"></div>
             <label for="content">Content:</label>
             <textarea id="postContent" name="content"></textarea>
-            <script>
-				
-			</script>
             <!-- <label for="content">Media:</label>
-				<input type="file" id="postMedia" name="media"> -->
-			<div class="space"></div>
+				    <input type="file" id="postMedia" name="media"> -->
+			      <div class="space"></div>
             <div class="flex">
                 <button class="newPostButtons" type="submit">Post</button>
                 <button class="newPostButtons" type="reset">Clear</button>
@@ -107,18 +102,16 @@
                 <button class="cancel" id="yCancelButton">Confirm Cancel</button>
                 <button class="cancel" id="nCancelButton">Deny Cancel</button>
             </div>
+            
           </form>
     </div>
-    <% if (isLoggedIn) { %>
-        <script src="./javascript/newSnacc.js"></script>
     <% } else { %>
-        <script>
-            function showAlert() {
-                alert("Please login first!");
-            }
-            document.getElementById("newPostWrite").addEventListener("click", showAlert);
-        </script>
-    <% } %>
+      <p id="loginMessage" style="display: none;">Please log in first to post!</p>
+      <button id="okButton" style="display: none;">OK</button>
+      <% } %>
+    
+    <script src="./javascript/newSnacc.js"></script>
+    
           
           <div id="forum">
             <% for (let i = 0; i < paginatedPosts.length; i++) { %>
