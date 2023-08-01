@@ -1,6 +1,5 @@
 // # Appdev Todo [Updated 11:30PM July 19)
 //    - input sanitization (sorta done?) and anti cross-site scripting (anti-hack stuff)
-//    - fix search
   
 //   ## Functionalities DONE FOR SURE
 //    - User: login, signup, logout, profile (updating, showing of posts)  
@@ -844,7 +843,7 @@ app.post('/api/react', async (req, res) => {
         }
         await newReact.save();
       }
-      
+      let updatedRatingCount;
       if(reactParentType == 'post'){
         // const positiveCount = await React.countDocuments({ parentPostID: parentId, voteValue: 1 });
         // const negativeCount = await React.countDocuments({ parentPostID: parentId, voteValue: -1 });
@@ -852,7 +851,7 @@ app.post('/api/react', async (req, res) => {
         
         const post = await Post.findById(parentId);
         let ratingCount = post.rating || 0;
-        let updatedRatingCount;
+        //let updatedRatingCount;
 
         if(oldReactValue && oldReactValue == -1){
           if(reactionValue == 0){
@@ -890,8 +889,7 @@ app.post('/api/react', async (req, res) => {
         // const ratingCount = positiveCount - negativeCount;
         const comment = await Comment.findById(parentId);
         let ratingCount = comment.rating || 0;
-        let updatedRatingCount;
-
+        //let updatedRatingCount;
         if(oldReactValue && oldReactValue == -1){
           if(reactionValue == 0){
             updatedRatingCount = ratingCount + 1;
@@ -914,8 +912,6 @@ app.post('/api/react', async (req, res) => {
             updatedRatingCount = ratingCount - 1;
           }
         }
-
-        
         await Comment.findOneAndUpdate(
           { _id: parentId, rating: ratingCount }, // Query: Find the post with the specific ratingCount
           { rating: updatedRatingCount }, // Update: Set the new rating count
@@ -925,7 +921,8 @@ app.post('/api/react', async (req, res) => {
       //await newReact.save();
       req.session.cachedPosts = []; 
       req.session.cachedNoUpdate = false;
-      res.json({ message: 'Reaction updated successfully' });
+      console.log(updatedRatingCount);
+      res.json({ message: 'Reaction updated successfully', newRatingValue: updatedRatingCount });
     } else{
       res.redirect("/login");
     }

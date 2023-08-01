@@ -13,9 +13,10 @@ $(document).on('click', '.dislike', function() {
 	} else {
 	  handleReact(postID, 'dislike', 'post'); // Run handleReact with 'dislike' action
 	}
-  });
+	
+});
   
-  $(document).on('click', '.like', function() {
+$(document).on('click', '.like', function() {
 	var reactionDiv = $(this).closest('.reactions');
 	var postID = reactionDiv.attr('id');
 	var isLiked = $(this).hasClass('like_colored'); // Check if the like button is already colored
@@ -30,7 +31,7 @@ $(document).on('click', '.dislike', function() {
 	} else {
 	  handleReact(postID, 'like', 'post'); // Run handleReact with 'like' action
 	}
-  });
+});
 
 $(document).on('click', '.comment_dislike', function() {
 	var reactionDiv = $(this).closest('.reactions');
@@ -65,6 +66,9 @@ $(document).on('click', '.comment_like', function() {
 	  }
 });
 
+
+
+
 function createReaction(reactions, preactValue, postID,checker,deleted) {
 	console.log(postID);
 	let reaction = document.createElement('div'),
@@ -85,6 +89,7 @@ function createReaction(reactions, preactValue, postID,checker,deleted) {
 		like.className = 'comment_like comment_like-hover';
 		dislike.className = 'comment_dislike comment_dislike-hover';
 	}
+	count.id = 'count-' + postID;
 	count.textContent = reactions;
 	if (preactValue == 1 && checker ==0) {
 		like.classList.toggle('like-hover');
@@ -146,8 +151,7 @@ function handleReact(postID, reactionType, parent) {
         reactionValue = 0; 
         break;
     }
- 
-    // Send an HTTP request to update the reaction on the server
+
 	let requestBody;
 	
 		requestBody = {
@@ -155,33 +159,26 @@ function handleReact(postID, reactionType, parent) {
 		reactionValue: reactionValue,
 		reactParentType: parent,
 		};
-	
-	// }else if(parent == 'comment'){}
-	// 	requestBody = {
-	// 	commentID: postID,
-	// 	reactionValue: reactionValue,
-	// 	reactParentType: parent,
-	// 	};
-	// }
   
-    fetch(`/api/react`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(requestBody)
-    })
-      .then(response => {
-        if (response.ok) {
-          // Handle successful reaction update
-        //   window.location.href = "/post/" + encodeURIComponent(ptitle);
-		window.location.reload();
-        } else {
-          throw new Error('Failed to update reaction');
-        }
-      })
-      .catch(error => {
-        console.error(error);
-        // Handle error
-      });
+		$.ajax({
+			url: '/api/react',
+			method: 'POST',
+			dataType: 'json',
+			contentType: 'application/json',
+			data: JSON.stringify(requestBody),
+			success: function (data) {
+				console.log("xdadas")
+			  // Handle successful reaction update
+			  // Assuming the response contains the updated rating data, you can now update the rating values on the page
+			  const newRatingValue = data.newRatingValue; // Replace 'newRatingValue' with the actual key in the response
+			  //console.log("new rating value:", newRatingValue);
+			  const ratingContainer = $('#count-' + postID);
+			  //console.log(ratingContainer);
+			  ratingContainer.text(newRatingValue);
+			},
+			error: function (error) {
+			  console.error('Failed to update reaction:', error);
+			  // Handle error
+			},
+		  });
   }
