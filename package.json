@@ -2,7 +2,6 @@
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cheerio": "^1.0.0-rc.12",
-    "cheerio-without-node-native": "^1.0.0-rc.2",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^5.0.0",
     "connect-mongodb-session": "^3.1.1",
@@ -10,12 +9,10 @@
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
     "ejs-async": "^0.0.1",
-    "escape-string-regexp": "^5.0.0",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "handlebars": "^4.7.7",
     "he": "^1.2.0",
-    "lodash.escaperegexp": "^4.1.2",
     "method-override": "^3.0.0",
     "mongoose": "^7.3.2",
     "nodemon": "^3.0.1"
@@ -26,7 +23,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-	"dev": "nodemon index"
+    "dev": "nodemon index"
   },
   "author": "",
   "license": "ISC"
