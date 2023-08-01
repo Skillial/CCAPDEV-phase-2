@@ -81,7 +81,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
     span.appendChild(pfp);
     let header_title = document.createElement('p');
     header_title.id="header_title";
-    header_title.textContent=ptitle+" ";
+    header_title.innerText=ptitle+" ";
     headers.appendChild(header_title);
     headers.appendChild(span);
      topic.appendChild(headers);
@@ -191,6 +191,8 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
           let newcomment = tinymce.get('comment_text_area_id').getContent();
           if (newcomment==''){
             alert("Please enter some content.");
+          }else if(newcomment.includes("&lt;script&gt;") || newcomment.includes("&lt;/script&gt;")){
+            alert("This comment is invalid.");
           }else{
             border.removeChild(comment_text_area);
             border.removeChild(cancel_save_wrap);
@@ -269,8 +271,16 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
       
         comment_save.onclick = function() {
           var newDescription = tinymce.get('post_img_content').getContent();
+          var newTitle = header_title.innerText;
+          console.log(newTitle);
           if (newDescription==''){
             alert('Edited post cannot be empty, Delete it instead!');
+          }else if(newDescription.includes("&lt;script&gt;") || newDescription.includes("&lt;/script&gt;")){
+            alert("This comment is invalid.");
+          }else if(newTitle.includes("&lt;script&gt;") || newTitle.includes("&lt;/script&gt;")){
+            alert("This title is invalid.");
+          }else if(newTitle.includes("<script>") || newTitle.includes("</script>")){
+            alert("This title is invalid.");
           }else{
           comment_edit.style.display='';
           comment_save.style.display = 'none';
@@ -281,7 +291,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
           
           // Save the content of post_img and header_title to variables
 
-          var newTitle = header_title.innerHTML;
+          
           handleEditPost(postID,newTitle,newDescription);
         };
       }
@@ -506,10 +516,13 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
             }
         }
         comment_text_area_save.onclick=function(){
+          console.log("hi");
             let newcomment = tinymce.get('comment_text_area_id').getContent();
             console.log(newcomment);
             if (newcomment==''){
               alert("Please enter some content.");
+            }else if(newcomment.includes("&lt;script&gt;") || newcomment.includes("&lt;/script&gt;")){
+              alert("This comment is invalid.");
             }else{
             comment_wrapping.removeChild(comment_text_area);
             comment_wrapping.removeChild(cancel_save_wrap);
@@ -601,7 +614,9 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
           var newCommentContent = tinymce.get(desc.id).getContent();
           if (newCommentContent==''){
               alert('Edited post cannot be empty, Delete it instead!');
-          } else{        
+          } else if(newCommentContent.includes("&lt;script&gt;") || newCommentContent.includes("&lt;/script&gt;")){
+            alert("This comment is invalid.");
+          }else{        
             comment_save.style.display = 'none';
             comment_edit.style.display='';
             desc.contentEditable = false;

@@ -71,12 +71,23 @@
     
     // Get the content of the editor
     const content = editor.getContent();
-
+    const newTitle = document.querySelector('#postTitle').value;
+    // console.log(newTitle);
     // Check if the content is empty or null
+    if(newTitle.includes("&lt;script&gt;") || newTitle.includes("&lt;/script&gt;")){
+      alert("This title is invalid.");
+      return false;
+    }else if(newTitle.includes("\<script\>") || newTitle.includes("\</script\>")){
+      alert("This title is invalid.");
+      return false;
+    }
     if (!content || content.trim() === "") {
       // Display an error message or handle the validation as per your requirements
       alert("Please enter some content.");
       return false; // Prevent form submission
+    } else if (content.includes("&lt;script&gt;") || content.includes("&lt;/script&gt;") || content.includes("\<script\>") || content.includes("\</script\>")){
+      alert("This comment is invalid ");
+      return false;
     }
     return true;
   }
