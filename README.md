@@ -5,7 +5,7 @@ Dy, Sealtiel
 Lu, Bentley
 Ong, Camron
 
-Link to the render website: https://snaccoverflow.onrender.com/index
+Link to the render website: https://snaccoverflow.onrender.com/index (may take a little to initially load)
 
 Running locally:
 Please do run an `npm i` before running `node index.js` or `nodemon index.js` (if you have nodemon).
