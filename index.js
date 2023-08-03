@@ -244,6 +244,11 @@ app.get("/fail", (req, res) =>{
   res.render("fail", {error: null})
 })
 
+app.get("/about", (req, res)=>{
+  res.render("about")
+})
+
+
 app.use(express.urlencoded({ extended: true }));
 
 

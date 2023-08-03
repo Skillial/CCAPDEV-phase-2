@@ -125,10 +125,21 @@ function createNavbar(isLoggedIn) {
     search_bar.appendChild(search_choices_div);
     
 
-    var login_button = document.createElement('div'),
+    var about_button = document.createElement('div'),
+        login_button = document.createElement('div'),
         sign_up_button = document.createElement('div');
         logout_button = document.createElement('div');
         profile_button = document.createElement('div');
+
+    about_button.textContent = 'About';
+    about_button.className = 'navbar-button';
+    about_button.className = 'navbar-button';
+    about_button.onclick = function() {
+      window.location.href = "/about";
+    };
+
+    
+
 
     login_button.textContent = 'Log In';
     login_button.className = 'navbar-button';
@@ -164,6 +175,7 @@ function createNavbar(isLoggedIn) {
     navbar.className = 'navbar';
 
     left_div.appendChild(home);
+    right_div.appendChild(about_button);
     right_div.appendChild(login_button);
     right_div.appendChild(sign_up_button);
     right_div.appendChild(profile_button);
