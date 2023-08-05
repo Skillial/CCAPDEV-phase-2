@@ -29,14 +29,13 @@ router.post("/login", async (req, res) => {
   
         req.session.isLoggedIn = true;
         req.session.userId = user._id;
-        if(remember) {
-          console.log(remember);
-          req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 21; // 21 days
-        }else{
-          console.log(remember);
-          req.session.cookie.maxAge = 24 * 60 * 60 * 1000 * 2;  //2 days
-  
+        if (!remember) {
+          console.log("no remember!");
+          //req.expires = false;
+          //req.session.expires=false;
+          req.session.cookie.expires = false;
         }
+        req.session.rememberMe = remember;
         res.redirect("/profile");
       }
       else{
@@ -100,5 +99,30 @@ router.post("/login", async (req, res) => {
       return res.status(505).json( { error: "An error occured, please try again" });
     }
   });
+
+
+
+// Server-side route to clear the session
+router.post("/clear-session", (req, res) => {
+  try {
+    // Clear the session (destroy the session)
+    req.session.destroy((error) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to clear the session." });
+      } else {
+        res.sendStatus(200);
+        console.log("Session destroyed.")
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error." });
+  }
+});
+
+
+
+
 
 module.exports = router;  

@@ -24,6 +24,7 @@ routesUserRegisterAndLogin
 
 const { isLoggedInMiddleware } = require('./lib/middleware');
 const { userIDMiddleware } = require('./lib/middleware');
+const { rememberMeMiddleware } = require('./lib/middleware');
 const { hashPassword } = require('./lib/hashing');
 const express = require('express');
 const session = require('express-session');
@@ -31,11 +32,24 @@ const bodyParser = require('body-parser')
 const ejs = require('ejs-async');
 const cors = require('cors');
 const he = require("he");
-const MongoStore = require('connect-mongodb-session')(session);
+//const MongoStore = require('connect-mongodb-session')(session);
+const mongoose = require('mongoose');
+const MongoStore = require('connect-mongodb-session')(session, mongoose);
+//const MongoStore = require('connect-mongo');
+//const MongoStore = require('express-mongoose-store')(session, mongoose);
 const cheerio = require('cheerio');
 const router = express.Router();
 
 const app = express();
+
+app.use(cors());
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
+app.set("view engine", "ejs")
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const mongoOptions = {
   useNewUrlParser: true,
@@ -43,7 +57,10 @@ const mongoOptions = {
 };
 const store = new MongoStore({
   uri: link,
+  databaseName: 'SnaccOverflow',
   collection: 'sessions',
+  ttl: 21*24*60*60,
+  autoRemove: 'native',
 });
 
 //Set the TTL index on the sessions collection
@@ -53,32 +70,23 @@ const store = new MongoStore({
 //     .collection('sessions')
 //     .createIndex({ expires: 1000 }, { expireAfterSeconds: 0 });
 // });
-app.use(cors());
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(express.json())
-app.use(express.urlencoded({extended: true}))
-app.set("view engine", "ejs")
-app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(session({
-  name: process.env.SesNAME,
+  //name: process.env.SesNAME,
+  key: 'user._id',
   secret: process.env.SesSECRET,
   resave: false,
   saveUninitialized: true,
-  store: store,
+  rolling: true,
   cookie: {
-    maxAge: 24 * 60 * 60 * 1000 * 2, //2 days 
-    httpOnly: true,
-    secure: false, 
-    // set to true in production if using HTTPS
+    maxAge: 1000 * 60 * 60 * 24 * 21,
   },
+  store: store,
 }));
 const methodOverride = require('method-override');
 app.use(methodOverride('_method'));
 
 
-const mongoose = require('mongoose');
 mongoose.connect(link)
     .then(()=>console.log('Connected to server!'))
     .catch((error) => console.error('Connection error:', error));
@@ -94,6 +102,7 @@ const React = require('./models/React')
 
 app.use(isLoggedInMiddleware);
 app.use(userIDMiddleware);
+app.use(rememberMeMiddleware);
 
 
 
@@ -215,6 +224,7 @@ app.get("/success", (req, res)=>{
 app.get("/login", (req, res)=>{
   if(req.session.isLoggedIn){
     req.session.cachedNoUpdate = false;
+    console.log(req.expires);
     res.redirect("/profile");
   }else{
   return res.render("login")
@@ -264,3 +274,5 @@ app.use(routesPost);
 app.use(routesComment);
 app.use(routesReact);
 app.use(routesSearch);
+
+
