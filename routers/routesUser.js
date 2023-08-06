@@ -151,12 +151,15 @@ router.post("/editprofile", async (req, res) => {
         const updateData = req.body;
         newPassword = newPassword.toString();
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}$/; 
-        let testuser = await User.findOne({username: username});
-        if(user){
-          console.log("found user");
+        if(username === newUsername){
+          delete updateData.username;
+        }else{
+          let tempUser = await User.findOne({username: newUsername})
+            if(tempUser){
+              return res.status(300).json({error: "Username has already been taken. Choose a different username."})
+            }
         }
-        
-        
+ 
         if(newPassword !== "" && !passwordRegex.test(newPassword)){
           console.log("invalid new password");
           return res.status(400).json( {  error: "Passwod should be at least 6 characters long, and containing only alphanumeric characters"});
