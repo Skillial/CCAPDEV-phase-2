@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 let oldContent;
+=======
+>>>>>>> parent of 58cf5bc (added ajax for comments)
 function initializeTinyMCE() {
   tinymce.init({
     selector: '#comment_text_area_id',

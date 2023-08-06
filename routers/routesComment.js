@@ -40,24 +40,7 @@ router.post("/api/comment", async (req, res) => {
   
         // Save the new comment object to the database
         await newComment.save();
-        console.log("YES!");
-        let data = {
-            pauthor: newComment.author,
-            ppfp: user.photo,
-            pdesc: content, 
-            pcount: 0,
-            pid: newComment._id,
-            user: user,
-            parentID: newComment.parentPostID,
-            isLoggedIn: true, 
-            preactValue: 0,
-            createDate: currentDate,
-            editDate: '',
-            parentCommentID: newComment.parentCommentID,
-        }
-        console.log(data.parentID);
-        res.json({ message: 'Comment posted successfully', data });
-        //res.redirect(`/post/${encodeURIComponent(masterPost._id)}`);
+        res.redirect(`/post/${encodeURIComponent(masterPost._id)}`);
       } else {
         // Redirect to the login page if not logged in
         // Also, display a message "you need to login first!"
@@ -101,7 +84,7 @@ router.patch("/api/comment/:id", async (req, res) => {
   
       // Save the updated post in the database
       await comment.save();
-      
+  
       res.json({ message: "Comment updated successfully", comment });
     } catch (error) {
       console.error(error);

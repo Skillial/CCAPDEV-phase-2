@@ -80,7 +80,6 @@ app.use(session({
   rolling: true,
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 21,
-    //expires: false,
   },
   store: store,
 }));
