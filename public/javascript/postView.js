@@ -1,31 +1,51 @@
-
+let oldContent;
+let oldTitle;
 function initializeTinyMCE() {
   tinymce.init({
     selector: '#comment_text_area_id',
     menubar: 'edit   format',
-    statusbar: false});  
+    statusbar: false,
     // Add your TinyMCE configuration options here if needed
-   
+    setup: function (editor) {
+      editor.on('init', function () {
+        oldContent = editor.getContent();
+        console.log(oldContent);
+      });
+    }
+  });
 }
 
-function initializeTinyMCEedit(){
+function initializeTinyMCEedit() {
   tinymce.init({
     selector: '#post_img_content',
     menubar: 'edit format',
-    statusbar: false
+    statusbar: false,
     // Add your TinyMCE configuration options here if needed
+    setup: function (editor) {
+      editor.on('init', function () {
+        oldContent = editor.getContent();
+        console.log(oldContent);
+      });
+    }
   });
 }
 
 
-function initializeTinyMCEeditReply(pid){
+function initializeTinyMCEeditReply(pid) {
   tinymce.init({
-    selector: '#'+pid,
+    selector: '#' + pid,
     menubar: 'edit format',
-    statusbar: false
+    statusbar: false,
     // Add your TinyMCE configuration options here if needed
+    setup: function (editor) {
+      editor.on('init', function () {
+        oldContent = editor.getContent();
+        console.log(oldContent);
+      });
+    }
   });
 }
+
 function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prating,pmedia, preactValue, isCurrUserTheAuthor,isLoggedIn) {
     let 
     // content_list = document.createElement('div'),
@@ -83,6 +103,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
     let header_title = document.createElement('p');
     header_title.id="header_title";
     header_title.innerText=ptitle+" ";
+    oldTitle=ptitle+" ";
     headers.appendChild(header_title);
     headers.appendChild(span);
      topic.appendChild(headers);
@@ -124,6 +145,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
 
           let header_remove = document.querySelector('#header_title');
           header_remove.style.border = 'none';
+          header_remove.textContent=oldTitle;
           let edit_add = document.querySelectorAll('#comment_edit_id');
           edit_add.forEach(edit =>{
             edit.style.display='';
@@ -136,6 +158,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
             if (tinymce.editors.hasOwnProperty(editorId)) {
               const editor = tinymce.editors[editorId];
               // Remove the editor instance
+              editor.setContent(oldContent);
               tinymce.remove(editor);
             }
           }
@@ -172,6 +195,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
             border.removeChild(comment_text_area);
             let header_remove = document.querySelector('#header_title');
           header_remove.style.border = 'none';
+          header_remove.textContent=oldTitle;
           let edit_add = document.querySelectorAll('#comment_edit_id');
           edit_add.forEach(edit =>{
             edit.style.display='';
@@ -180,13 +204,14 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
           share_remove.forEach(share =>{
             share.style.display='none';
           });
-            for (const editorId in tinymce.editors) {
-              if (tinymce.editors.hasOwnProperty(editorId)) {
-                const editor = tinymce.editors[editorId];
-                // Remove the editor instance
-                tinymce.remove(editor);
-              }
+          for (const editorId in tinymce.editors) {
+            if (tinymce.editors.hasOwnProperty(editorId)) {
+              const editor = tinymce.editors[editorId];
+              // Remove the editor instance
+              editor.setContent(oldContent);
+              tinymce.remove(editor);
             }
+          }
         }
         comment_text_area_save.onclick=function(){
           let newcomment = tinymce.get('comment_text_area_id').getContent();
@@ -226,6 +251,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
         });
         let header_remove = document.querySelector('#header_title');
           header_remove.style.border = 'none';
+          header_remove.textContent=oldTitle;
           let edit_add = document.querySelectorAll('#comment_edit_id');
           edit_add.forEach(edit =>{
             edit.style.display='';
@@ -234,13 +260,14 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
           share_remove.forEach(share =>{
             share.style.display='none';
           });
-        for (const editorId in tinymce.editors) {
-          if (tinymce.editors.hasOwnProperty(editorId)) {
-            const editor = tinymce.editors[editorId];
-            // Remove the editor instance
-            tinymce.remove(editor);
+          for (const editorId in tinymce.editors) {
+            if (tinymce.editors.hasOwnProperty(editorId)) {
+              const editor = tinymce.editors[editorId];
+              // Remove the editor instance
+              editor.setContent(oldContent);
+              tinymce.remove(editor);
+            }
           }
-        }
       let commentSaves = document.querySelectorAll('.cancel_save_wrap');
       // Remove each comment save element from its parent "comment_wrapping" div
       commentSaves.forEach(commentSave => {
@@ -288,11 +315,21 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
           post_img.style.border = 'none';
           header_title.contentEditable = false;
           header_title.style.border = 'none';
-          
+          oldTitle=newTitle;
           // Save the content of post_img and header_title to variables
 
           
           handleEditPost(postID,newTitle,newDescription);
+          var editDate = Date.now();
+          editedSpan.textContent=new Date(editDate).toLocaleString();
+          for (const editorId in tinymce.editors) {
+            if (tinymce.editors.hasOwnProperty(editorId)) {
+              const editor = tinymce.editors[editorId];
+              // Remove the editor instance
+              // editor.setContent(oldContent);
+              tinymce.remove(editor);
+            }
+          }
         };
       }
       };
@@ -449,6 +486,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
         });
         let header_remove = document.querySelector('#header_title');
           header_remove.style.border = 'none';
+          header_remove.textContent=oldTitle;
           let edit_add = document.querySelectorAll('#comment_edit_id');
           edit_add.forEach(edit =>{
             edit.style.display='';
@@ -457,13 +495,14 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
           share_remove.forEach(share =>{
             share.style.display='none';
           });
-        for (const editorId in tinymce.editors) {
-          if (tinymce.editors.hasOwnProperty(editorId)) {
-            const editor = tinymce.editors[editorId];
-            // Remove the editor instance
-            tinymce.remove(editor);
+          for (const editorId in tinymce.editors) {
+            if (tinymce.editors.hasOwnProperty(editorId)) {
+              const editor = tinymce.editors[editorId];
+              // Remove the editor instance
+              editor.setContent(oldContent);
+              tinymce.remove(editor);
+            }
           }
-        }
         let commentSaves = document.querySelectorAll('.cancel_save_wrap');
         // Remove each comment save element from its parent "comment_wrapping" div
         commentSaves.forEach(commentSave => {
@@ -500,6 +539,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
             comment_wrapping.removeChild(comment_text_area);
             let header_remove = document.querySelector('#header_title');
           header_remove.style.border = 'none';
+          header_remove.textContent=oldTitle;
           let edit_add = document.querySelectorAll('#comment_edit_id');
           edit_add.forEach(edit =>{
             edit.style.display='';
@@ -508,13 +548,14 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
           share_remove.forEach(share =>{
             share.style.display='none';
           });
-            for (const editorId in tinymce.editors) {
-              if (tinymce.editors.hasOwnProperty(editorId)) {
-                const editor = tinymce.editors[editorId];
-                // Remove the editor instance
-                tinymce.remove(editor);
-              }
+          for (const editorId in tinymce.editors) {
+            if (tinymce.editors.hasOwnProperty(editorId)) {
+              const editor = tinymce.editors[editorId];
+              // Remove the editor instance
+              editor.setContent(oldContent);
+              tinymce.remove(editor);
             }
+          }
         }
         comment_text_area_save.onclick=function(){
           console.log("hi");
@@ -570,6 +611,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
         });
         let header_remove = document.querySelector('#header_title');
           header_remove.style.border = 'none';
+          header_remove.textContent=oldTitle;
           let edit_add = document.querySelectorAll('#comment_edit_id');
           edit_add.forEach(edit =>{
             edit.style.display='';
@@ -578,13 +620,14 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
           share_remove.forEach(share =>{
             share.style.display='none';
           });
-        for (const editorId in tinymce.editors) {
-          if (tinymce.editors.hasOwnProperty(editorId)) {
-            const editor = tinymce.editors[editorId];
-            // Remove the editor instance
-            tinymce.remove(editor);
+          for (const editorId in tinymce.editors) {
+            if (tinymce.editors.hasOwnProperty(editorId)) {
+              const editor = tinymce.editors[editorId];
+              // Remove the editor instance
+              editor.setContent(oldContent);
+              tinymce.remove(editor);
+            }
           }
-        }
       let commentSaves = document.querySelectorAll('.cancel_save_wrap');
       // Remove each comment save element from its parent "comment_wrapping" div
       commentSaves.forEach(commentSave => {
@@ -616,6 +659,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
         // comment_content_desc.appendChild(comment_edited);
         comment_save.onclick=function(){
           var newCommentContent = tinymce.get(desc.id).getContent();
+          // console.log("here"+newCommentContent);
           if (newCommentContent==''){
               alert('Edited post cannot be empty, Delete it instead!');
           } else if(newCommentContent.includes("&lt;script&gt;") || newCommentContent.includes("&lt;/script&gt;")){
@@ -629,6 +673,7 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
               if (tinymce.editors.hasOwnProperty(editorId)) {
                 const editor = tinymce.editors[editorId];
                 // Remove the editor instance
+                // editor.setContent(oldContent);
                 tinymce.remove(editor);
               }
             }
@@ -844,6 +889,7 @@ function handleReply(postID,replyContent,parentID,checker) {
             if (tinymce.editors.hasOwnProperty(editorId)) {
               const editor = tinymce.editors[editorId];
               // Remove the editor instance
+              editor.setContent(oldContent);
               tinymce.remove(editor);
             }
           }
@@ -909,12 +955,13 @@ function handleEditComment(commentID, newContent) {
         .then(response => {
           if (response.ok) {
             for (const editorId in tinymce.editors) {
-              if (tinymce.editors.hasOwnProperty(editorId)) {
-                const editor = tinymce.editors[editorId];
-                // Remove the editor instance
-                tinymce.remove(editor);
-              }
+            if (tinymce.editors.hasOwnProperty(editorId)) {
+              const editor = tinymce.editors[editorId];
+              // Remove the editor instance
+              editor.setContent(oldContent);
+              tinymce.remove(editor);
             }
+          }
             //return true;
             let date = Date.now();
             
@@ -983,7 +1030,7 @@ function handleEditPost(postID, newTitle,newDescription) {
             // Reload the page to see the updated post details
             //const encodedTitle = encodeURIComponent(newTitle); // Assuming newTitle is the updated title
             //window.location.replace(`/post/${encodedTitle}`);
-            window.location.reload();
+            // window.location.reload();
           } else {
             throw new Error('Failed to update post');
           }
