@@ -1,50 +1,29 @@
-<<<<<<< HEAD
-let oldContent;
-=======
->>>>>>> parent of 58cf5bc (added ajax for comments)
+
 function initializeTinyMCE() {
   tinymce.init({
     selector: '#comment_text_area_id',
     menubar: 'edit   format',
-    statusbar: false,
+    statusbar: false});  
     // Add your TinyMCE configuration options here if needed
-    setup: function (editor) {
-      editor.on('init', function () {
-        oldContent = editor.getContent();
-        console.log(oldContent);
-      });
-    }
-  });
+   
 }
 
-function initializeTinyMCEedit() {
+function initializeTinyMCEedit(){
   tinymce.init({
     selector: '#post_img_content',
     menubar: 'edit format',
-    statusbar: false,
+    statusbar: false
     // Add your TinyMCE configuration options here if needed
-    setup: function (editor) {
-      editor.on('init', function () {
-        oldContent = editor.getContent();
-        console.log(oldContent);
-      });
-    }
   });
 }
 
 
-function initializeTinyMCEeditReply(pid) {
+function initializeTinyMCEeditReply(pid){
   tinymce.init({
-    selector: '#' + pid,
+    selector: '#'+pid,
     menubar: 'edit format',
-    statusbar: false,
+    statusbar: false
     // Add your TinyMCE configuration options here if needed
-    setup: function (editor) {
-      editor.on('init', function () {
-        oldContent = editor.getContent();
-        console.log(oldContent);
-      });
-    }
   });
 }
 function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prating,pmedia, preactValue, isCurrUserTheAuthor,isLoggedIn) {
@@ -157,7 +136,6 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
             if (tinymce.editors.hasOwnProperty(editorId)) {
               const editor = tinymce.editors[editorId];
               // Remove the editor instance
-              editor.setContent(oldContent);
               tinymce.remove(editor);
             }
           }
@@ -202,14 +180,13 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
           share_remove.forEach(share =>{
             share.style.display='none';
           });
-          for (const editorId in tinymce.editors) {
-            if (tinymce.editors.hasOwnProperty(editorId)) {
-              const editor = tinymce.editors[editorId];
-              // Remove the editor instance
-              editor.setContent(oldContent);
-              tinymce.remove(editor);
+            for (const editorId in tinymce.editors) {
+              if (tinymce.editors.hasOwnProperty(editorId)) {
+                const editor = tinymce.editors[editorId];
+                // Remove the editor instance
+                tinymce.remove(editor);
+              }
             }
-          }
         }
         comment_text_area_save.onclick=function(){
           let newcomment = tinymce.get('comment_text_area_id').getContent();
@@ -220,7 +197,6 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
           }else{
             border.removeChild(comment_text_area);
             border.removeChild(cancel_save_wrap);
-            // border.append(postreply(userID,"",newcomment,0,postID+1)); //change to currently logged in
             handleReply(postID,newcomment,'a',0);
           }
         }
@@ -258,14 +234,13 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
           share_remove.forEach(share =>{
             share.style.display='none';
           });
-          for (const editorId in tinymce.editors) {
-            if (tinymce.editors.hasOwnProperty(editorId)) {
-              const editor = tinymce.editors[editorId];
-              // Remove the editor instance
-              editor.setContent(oldContent);
-              tinymce.remove(editor);
-            }
+        for (const editorId in tinymce.editors) {
+          if (tinymce.editors.hasOwnProperty(editorId)) {
+            const editor = tinymce.editors[editorId];
+            // Remove the editor instance
+            tinymce.remove(editor);
           }
+        }
       let commentSaves = document.querySelectorAll('.cancel_save_wrap');
       // Remove each comment save element from its parent "comment_wrapping" div
       commentSaves.forEach(commentSave => {
@@ -392,6 +367,7 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
 
 // new reply / new comment
 function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preactValue,createDate,editDate){
+  console.log("Received arguments:", pauthor, ppfp, pdesc, pcount, pid, user, parentID, isLoggedIn, preactValue, createDate, editDate);
     let 
     comment_align = document.createElement('div'),
     comment_forum = document.createElement('div'),
@@ -481,14 +457,13 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
           share_remove.forEach(share =>{
             share.style.display='none';
           });
-          for (const editorId in tinymce.editors) {
-            if (tinymce.editors.hasOwnProperty(editorId)) {
-              const editor = tinymce.editors[editorId];
-              // Remove the editor instance
-              editor.setContent(oldContent);
-              tinymce.remove(editor);
-            }
+        for (const editorId in tinymce.editors) {
+          if (tinymce.editors.hasOwnProperty(editorId)) {
+            const editor = tinymce.editors[editorId];
+            // Remove the editor instance
+            tinymce.remove(editor);
           }
+        }
         let commentSaves = document.querySelectorAll('.cancel_save_wrap');
         // Remove each comment save element from its parent "comment_wrapping" div
         commentSaves.forEach(commentSave => {
@@ -533,14 +508,13 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
           share_remove.forEach(share =>{
             share.style.display='none';
           });
-          for (const editorId in tinymce.editors) {
-            if (tinymce.editors.hasOwnProperty(editorId)) {
-              const editor = tinymce.editors[editorId];
-              // Remove the editor instance
-              editor.setContent(oldContent);
-              tinymce.remove(editor);
+            for (const editorId in tinymce.editors) {
+              if (tinymce.editors.hasOwnProperty(editorId)) {
+                const editor = tinymce.editors[editorId];
+                // Remove the editor instance
+                tinymce.remove(editor);
+              }
             }
-          }
         }
         comment_text_area_save.onclick=function(){
           console.log("hi");
@@ -553,7 +527,6 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
             }else{
             comment_wrapping.removeChild(comment_text_area);
             comment_wrapping.removeChild(cancel_save_wrap);
-            // comment_align.append(postreply("poop bandit","../sample users/poop bandit.jpg",newcomment,0,pid+1));
             handleReply(pid,newcomment,parentID,1);
             }
         }
@@ -579,6 +552,10 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
         // desc.textContent="Deleted";
         // count.textContent="Deleted";
         handleDeleteComment(pid);
+        
+
+
+
     };
     comment_edit.onclick = function() {
       let textAreas = document.querySelectorAll('.comment_text_area');
@@ -601,14 +578,13 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
           share_remove.forEach(share =>{
             share.style.display='none';
           });
-          for (const editorId in tinymce.editors) {
-            if (tinymce.editors.hasOwnProperty(editorId)) {
-              const editor = tinymce.editors[editorId];
-              // Remove the editor instance
-              editor.setContent(oldContent);
-              tinymce.remove(editor);
-            }
+        for (const editorId in tinymce.editors) {
+          if (tinymce.editors.hasOwnProperty(editorId)) {
+            const editor = tinymce.editors[editorId];
+            // Remove the editor instance
+            tinymce.remove(editor);
           }
+        }
       let commentSaves = document.querySelectorAll('.cancel_save_wrap');
       // Remove each comment save element from its parent "comment_wrapping" div
       commentSaves.forEach(commentSave => {
@@ -653,12 +629,25 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
               if (tinymce.editors.hasOwnProperty(editorId)) {
                 const editor = tinymce.editors[editorId];
                 // Remove the editor instance
-                editor.setContent(oldContent);
                 tinymce.remove(editor);
               }
             }
             // desc.style.border = 'none'; 
+            //let isEdited = false;
             handleEditComment(pid, newCommentContent ); 
+            // console.log(editDate);
+            
+            if(editDate !==''){
+              dates.removeChild(edited);
+              dates.removeChild(editedSpan);
+            }
+              edited = document.createElement('p');
+              edited.textContent= "Edited ";
+              dates.appendChild(edited);
+              editedSpan = document.createElement('span');
+              editDate = Date.now();
+              editedSpan.textContent=new Date(editDate).toLocaleString();
+              dates.appendChild(editedSpan);
         }
       }
 
@@ -676,12 +665,14 @@ function postreply(pauthor,ppfp,pdesc,pcount,pid,user,parentID,isLoggedIn,preact
     postedSpan.textContent=new Date(createDate).toLocaleString();;
     dates.appendChild(postedSpan);
     }
+    let edited;
+    let editedSpan;
     if (editDate !== '') {
       console.log(editDate);
-        let edited = document.createElement('p');
+        edited = document.createElement('p');
         edited.textContent= "Edited ";
         dates.appendChild(edited);
-        let editedSpan = document.createElement('span');
+        editedSpan = document.createElement('span');
         editedSpan.textContent=new Date(editDate).toLocaleString();
         dates.appendChild(editedSpan);
     }
@@ -819,6 +810,8 @@ function profilePost(pauthor,ppfp,pdesc,pcount,pid,phtml){
 }
 
 function handleReply(postID,replyContent,parentID,checker) {
+  //const mongoose = require('mongoose');
+
     if (replyContent) {
       // Send an HTTP request to your server to save the reply
       var requestBody;
@@ -843,15 +836,28 @@ function handleReply(postID,replyContent,parentID,checker) {
         },
         body: JSON.stringify(requestBody)
       })
-        .then(response => {
-          if (response.ok) {
-            // Handle successful reply creation
-            // Reload or update the comments section if needed
-            //window.location.href = "/post/" + encodeURIComponent(pid);
-            window.location.reload();
-          } else {
-            throw new Error('Failed to create reply');
+        .then(response => response.json()) // Parse the response JSON
+        .then(data => {
+          // Handle successful reply creation
+          console.log(data); // Log the response data for debugging purposes
+          for (const editorId in tinymce.editors) {
+            if (tinymce.editors.hasOwnProperty(editorId)) {
+              const editor = tinymce.editors[editorId];
+              // Remove the editor instance
+              tinymce.remove(editor);
+            }
           }
+          const commentData = data.data; // Access the nested comment data object
+          let border;
+          if(commentData.parentCommentID){
+            border= '#' + commentData.parentCommentID;
+          }else{
+            border= document.querySelector('.border');
+          }
+          let commentElement = postreply(commentData.pauthor, commentData.ppfp, commentData.pdesc, 0, commentData.pid, 
+                                commentData.user.username, commentData.parentID, commentData.isLoggedIn, 0, commentData.createDate, '');
+          $(border).append(commentElement);
+          console.log("commented successfuly!");
         })
         .catch(error => {
           console.error(error);
@@ -859,9 +865,77 @@ function handleReply(postID,replyContent,parentID,checker) {
         });
     }
   }
+function handleDeleteComment(commentID) {
+    // Show a confirmation dialog before deleting the commenttastatas
+    if (confirm('Are you sure you want to delete this comment?')) {
+      // Send an HTTP request to your server to update the commentt data
+      fetch(`/api/comment/${commentID}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ isDeleted: true })
+      })
+        .then(response => {
+          if (response.ok) {
+            window.location.reload();
+          } else {
+            throw new Error('Failed to delete the comment');
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          // Handle error
+        });
+    }
+}
+  
+function handleEditComment(commentID, newContent) {
+    // const newContent = prompt('Edit your comment content:', currentContent);
+  
+    if (newContent !== null) {
+      // Send an HTTP request to update the post on the server
+      const requestBody = {
+        content: newContent
+      };
+  
+      fetch(`/api/comment/${commentID}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      })
+        .then(response => {
+          if (response.ok) {
+            for (const editorId in tinymce.editors) {
+              if (tinymce.editors.hasOwnProperty(editorId)) {
+                const editor = tinymce.editors[editorId];
+                // Remove the editor instance
+                tinymce.remove(editor);
+              }
+            }
+            //return true;
+            let date = Date.now();
+            
+            let comment_dates; //why the fuck is it named like this
 
 
-  function handleDeletePost(postID) {
+
+
+          } else {
+            throw new Error('Failed to update comment');
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          // Handle error
+        });
+    }
+}
+
+
+function handleDeletePost(postID) {
     // Show a confirmation dialog before deleting the post
     if (confirm('Are you sure you want to delete this post?')) {
       // Send an HTTP request to your server to update the post data
@@ -887,7 +961,7 @@ function handleReply(postID,replyContent,parentID,checker) {
     }
   }
 
-  function handleEditPost(postID, newTitle,newDescription) {
+function handleEditPost(postID, newTitle,newDescription) {
   
     if (newTitle !== null || newDescription !== null) {
       // Send an HTTP request to update the post on the server
@@ -921,57 +995,4 @@ function handleReply(postID,replyContent,parentID,checker) {
     }
   }
 
-  function handleDeleteComment(commentID) {
-    // Show a confirmation dialog before deleting the commenttastatas
-    if (confirm('Are you sure you want to delete this comment?')) {
-      // Send an HTTP request to your server to update the commentt data
-      fetch(`/api/comment/${commentID}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ isDeleted: true })
-      })
-        .then(response => {
-          if (response.ok) {
-            window.location.reload();
-          } else {
-            throw new Error('Failed to delete the comment');
-          }
-        })
-        .catch(error => {
-          console.error(error);
-          // Handle error
-        });
-    }
-  }
   
-  function handleEditComment(commentID, newContent) {
-    // const newContent = prompt('Edit your comment content:', currentContent);
-  
-    if (newContent !== null) {
-      // Send an HTTP request to update the post on the server
-      const requestBody = {
-        content: newContent
-      };
-  
-      fetch(`/api/comment/${commentID}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
-      })
-        .then(response => {
-          if (response.ok) {
-            window.location.reload();
-          } else {
-            throw new Error('Failed to update comment');
-          }
-        })
-        .catch(error => {
-          console.error(error);
-          // Handle error
-        });
-    }
-  }
