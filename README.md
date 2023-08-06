@@ -1,4 +1,4 @@
-# MCO3 Specs 2 (Forum)
+# MCO2 Specs 2 (Forum)
 Grp Members:
 Cabrera, Jean
 Dy, Sealtiel
@@ -26,12 +26,12 @@ Format: <Username> - <Password>
 - Note also that when creating an account (or editing account information):
  - Usernames must only contain alphanumeric characters.
  - Passwords should be 6 characters long, containing at least one uppercase, lowercase, and number in it.
- - MCO3 note: these passwords "should" still be the same. (Honestly, the writer does not remember anymore)
+
 
 Some additional notes:
- - Caching is implemented in the /index route. It's set to expire every minute and should be refreshing (chache deleted) when new posts/reacts are made, and when reacts are changed (vote up to down, etc). Post edits by other users (ie, user A is logged in, user B edits a post) will not make user A's cache expire automatically.
- - AJAX has been implemented.
- - Profile pictures should now more consistently work in non-chrome browsers.
+ - Caching is implemented in the /index route. It's set to expire every minute, and should be refreshing when new posts/reacts are made, and when reacts are changed (vote up to down, etc). Post edits by other users (ie, user A is logged in, user B edits a post) will not make user A's cache expire automatically.
+ - AJAX was also implemented for reactions in the newest version of this project.
+ - PROFILE PICTURES WILL ONLY 100% WORK IN GOOGLE CHROME. 
 
 ## --End of README--
 
