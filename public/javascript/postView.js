@@ -330,6 +330,21 @@ function posthtml(postID, pauthor,ptitle,ppfp,pdesc,ppostedDate,peditedDate,prat
               tinymce.remove(editor);
             }
           }
+          if (peditedDate == '- Not Edited') {
+            info.removeChild(buttons);
+            edited = document.createElement('p');
+            edited.textContent= "Edited ";
+            info.appendChild(edited);
+            editedSpan = document.createElement('span');
+            peditedDate = Date.now();
+            editedSpan.textContent=new Date(editDate).toLocaleString();
+            info.appendChild(editedSpan);
+            info.appendChild(buttons);
+          } else{
+            editedSpan.textContent=new Date(editDate).toLocaleString();
+          }
+      
+          
         };
       }
       };
